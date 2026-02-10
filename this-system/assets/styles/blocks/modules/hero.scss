@@ -1,0 +1,386 @@
+.m-hero
+{
+  .aside
+  form
+  {
+    background-color: var(--bs-body-bg);
+    border-radius: 1.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
+    padding: 1.5rem 1rem;
+
+    fieldset {
+      color: var(--bs-body-color);;
+    }
+  }
+
+  .content,
+  .footer {
+    padding-top: 1.313rem;
+  }
+}
+
+/* hero-default */
+.hero-default {
+  padding: 1rem;
+
+  .main {
+    display: flex;
+    align-items: center;
+  }
+
+  .footer {
+    display
+    : flex;
+    justify-content: start;
+
+    .row {
+      align-items: center;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  h1 {
+    font-size: 2.813rem;
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  .lead {
+    font-size: 0.938rem;
+  }
+
+  .aside {
+    padding: 0;
+
+    section {
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .aside {
+      margin-left: 8.33333%;
+    }
+  }
+}
+/* hero-default */
+
+
+/* hero-fullpage */
+.hero_fullpage
+{
+  width: 100%;
+  position: relative;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+
+  article
+  {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    position: relative;
+
+    h1 {
+      color: #fff;
+      font-weight: 700;
+      font-size: 120px;
+      text-transform: uppercase;
+      text-align: center;
+
+      @media (max-width: 991.98px) {
+        font-size: 50px;
+      }
+    }
+
+    h2 {
+      font-size: 20px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #fff;
+      text-align: center;
+
+      span {
+        position: relative;
+
+        &:before,
+        &:after {
+          position: absolute;
+          top: 50%;
+          content: '';
+          width: 30px;
+          height: 1px;
+          background: #fff;
+        }
+
+        &:before {
+          left: -45px;
+        }
+
+        &:after {
+          right: -45px;
+        }
+      }
+    }
+
+    .bread {
+      font-weight: 100;
+      color: #000000;
+      font-size: 40px;
+      font-family: "Lato", Arial, sans-serif;
+      letter-spacing: 3px;
+    }
+
+    .btn-primary {
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 30px;
+
+      &:hover,
+      &:focus {
+        background: #fff !important;
+        color: #000000;
+      }
+    }
+  }
+
+  .mouse {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8em;
+    z-index: 99;
+  }
+
+  .mouse-icon {
+    width: 60px;
+    height: 60px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+
+    .mouse-wheel {
+      height: 30px;
+      margin: 2px auto 0;
+      display: block;
+      width: 30px;
+      background: transparent;
+      border-radius: 50%;
+      animation: wheel-up-down 1.6s ease infinite;
+      color: #000000;
+      font-size: 20px;
+    }
+  }
+
+  @keyframes wheel-up-down {
+    0% {
+      margin-top: 2px;
+      opacity: 1;
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      margin-top: 20px;
+      opacity: 0;
+    }
+  }
+}
+/* hero-fullpage */
+
+
+/* hero-blur */
+.hero-blur
+{
+  /*border: 1px solid #dee2e6;*/
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  background-color: #ffffff85;
+  backdrop-filter: blur(5px);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+
+  .main {
+    display: flex;
+    align-items: center;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: start;
+
+    .row {
+      align-items: center;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  h1 {
+    font-size: 2.813rem;
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  .lead {
+    font-size: 0.938rem;
+  }
+
+  .aside {
+    padding: 0;
+
+    section {
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .aside {
+      margin-left: 8.33333%;
+    }
+  }
+}
+/* hero-blur */
+
+
+/* hero-box */
+.hero-box {
+  border: 1px solid #dee2e6;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+
+  .main {
+    padding: 1rem;
+
+    @media (min-width: 992px) {
+      padding: 3rem;
+      padding-top: 1rem;
+    }
+  }
+
+  .content {
+    display: flex;
+    justify-content: start;
+
+    .row {}
+
+    .row .col-lg-7 {
+      padding: 1.25rem 1.875rem;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  h3 {
+    font-size: 1.563rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .lead {
+    font-size: 0.938rem;
+  }
+
+  .aside {
+    padding: 0;
+
+    section {
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+  }
+
+  @media (min-width: 992px) {
+    .aside {
+      margin-left: 8.33333%;
+    }
+  }
+}
+/* hero-box */
+
+/* hero-vertical */
+.hero-vertical {
+  margin: 3rem 0;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+
+  .main {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .content {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+
+    .row {
+      align-items: center;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  h1 {
+    font-size: 2.813rem;
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  .lead {
+    font-size: 0.938rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .aside {
+    padding: 0;
+
+    img {
+      max-height: 30vh;
+      width: -webkit-fill-available;
+      max-width: fit-content;
+    }
+
+    section {
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+  }
+}
+/* hero-vertical */

@@ -1,0 +1,32 @@
+# Protect sensitive files
+<FilesMatch "(^\.git|\.gitignore$|.*\.env$|composer\.(json|lock)$|package\.json$|yarn\.lock$|webpack\.config\.js$|vite\.config\.js$|rollup\.config\.js$|.*\.sql$|.*\.log$)">
+    Require all denied
+</FilesMatch>
+
+# Prevents directory listing
+Options -Indexes
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Redirect to HTTPS (optional – remove if not using SSL)
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Allows static files directly
+RewriteRule \.(jpg|jpeg|png|gif|webp|svg|css|js|woff2?|ttf|eot|ico|robots\.txt|sitemap\.xml)$ - [L]
+
+# Redirect all requests to index.php if they are not existing files or directories
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+
+# PHP Settings
+php_flag display_errors Off
+php_flag display_startup_errors Off
+php_value upload_max_filesize 500M
+php_value post_max_size 500M
+php_value memory_limit 200M
+php_value max_execution_time 60
+php_value max_file_uploads 20

@@ -1,0 +1,79 @@
+.module {
+  position: relative;
+  padding: 2rem 1.5rem;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  // z-index: 1;
+
+  &.content-admin {
+    padding: 0.75rem 1.25rem;
+  }
+
+  &.content-admin .modules {
+    padding: 0.75rem 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+}
+
+.m-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.m-header
+{
+  margin-bottom: 3rem !important;
+
+  .pre-title {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: .75rem;
+
+    @include media-breakpoint-down(sm) {
+      font-size: .75rem;
+    }
+  }
+
+  .title {
+    font-size: 2.313rem;
+    font-weight: 700;
+
+    @include media-breakpoint-down(sm) {
+      font-size: 2rem;
+    }
+  }
+
+  p {
+    margin-top: 2.313rem;
+  }
+}
+
+.m-link, .m-link:hover {
+  font-weight: 700;
+  // text-transform: uppercase; // commented out as per your original CSS
+}
+
+.m-listing,
+.m-footer {
+  display: flex;
+  margin-top: 1rem;
+}
+
+//.m-footer {
+  .content-start {
+    justify-content: start;
+  }
+
+  .content-center {
+    justify-content: center;
+  }
+
+  .content-end {
+    justify-content: end;
+  }
+//}

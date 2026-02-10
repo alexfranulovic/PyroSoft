@@ -1,0 +1,130 @@
+.m-vertical-list
+{
+
+  // Knobs
+  $icon-size:    1.15rem; // a hair larger ajuda a perceber o “peso”
+  $icon-gap:     0.5rem;
+  $icon-stroke:  3.2;     // <<< AQUI: aumente para engrossar o traço (ex.: 3.2 → 4.5)
+
+  // Colors
+  $verified-color:     #16a34a;
+  $not-verified-color: #dc2626;
+
+  // Stroke-based SVGs (fill:none + stroke + stroke-width)
+  // Dica: aumentar $icon-stroke para “engrossar”.
+  $svg-check: "data:image/svg+xml;utf8,\
+	<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='#{$icon-stroke}' stroke-linecap='round' stroke-linejoin='round'>\
+	  <path d='M20 6 L9 17 L4 12'/>\
+	</svg>";
+
+  $svg-x: "data:image/svg+xml;utf8,\
+	<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='#{$icon-stroke}' stroke-linecap='round' stroke-linejoin='round'>\
+	  <path d='M18 6 L6 18 M6 6 L18 18'/>\
+	</svg>";
+
+  @mixin icon-bullet($svg-uri) {
+    position: relative;
+    padding-left: $icon-size + $icon-gap;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.35em; // levemente mais alto p/ stroke parecer centrado
+      width: $icon-size;
+      height: $icon-size;
+
+      // Color from text
+      background-color: currentColor;
+
+      // Mask icons so they herdar cor
+      -webkit-mask: url(#{$svg-uri}) no-repeat center / contain;
+              mask: url(#{$svg-uri}) no-repeat center / contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+  }
+
+  [type="verified-list"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+      margin: 0.35rem 0;
+      line-height: 1.35;
+
+      &::before { content: none; }
+
+      &.verified {
+        @include icon-bullet($svg-check);
+        &::before { background-color: $verified-color; }
+      }
+
+      &.not-verified {
+        @include icon-bullet($svg-x);
+        &::before { background-color: $not-verified-color; }
+      }
+    }
+  }
+
+
+  // SVGs com stroke (herdam cor via mask + currentColor)
+  // Cadeado fechado
+  $svg-locked: "data:image/svg+xml;utf8,\
+	<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='#{$icon-stroke}' stroke-linecap='round' stroke-linejoin='round'>\
+	  <path d='M7 10V7a5 5 0 0 1 10 0v3'/>\
+	  <rect x='5' y='10' width='14' height='10' rx='2' ry='2'/>\
+	</svg>";
+
+	// Cadeado aberto
+	$svg-unlocked: "data:image/svg+xml;utf8,\
+	<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='#{$icon-stroke}' stroke-linecap='round' stroke-linejoin='round'>\
+	  <path d='M17 10V7a5 5 0 0 0-10 0'/>\
+	  <rect x='5' y='10' width='14' height='10' rx='2' ry='2'/>\
+	</svg>";
+
+  @mixin icon-bullet($svg-uri) {
+    position: relative;
+    padding-left: $icon-size + $icon-gap;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.35em;
+      width: $icon-size;
+      height: $icon-size;
+      background-color: currentColor;
+
+      -webkit-mask: url(#{$svg-uri}) no-repeat center / contain;
+              mask: url(#{$svg-uri}) no-repeat center / contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+  }
+
+  // Nova lista: cadeados
+  [type="lock-list"] {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+      margin: 0.35rem 0;
+      line-height: 1.35;
+      &::before { content: none; }
+
+      &.unlocked {
+        @include icon-bullet($svg-unlocked);
+        &::before { background-color: $not-verified-color; }
+      }
+      &.locked {
+        @include icon-bullet($svg-locked);
+        &::before { background-color: $verified-color; }
+      }
+    }
+  }
+}

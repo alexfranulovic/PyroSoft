@@ -1,0 +1,17 @@
+.horizontal-list
+{
+  	display: flex;
+  	flex-wrap: nowrap;
+  	overflow-x: auto;
+
+  	.badge
+  	{
+  		margin-right: .5rem;
+  		width: auto;
+  		padding: .5rem 1rem;
+
+  		&:last-child {
+  			margin-right: 0;
+  		}
+  	}
+}

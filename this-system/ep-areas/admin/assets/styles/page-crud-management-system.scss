@@ -1,0 +1,234 @@
+/* Base */
+.box-fields { margin-bottom: 1.5rem; }
+
+/* piece-controls (máx. 2 níveis) */
+.box-fields.piece-controls .input-group { @extend .input-group-sm; }
+
+.box-fields.piece-controls .list-group { margin-top: 1rem; }
+
+.box-fields.piece-controls .list-group .piece {
+  display: flex !important;
+  border-radius: 0;
+  border: 1px solid var(--bs-border-color);
+  font-weight: 600;
+  font-size: .875rem !important;
+}
+
+.box-fields.piece-controls .list-group .piece button {
+  @extend .btn;
+  padding: .25rem .5rem !important;
+}
+.box-fields.piece-controls .list-group .piece button.control {
+  border-radius: 0;
+  border-right: 1px solid var(--bs-border-color);
+}
+.box-fields.piece-controls .list-group .piece button.crud-piece {
+  border-radius: 0;
+  width: 100%;
+}
+.box-fields.piece-controls .list-group .piece button div {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-left: .5rem !important;
+  margin-right: auto !important;
+  font-size: .75rem;
+  display: grid;
+}
+.box-fields.piece-controls .list-group .piece button .name { font-weight: 700; }
+.box-fields.piece-controls .list-group .piece button .type {
+  margin-left: .313rem;
+  font-weight: 400;
+  font-size: .7rem;
+  color: $gray-500;
+}
+
+/* card-body */
+.box-fields .card-body {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.box-fields .card-body .btn { padding-left: 1.5rem; padding-right: 1.5rem; }
+
+/* Escopo compartilhado (evita duplicação com :is) */
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .remove-confirm {
+  color: $danger;
+}
+
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .remove-confirm:after {
+  display: none !important;
+}
+
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .dropdown-menu {
+  border-radius: 1rem;
+  width: max-content;
+}
+
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .dropdown-menu .dropdown-item { text-align: left; }
+
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .dropdown-menu p {
+  font-size: .875rem;
+  font-weight: 600;
+  padding: .25rem .5rem;
+}
+
+:is(.template-crud-management, .template-page-management) #crud-piece-list .btn-group.remove .dropdown-menu [data-mode='delete'] {
+  background-color: $danger;
+  color: $white;
+}
+
+/* Modal list-group */
+:is(.template-crud-management, .template-page-management) .modal .list-group { margin-bottom: .625rem; }
+
+:is(.template-crud-management, .template-page-management) .modal .list-group button {
+  @extend .list-group-item;
+  @extend .list-group-item-action;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+:is(.template-crud-management, .template-page-management) .modal .list-group button .name { font-size: .8rem; }
+
+:is(.template-crud-management, .template-page-management) .modal .list-group button .type {
+  margin-left: .313rem;
+  font-weight: 400;
+  font-size: .7rem;
+  color: $gray-500;
+}
+
+/* Add more */
+:is(.template-crud-management, .template-page-management) .m-add-more h3 {
+  font-size: 2rem;
+  margin-top: 1rem;
+  font-weight: 400;
+}
+
+:is(.template-crud-management, .template-page-management) .m-add-more p {
+  padding-bottom: 1rem;
+  font-size: .688rem;
+}
+
+ // Row leve (mantém teu @extend se ainda quiser)
+:is(.template-crud-management, .template-page-management) .insert-crud-piece-form { @extend .row; }
+
+/* Fields list */
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list {
+  @extend .list-group;
+  @extend .list-group-numbered;
+  list-style: none;
+  max-height: 500px;
+  width: auto;
+}
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list button {
+  @extend .list-group-item;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list button div {
+  margin-left: .5rem !important;
+  margin-right: auto !important;
+  font-size: .75rem;
+  display: grid;
+}
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list button div span { font-size: .5rem; }
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list button .type {
+  margin-left: .313rem;
+  font-weight: 400;
+  font-size: .7rem;
+  color: $gray-500;
+}
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud #fields-from-table-crud-list button:before { content: "" !important; }
+
+/* Loading */
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud .loading-template {
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed var(--bs-border-color);
+  border-radius: 2rem;
+}
+
+:is(.template-crud-management, .template-page-management) #fields-from-table-crud .loading-template .spinner-border {
+  color: var(--bs-border-color);
+}
+
+/* Addable content */
+:is(.template-crud-management, .template-page-management) .addable-content { margin-top: 1.5rem; margin-bottom: 1rem; }
+
+:is(.template-crud-management, .template-page-management) .addable-content .header { display: flex; justify-content: space-between; margin-bottom: .5rem; }
+
+:is(.template-crud-management, .template-page-management) .addable-content h4 { font-weight: 300; }
+
+:is(.template-crud-management, .template-page-management) .addable-content .add-module-content {
+  @extend .btn-outline-primary;
+  @extend .btn-sm;
+}
+
+:is(.template-crud-management, .template-page-management) .addable-content hr { margin-top: 0; }
+
+:is(.template-crud-management, .template-page-management) .addable-content .draggable-column { @extend .accordion; }
+
+/* Edição */
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .draggable-column .depth-1 {
+  margin-left: 20px; background: #e6e6e6;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .draggable-column .depth-2 {
+  margin-left: 40px; background: #d9d9d9;
+}
+
+/* Options */
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options { margin-bottom: 2.5rem; }
+@media (max-width: #{breakpoint-max(md)}) {
+  :is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options {
+    overflow-y: auto; max-height: 300px; height: 300px;
+  }
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .options .dropdown { width: 100%; }
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options nav {
+  @extend .nav;
+  @extend .nav-tabs;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options nav button {
+  @extend .nav-link;
+  font-size: .875rem !important;
+  font-weight: bolder;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options h5 { margin-bottom: 0; }
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .tab-content article { @extend .fade; }
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .content-options { margin: .75rem 0; }
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .content-options div {
+  grid-template-columns: 50% 50%;
+  padding-right: .5rem;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .content-options div button {
+  @extend .btn;
+  border: 1px solid var(--bs-border-color) !important;
+  padding: 1rem 1.2rem !important;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .content-options div button .icon {
+  margin-bottom: .313rem; font-size: 1.5rem;
+}
+
+:is(.template-crud-management, .template-page-management) :is(#edit-fields, #edit-modules) .modal-body .options .content-options div button p {
+  font-size: .625rem; margin-top: 0;
+}

@@ -1,0 +1,19 @@
+User-agent: *
+Disallow: 
+#Disallow:/
+Disallow:
+Disallow: /cgi-bin/
+Disallow: /this-system/*
+#Disallow: /ep-areas/*
+Disallow: /ep-includes/*
+Disallow: /node_modules/p*
+Disallow: /config.php
+Disallow: /cron.php
+Disallow: /?*
+Disallow: /*?
+Disallow: /*.php$
+Disallow: /.env
+Allow: /uploads/
+Allow: /index.php
+
+#Sitemap: https://euphoriasystems.com.br/sitemap.xml

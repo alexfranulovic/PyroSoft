@@ -1,0 +1,97 @@
+.audio-player
+{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--bs-border-color);
+    padding: 10px 15px;
+    border-radius: $border-radius;
+    width: 100%;
+
+    &.template-player {
+        display: none;
+    }
+
+    .play-btn,
+    .pause-btn
+    {
+        @extend .btn;
+        @include extend-btn($nd-is-dark);
+        // color: #fff;
+        border: none;
+        font-size: 16px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+    }
+
+    .progress-bar
+    {
+        flex: 1;
+        height: 5px;
+        // background: #444;
+        background: #d7d7d7;
+        border-radius: 4px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+
+        .progress-fill
+        {
+            @include bg-($nd-is-dark);
+            height: 100%;
+            width: 0%;
+            pointer-events: none;
+            border-radius: 2rem;
+        }
+    }
+
+    .time {
+        font-size: 12px;
+        width: 40px;
+        text-align: right;
+    }
+
+    .btn-remove
+    {
+        position: absolute;
+        top: -5px;
+        right: 0;
+        background: $danger;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        font-size: .5rem;
+        text-align: center;
+        height: 20px;
+        width: 20px;
+        line-height: 0;
+        padding: .2rem;
+        cursor: pointer;
+        z-index: 10;
+    }
+}
+
+[data-bs-theme="dark"]
+{
+    .audio-player
+    {
+        .play-btn,
+        .pause-btn
+        {
+            @include extend-btn($st-is-dark);
+        }
+
+        .progress-bar
+        {
+            background: #444;
+
+            .progress-fill
+            {
+                @include bg-($st-is-dark);
+            }
+        }
+    }
+}

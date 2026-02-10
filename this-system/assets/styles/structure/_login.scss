@@ -1,0 +1,235 @@
+.template-login
+{
+  nav {
+    box-shadow: none;
+  }
+  body
+  {
+    background-image: $linear-gradient;
+    justify-content: center;
+    background-size: 200% 200% !important;
+    animation: rotate_gradient 12s ease-in-out infinite;
+  }
+
+  .card {
+    border: none;
+  }
+
+  .login-management
+  {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .main-content
+    {
+      justify-content: center;
+      width: 100%;
+
+      main {
+        padding: 0;
+      }
+
+      .card
+      {
+        //background-color: $light;
+        box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+
+        .card-body
+        {
+          padding-top: 2rem;
+          padding-bottom: 2rem;
+        }
+
+        .left-box
+        {
+          padding: 1.5rem;
+          align-items: center;
+          display: flex;
+          justify-content: center;
+
+          svg,
+          img
+          {
+            display: block;
+            margin: 0 auto;
+          }
+
+          h3
+          {
+            color: $st;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: .5rem;
+            text-align: center;
+          }
+
+          p
+          {
+            margin-top: .5rem;
+            text-align: center;
+            font-size: .875rem;
+          }
+
+          @include media-breakpoint-up(lg) {
+            border-right: 1px solid $th-light;
+          }
+        }
+
+      }
+    }
+  }
+}
+
+#login-modal,
+.template-login
+{
+  .main-footer-login,
+  .forgot-password,
+  {
+    margin-top: 1.2rem;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+
+    a {
+      text-align: center;
+    }
+  }
+}
+
+.social-logins
+{
+  gap: .75rem !important;
+
+  .from {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem !important;
+    border-radius: 2rem;
+    font-weight: 600;
+    height: 2.5rem;
+    padding: 0;
+    font-size: .75rem;
+    border: 1px solid var(--bs-border-color);
+    margin-bottom: .313rem;
+    color: var(--bs-body-color) !important;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .fa-google
+  {
+    @include bg-svg-google;
+
+    &:before {
+      content: '' !important;
+    }
+  }
+}
+
+#login-modal,
+.template-login .right-box
+{
+  padding: 1.5rem;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+
+  .division {
+    margin: 0;
+  }
+
+  .register {
+    font-weight: 600;
+    font-size: .875rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .row
+  {
+    &.justify-content-end
+    {
+      width: 100%;
+    }
+
+    > * {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  form
+  {
+    gap: 1rem !important;
+
+    div.col-12,
+    fieldset
+    {
+      &:not(:last-child)
+      {
+        margin-bottom: 1.2rem;
+      }
+    }
+  }
+
+  a.btn,
+  [type="submit"]
+  {
+    width: 100%;
+    padding-bottom: .313rem !important;
+    padding-top: .313rem !important;
+  }
+
+  .main-footer-login,
+  .forgot-password,
+  {
+    // margin-top: 1.2rem;
+    margin-top: 0;
+    display: flex;
+    justify-content: end;
+    text-align: center;
+
+    a {
+      font-size: .8rem;
+      text-align: center;
+    }
+  }
+
+  .social-media
+  {
+    margin-top: 1.2rem;
+  }
+}
+
+
+
+#login-modal
+{
+  padding: 0;
+  .content
+  {
+    padding-bottom: 2rem;
+    .title
+    {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 2rem;
+      display: block;
+      margin: 0;
+    }
+
+    .description {
+      font-weight: 500;
+      font-size: .875rem;
+    }
+  }
+}

@@ -1,0 +1,97 @@
+/**
+ * You can edit/delete everything.
+ * Your creativity rules!
+ */
+.template-home
+{
+  main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .easter-egg {
+    text-decoration: none;
+  }
+
+  .card
+  {
+    box-shadow: $basic-shadow;
+    display: flex;
+    background-color: rgba(var(--bs-body-color-rgb), .03) !important;
+
+    @include media-breakpoint-up(lg) {
+      flex-direction: row;
+    }
+  }
+
+  .card-body
+  {
+    padding: 1.5rem;
+    @include media-breakpoint-up(lg) {
+      padding: calc(.25rem * 20);
+    }
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: .5rem;
+  }
+
+  p {
+    color: $gray-600;
+    margin: 0;
+    margin-top: .313rem;
+    font-size: .875rem;
+  }
+
+  .icon {
+    font-size: unset;
+  }
+
+  .col-lg {
+    padding: 0;
+  }
+
+  .left-box
+  {
+    @include media-breakpoint-down(lg) {
+      order: 2;
+    }
+  }
+
+  .right-box {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .progress-step-label {
+    display: block !important;
+  }
+
+  .btn-st {
+    width: 100%;
+  }
+
+  small {
+    color: $gray-600;
+    font-size: .75rem;
+    width: 100%;
+    display: block;
+    margin-top: .875rem;
+    text-align: center;
+  }
+}
+
+[data-bs-theme="dark"]
+{
+  background-color: #000;
+}

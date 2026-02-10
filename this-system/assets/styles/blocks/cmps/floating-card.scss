@@ -1,0 +1,49 @@
+.floating-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  position: fixed;
+  z-index: 1026;
+  margin: 0.5rem;
+
+  &.fixed-top-start {
+    top: 0;
+    left: 0;
+  }
+
+  &.fixed-top-end {
+    top: 0;
+    right: 0;
+  }
+
+  &.fixed-center-start {
+    top: 30%;
+    left: 0;
+  }
+
+  &.fixed-center-end {
+    top: 30%;
+    right: 0;
+  }
+
+  &.fixed-bottom-start {
+    bottom: 0;
+    left: 0;
+  }
+
+  &.fixed-bottom-end {
+    bottom: 0;
+    right: 0;
+  }
+
+  .close {
+    z-index: 1027;
+    position: fixed;
+    top: 2%;
+    right: 5%;
+  }
+
+  article {
+    max-width: 18rem;
+  }
+}

@@ -1,0 +1,21 @@
+[status-button]
+{
+  box-shadow: none !important;
+
+  .badge
+  {
+    box-shadow: inset -1px -3px 7.8px 0 rgba(27, 27, 27, .25),
+      inset 1px 3px 8px 0 hsla(0, 0%, 100%, .2),
+      0 4px 8px -2px rgba(27, 27, 27, .14),
+      0 2px 4px -2px rgba(27, 27, 27, .1);
+  }
+
+}
+
+@each $name, $value in $theme-colors {
+  .text-bg-subtle-#{$name} {
+    color: var(--bs-#{$name}-text-emphasis) !important;
+    background-color: var(--bs-#{$name}-bg-subtle) !important;
+    border: var(--bs-border-width) solid var(--bs-#{$name}-border-subtle) !important;
+  }
+}

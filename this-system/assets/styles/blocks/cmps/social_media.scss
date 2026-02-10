@@ -1,0 +1,45 @@
+.social-media
+{
+  ul
+  {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+
+    li
+    {
+      margin-right: .625rem;
+
+      a
+      {
+        background-color: transparent;
+        color: $st;
+        border: 1px solid $st;
+        height: 2.875rem;
+        width: 2.875rem;
+        display: block;
+        float: left;
+        border-radius: 50%;
+        position: relative;
+        transition: .3s;
+
+        .icon
+        {
+          position: absolute;
+          font-size: 1.25rem;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        &:active,
+        &:hover {
+          background-color: $st;
+          color: $white;
+          transition: .3s;
+        }
+
+      }
+    }
+  }
+}

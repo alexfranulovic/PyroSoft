@@ -1,0 +1,141 @@
+footer
+{
+  $footer-color: $st;
+  $footer-color-dark: $st-dark;
+  $footer-color-text: $st-text;
+
+  background-image: linear-gradient(90deg, $footer-color 0%, $footer-color-dark 100%);
+  color: $footer-color-text;
+  margin-top: 0px;
+  font-size: 1rem;
+  padding: 2rem;
+
+  a {
+    color: $footer-color-text;
+  }
+
+  .social-media
+  {
+    li
+    {
+      a {
+        border: 0;
+        background: #79797933;
+        color: $footer-color-text;
+        height: 3.125rem;
+        width: 3.125rem;
+
+        .icon
+        {
+          position: absolute;
+          font-size: 1.625rem;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        &:focus,
+        &:hover {
+          color: $footer-color-text;
+          border: 1px solid $footer-color;
+          background-color: transparent;
+          border-color: $footer-color-text;
+          transform: scale(1.075);
+        }
+      }
+    }
+  }
+
+
+  @include media-breakpoint-down(md) {
+    padding: 1rem 1.5rem;
+  }
+
+  &.medium {
+    text-align: center;
+    font-size: .8rem;
+    padding: 1.5rem;
+  }
+
+  h3
+  {
+    font-weight: normal;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  .row
+  {
+    article
+    {
+      display: flex;
+
+      @include media-breakpoint-up(md) {
+        justify-content: center;
+      }
+
+      @include media-breakpoint-down(md) {
+        margin-bottom: 2.5rem;
+      }
+    }
+  }
+
+  ul
+  {
+    list-style: none;
+    padding-left: 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      font-size: .875rem;
+      margin-bottom: .5rem;
+
+      .icon {
+        margin-right: .5rem;
+        vertical-align: -.1em;
+      }
+    }
+  }
+
+  .developed-by {
+    text-align: center;
+    width: 100%;
+    font-size: .813rem;
+
+    @include media-breakpoint-up(md) {
+      margin-top: 2rem;
+    }
+  }
+}
+
+#about-system
+{
+  color: $white;
+  font-size: .688rem;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+
+  img {
+    padding-right: 1rem;
+  }
+
+  .copyright {
+    border-left: 1px solid #fff;
+    padding-left: 1rem;
+  }
+
+  a {
+    color: $white;
+  }
+
+  span {
+    line-height: 1.5;
+    display: block;
+    line-height: 130%;
+  }
+}

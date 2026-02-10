@@ -1,0 +1,117 @@
+.menu-management
+{
+	h3 {
+		&.title
+		{
+			font-size: 1.2rem;
+			font-weight: 700;
+			margin-bottom: 1rem;
+		}
+	}
+
+	.card-header
+	{
+		fieldset {
+			margin-bottom: 0;
+		}
+	}
+
+	.accordion-button {
+		font-size: .875rem;
+	}
+
+	.accordion-body {
+		padding: 1rem .5rem;
+	}
+
+	.instruction {
+		font-weight: 400;
+		font-size: .625rem;
+		margin-top: 0;
+		margin-bottom: .313rem;
+	}
+
+	#field-container-card {
+		display: block;
+		width: 100%;
+		padding: 1rem 0.75rem;
+
+		hr {
+			margin-top: 2em;
+		}
+
+		h4 {
+			margin-top: 1.2rem;
+		}
+	}
+
+	.main-form
+	{
+		h4 {
+			font-size: 1rem;
+    		font-weight: 600;
+    		margin-bottom: 1rem;
+		}
+
+		@include media-breakpoint-down(md) {
+			margin-top: 2.5rem !important;
+		}
+	}
+
+	#draggable-menu-items
+	{
+        list-style: none;
+        padding: 0;
+        width: 100%;
+
+	    .menu-item
+	    {
+	        @extend .card;
+	        position: relative;
+
+	        // padding: 10px;
+	        // margin: 5px 0;
+	        // cursor: pointer;
+	        // border: 1px solid #ddd;
+	        // display: flex;
+	        // justify-content: space-between;
+	        // align-items: center;
+
+		    &.active {
+		     	border: 1px solid black;
+		    }
+
+		    .remove-item {
+		        @extend .btn;
+		        @extend .btn-outline-danger;
+		        // background: red;
+		        // border: none;
+		        // color: white;
+		        // cursor: pointer;
+		        // padding: 3px 6px;
+		        // border-radius: 3px;
+		    }
+	    }
+
+	    .depth-1 {
+	        margin-left: 20px;
+	        background: #e6e6e6;
+	    }
+
+	    .depth-2 {
+	        margin-left: 40px;
+	        background: #d9d9d9;
+	    }
+
+	    .depth-3 {
+	        margin-left: 60px;
+	        background: #ccc;
+	    }
+
+	    .sortable-placeholder {
+	        border: 1px dashed #ccc;
+	        height: 40px;
+	        background: #fafafa;
+	    }
+    }
+}

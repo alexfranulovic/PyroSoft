@@ -1,0 +1,157 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.app-header {
+  /*background-image: linear-gradient(90deg, $st 0%, darken($st, 15) 100%);*/
+  left: 0;
+  padding: 1rem 0;
+  position: fixed;
+  right: 0;
+  z-index: 10;
+  box-shadow: 5px 5px 6px rgba(0, 0, 0, .2);
+}
+
+.app-main {
+  flex-grow: 1;
+  padding-top: 5.75rem;
+  position: relative;
+}
+
+.app-featured {
+  background-color: $light;
+}
+
+
+/* Footer estilo preto */
+.block-20 {
+  overflow: hidden;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 250px;
+  position: relative;
+  display: block; }
+
+
+.size-11 { font-size: .688rem !important; }
+.size-14 { font-size: .875rem !important; }
+.size-16 { font-size: 1rem !important; }
+.size-18 { font-size: 1.125rem !important; }
+.size-21 { font-size: 1.313rem !important; }
+.size-64 { font-size: 4rem !important; }
+/*Fim tamanho icone*/
+
+
+
+/*title*/
+.display-4 {
+  font-size: 2.5rem;
+}
+@media (min-width: 768px) {
+  .display-4 {
+    font-size: 3rem;
+  }
+}
+
+
+
+.cursor-move { cursor: move; }
+.cursor-pointer{ cursor: pointer; }
+
+.dragging { opacity: .5; }
+
+
+.rounded { border-radius: 1.25rem !important; }
+.rounded-top { border-radius: 1.25rem 1.25rem 0 0 !important; }
+
+
+
+
+
+
+.btn.btn-status-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.accordion-scroll-crud-menu {
+  overflow-y: auto;
+  height: auto;
+  max-height: 220px;
+}
+
+
+
+
+.heading-section {
+  position: relative;
+
+  .subheading {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-size: 30px;
+    font-weight: 400;
+    position: relative;
+    text-transform: none;
+    letter-spacing: 6px;
+
+    strong {
+      font-weight: 700;
+    }
+
+    @media (max-width: 767.98px) {
+      font-size: 28px;
+    }
+  }
+
+  &.heading-section-white {
+    .subheading {
+      color: rgba(255, 255, 255, .9);
+    }
+
+    h2 {
+      font-size: 30px;
+      color: #fff;
+
+      &:after, &:before {
+        display: none;
+      }
+    }
+
+    p {
+      color: rgba(255, 255, 255, .9);
+    }
+  }
+
+  .big {
+    position: absolute;
+    top: -60px;
+    font-size: 90px;
+    color: rgba(0, 0, 0, 15%);
+    font-weight: 900;
+
+    @media (max-width: 991.98px) {
+      display: none;
+    }
+  }
+}
+
+
+.error404 {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+
+  @media (min-width: 1500px) {
+    padding-top: 7.5rem;
+    padding-bottom: 7.5rem;
+  }
+}

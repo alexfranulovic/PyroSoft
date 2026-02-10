@@ -1,0 +1,121 @@
+@import 'bootstrap/scss/functions';
+
+/**
+ *
+ * Color Branding
+ *
+ */
+$st: #f6bb1b;
+$st-text: #121212;
+$st-is-dark: false;
+
+$nd: #C77A00;
+$nd-text: #121212;
+$nd-is-dark: false;
+
+$rd: #f8f8f8;
+$rd-text: #121212;
+$rd-is-dark: false;
+
+$th: #121212;
+$th-text: #f8f8f8;
+$th-is-dark: true;
+
+
+/**
+ *
+ * Helpers
+ *
+ */
+@import '../../../../assets/styles/_helpers.scss';
+
+
+/**
+ *
+ * Bootstrap overrides & variavles
+ *
+ */
+// Colors
+$primary: $st;
+$secondary: $nd;
+
+// Text
+$font-family-base: 'montserrat', sans-serif;
+$nd-font-family-base: 'montserrat', sans-serif;
+$font-weight-base: 500;
+
+// Generic
+$basic-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+$linear-gradient: linear-gradient(162deg, $st, $th-dark, $nd);
+
+
+/**
+ * Radius
+ */
+// Global
+$border-radius-100: .25rem;
+$border-radius-200: .5rem;
+$border-radius-300: .75rem;
+$border-radius-400: 1rem;
+$border-radius-500: 1.25rem;
+$border-radius-600: 1.5rem;
+$border-radius-700: 1.75rem;
+$border-radius-800: 2rem;
+
+$border-radius: .25rem;
+$border-radius-sm: .25rem;
+$border-radius-lg: .25rem;
+
+// Buttons
+$btn-border-radius: $border-radius-100;
+$btn-border-radius-sm: $border-radius-100;
+$btn-border-radius-lg: $border-radius-100;
+
+// Inputs
+$input-border-radius: $border-radius-200;
+$input-border-radius-sm: $border-radius-200;
+$input-border-radius-lg: $border-radius-200;
+
+// Cards
+$card-border-radius: $border-radius-800;
+$card-inner-border-radius: $border-radius-800;
+
+// Modals
+$modal-content-border-radius: $border-radius-400;
+$modal-header-border-radius: $border-radius-400;
+$modal-footer-border-radius: $border-radius-400;
+
+// Toasts
+$toast-border-radius: $border-radius-100;
+$toast-header-border-radius: $border-radius-100;
+
+// Tabs / Navs
+$nav-tabs-border-radius: $border-radius-400;
+$nav-pills-border-radius: $border-radius-400;
+$nav-link-border-radius: $border-radius-400;
+
+// Dropdowns
+$dropdown-border-radius: $border-radius-400;
+$dropdown-item-border-radius: $border-radius-400;
+
+
+@import 'bootstrap/scss/bootstrap';
+
+
+/**
+ *
+ * Global styles
+ *
+ */
+@import '../../../../assets/styles/structure/**/*.scss';
+@import '../../../../assets/styles/blocks/cmps/**/*.scss';
+@import '../../../../assets/styles/blocks/modules/**/*.scss';
+
+/**
+ *
+ * Area styles
+ *
+ */
+@import './nav.scss';
+@import './footer.scss';
+@import './pages.scss';

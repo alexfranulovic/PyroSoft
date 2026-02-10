@@ -1,0 +1,131 @@
+<script>
+(() => {
+  'use strict';
+
+  /**
+   * SAFE / ALLOW-LIST security layer
+   * - Avoids patching globals (console, Function, freeze, prototypes)
+   * - Keeps ONLY: shortcut blocking + devtools detection (reload)
+   * - Explicit allow-list for Tom Select DOM
+   */
+
+  const CFG = {
+    // Block DevTools shortcuts
+    blockShortcuts: true,
+    blockViewSource: true,
+
+    // DevTools detection via debugger timing
+    devtoolsIntervalMs: 900,
+    devtoolsPauseThresholdMs: 220,
+
+    // Reload strategy
+    onDevtoolsDetected: () => {
+      try { alert('⚠ Developer tools detected. Reloading for security.'); } catch (e) {}
+      location.replace(location.href);
+    },
+
+    // Allow-list selectors (do NOT interfere with these roots)
+    allowSelectors: [
+      // Tom Select common structures
+      '.ts-wrapper',
+      '.ts-control',
+      '.ts-dropdown',
+      '.ts-dropdown-content',
+      'input.tomselected',
+      'select.tomselected',
+      // Some builds/skins vary
+      '.tom-select',
+      '.tomselect',
+    ],
+  };
+
+  // -----------------------------
+  // Allow-list helpers
+  // -----------------------------
+  function isInsideAllowedArea(target) {
+    if (!target || target === window || target === document) return false;
+
+    const el = target.nodeType === 1 ? target : (target.parentElement || null);
+    if (!el || typeof el.closest !== 'function') return false;
+
+    for (const sel of CFG.allowSelectors) {
+      try {
+        if (el.closest(sel)) return true;
+      } catch (e) {}
+    }
+    return false;
+  }
+
+  function isEditableTarget(target) {
+    const el = target && target.nodeType === 1 ? target : null;
+    if (!el) return false;
+
+    const tag = (el.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+
+    if (el.isContentEditable) return true;
+    if (typeof el.closest === 'function' && el.closest('[contenteditable="true"]')) return true;
+
+    return false;
+  }
+
+  // -----------------------------
+  // 1) Block shortcuts (with allow-list)
+  // -----------------------------
+  if (CFG.blockShortcuts) {
+    window.addEventListener('keydown', (e) => {
+      // If event originated inside Tom Select (or allowed zones), do nothing.
+      // This prevents conflicts with search input, navigation, dropdown behavior.
+      if (isInsideAllowedArea(e.target)) return;
+
+      // Also avoid breaking normal typing UX
+      if (isEditableTarget(e.target)) return;
+
+      const key = (e.key || '').toLowerCase();
+      const code = e.keyCode || e.which;
+
+      const isF12        = code === 123;
+      const isCtrlShiftI = e.ctrlKey && e.shiftKey && key === 'i';
+      const isCtrlShiftJ = e.ctrlKey && e.shiftKey && key === 'j';
+      const isCtrlShiftC = e.ctrlKey && e.shiftKey && key === 'c';
+      const isCtrlU      = CFG.blockViewSource && e.ctrlKey && !e.shiftKey && key === 'u';
+
+      if (isF12 || isCtrlShiftI || isCtrlShiftJ || isCtrlShiftC || isCtrlU) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }, true);
+  }
+
+  // -----------------------------
+  // 2) DevTools detection (minimal, no globals patched)
+  // -----------------------------
+  let devtoolsTriggered = false;
+
+  function devtoolsTick() {
+    if (devtoolsTriggered) return;
+
+    console.clear();
+    console.warn("%c⚠ Atenção!", "color:red; font-size:22px; font-weight:bold;");
+    console.warn("%cPor segurança, comandos no console foram desativados.", "font-size:16px;");
+
+    // Optional: avoid running detection while user is actively interacting with Tom Select
+    // (prevents any edge-case timing hiccup during dropdown open / typing)
+    const active = document.activeElement;
+    if (active && isInsideAllowedArea(active)) return;
+
+    const start = performance.now();
+    debugger; // if DevTools open, may pause here
+    const end = performance.now();
+
+    if ((end - start) > CFG.devtoolsPauseThresholdMs) {
+      devtoolsTriggered = true;
+      CFG.onDevtoolsDetected();
+    }
+  }
+
+  setInterval(devtoolsTick, CFG.devtoolsIntervalMs);
+
+})();
+</script>

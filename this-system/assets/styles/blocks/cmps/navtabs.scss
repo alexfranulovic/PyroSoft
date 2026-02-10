@@ -1,0 +1,55 @@
+.navtabs
+{
+  &.navtabs_default { margin-bottom: 1rem; }
+  &.navtabs_folder { margin-bottom: 1.5rem; }
+  &.navtabs_underline { margin-bottom: 1rem; }
+
+  &.navtabs_default,
+  &.navtabs_folder,
+  &.navtabs_underline
+  {
+    nav
+    {
+      @extend .nav;
+      font-size: 14px;
+
+      &.nav-tabs   { @extend .nav-tabs; }
+      &.nav-underline { @extend .nav-underline; }
+
+      button { @extend .nav-link; }
+    }
+
+    .tab-content { padding-top: 1rem; }
+  }
+
+  &.navtabs_pills
+  {
+    ul {
+      @extend .nav;
+      @extend .nav-pills;
+
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-y: unset;
+      overflow-x: auto;
+      padding-bottom: .5rem;
+
+      li { @extend .nav-item; }
+    }
+
+    .tab-content { padding-top: .5rem; }
+  }
+}
+
+.navtabs_folder
+{
+  .tab-content {
+    padding: 1rem;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-top: 0;
+    border-bottom-right-radius: $border-radius;
+    border-bottom-left-radius: $border-radius;
+    // opcional: manter cantos suaves com tabs
+  }
+}

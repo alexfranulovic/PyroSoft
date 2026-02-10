@@ -1,0 +1,30 @@
+{
+    "name": "Site",
+    "description": "This is the PyroSoft app development area.",
+    "slug": "site",
+    "path": "app",
+    "url": "",
+    "branding": {
+        "navbar": {
+            "format": "full",
+            "style": "fixed"
+        },
+        "footer": {
+            "format": "full"
+        }
+    },
+    "allow_change_color_mode": false,
+    "theme_color": "light",
+    "form": {
+        "input_style": "basic"
+    },
+    "main_page": {
+        "title": "Installer page",
+        "url": "home",
+        "page_template": "home.php"
+    },
+    "seo": {
+        "never_map": true,
+        "robots": "noindex,nofollow"
+    }
+}

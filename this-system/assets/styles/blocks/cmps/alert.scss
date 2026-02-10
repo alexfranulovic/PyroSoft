@@ -1,0 +1,32 @@
+.alert
+{
+	@extend .alert-dismissible;
+
+	&.alert-disclaimer
+	{
+		background: transparent;
+		border-radius: 0.25rem;
+		border-left-width: 0.25rem;
+		border-top: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+		border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+		border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+		color: var(--bs-card-color);
+		padding: 1.25rem;
+    	margin-bottom: 1.25rem;
+	}
+
+	&.alert-disclaimer-colored
+	{
+		border-radius: 0.25rem;
+		border-left-width: 0.25rem;
+		border-top: 0!important;
+		border-right: 0!important;
+		border-bottom: 0!important;
+		padding: 1.25rem;
+    	margin-bottom: 1.25rem;
+	}
+
+	.content {
+		// display: flex;
+	}
+}

@@ -1,0 +1,21 @@
+{
+    "name": "Administrativo",
+    "description": "This is the basic administrative area option of PyroSoft.",
+    "slug": "ADM",
+    "url": "admin/",
+    "path": "admin",
+    "form": {
+        "input_style": "floating"
+    },
+    "allow_change_color_mode": true,
+    "theme_color": "dark",
+    "main_page": {
+        "title": "Início",
+        "url": "home",
+        "page_template": "admin.php"
+    },
+    "seo": {
+        "never_map": true,
+        "robots": "noindex,nofollow"
+    }
+}

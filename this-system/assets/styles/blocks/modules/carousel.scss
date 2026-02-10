@@ -1,0 +1,72 @@
+.carousel-hover {
+  transition: 0.2s;
+  filter: brightness(100%);
+  
+  &:hover {
+    transition: 0.2s;
+    filter: brightness(70%);
+  }
+}
+
+.carousel-button-pers {
+  background-color: #5a5a5a;
+  justify-content: center;
+  margin-top: auto;
+  margin-bottom: auto;
+
+  @media (min-width: 300px) {
+    height: 40%;
+    width: 10%;
+  }
+
+  @media (min-width: 992px) {
+    height: 30%;
+    width: 5%;
+  }
+}
+
+.carousel-indicators li {
+  display: block;
+}
+
+// .carousel-indicators {
+//   position: absolute;
+//   bottom: 10px;
+//   left: 50%;
+//   z-index: 15;
+//   width: 60%;
+//   padding-left: 0;
+//   margin-left: -30%;
+//   text-align: center;
+//   height: 12px !important;
+//   list-style: none;
+//   border: none;
+
+//   li {
+//     display: inline-block;
+//     width: 10px !important;
+//     height: 10px !important;
+//     margin: 1px;
+//     text-indent: -999px;
+//     margin-left: 10px;
+//     cursor: pointer;
+//     background-color: #000 \9;
+//     background-color: rgba(0, 0, 0, 0);
+//     border: 1px solid #fff;
+//     border-radius: 10px;
+//     box-shadow: 0 0 1em black;
+//     background-clip: unset !important;
+
+//     &.active {
+//       width: 12px !important;
+//       height: 12px !important;
+//       margin: 0;
+//       margin-left: 10px;
+//       background-color: #fff;
+//     }
+//   }
+// }
+
+.carousel-item.comment {
+  min-height: 400px;
+}

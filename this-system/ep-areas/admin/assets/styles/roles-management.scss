@@ -1,0 +1,29 @@
+.user-role-management
+{
+	.accordion-button {
+		font-size: .875rem;
+	}
+
+	.accordion-body {
+		padding: 1rem .5rem;
+	}
+
+	#container-card {
+		display: block;
+		width: 100%;
+		padding: 1rem 0.75rem;
+	}
+
+	.main-form
+	{
+		h4 {
+			font-size: 1rem;
+    		font-weight: 600;
+    		margin-bottom: 1rem;
+		}
+
+		@include media-breakpoint-down(md) {
+			margin-top: 2.5rem !important;
+		}
+	}
+}

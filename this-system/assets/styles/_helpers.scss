@@ -1,0 +1,102 @@
+@function choose-color($primary, $secondary, $is-dark) {
+  @return if($is-dark, $secondary, $primary);
+}
+
+@mixin extend-btn-outline($is-dark) {
+  @if $is-dark { @extend .btn-outline-nd; }
+  @else        { @extend .btn-outline-st; }
+}
+
+@mixin bg-($is-dark) {
+  @if $is-dark { @extend .bg-secondary; }
+  @else        { @extend .bg-primary; }
+}
+
+@mixin extend-btn($is-dark) {
+  @if $is-dark { @extend .btn-nd; }
+  @else        { @extend .btn-st; }
+}
+
+@function color-scale($color) {
+  @return (
+    100: mix(white, $color, 90%),
+    200: mix(white, $color, 75%),
+    300: mix(white, $color, 60%),
+    400: mix(white, $color, 45%),
+    500: $color,
+    600: mix(black, $color, 15%),
+    700: mix(black, $color, 30%),
+    800: mix(black, $color, 45%),
+    900: mix(black, $color, 60%),
+  );
+}
+
+$st-scale: color-scale($st);
+$nd-scale: color-scale($nd);
+$rd-scale: color-scale($rd);
+$th-scale: color-scale($th);
+
+// st
+$st-100: map-get($st-scale, 100);
+$st-200: map-get($st-scale, 200);
+$st-300: map-get($st-scale, 300);
+$st-400: map-get($st-scale, 400);
+$st-500: map-get($st-scale, 500);
+$st-600: map-get($st-scale, 600);
+$st-700: map-get($st-scale, 700);
+$st-800: map-get($st-scale, 800);
+$st-900: map-get($st-scale, 900);
+$st-dark: darken($st, 10%);
+$st-light: lighten($st, 10%);
+
+
+// nd
+$nd-100: map-get($nd-scale, 100);
+$nd-200: map-get($nd-scale, 200);
+$nd-300: map-get($nd-scale, 300);
+$nd-400: map-get($nd-scale, 400);
+$nd-500: map-get($nd-scale, 500);
+$nd-600: map-get($nd-scale, 600);
+$nd-700: map-get($nd-scale, 700);
+$nd-800: map-get($nd-scale, 800);
+$nd-900: map-get($nd-scale, 900);
+$nd-dark: darken($nd, 10%);
+$nd-light: lighten($nd, 10%);
+
+
+// rd
+$rd-100: map-get($rd-scale, 100);
+$rd-200: map-get($rd-scale, 200);
+$rd-300: map-get($rd-scale, 300);
+$rd-400: map-get($rd-scale, 400);
+$rd-500: map-get($rd-scale, 500);
+$rd-600: map-get($rd-scale, 600);
+$rd-700: map-get($rd-scale, 700);
+$rd-800: map-get($rd-scale, 800);
+$rd-900: map-get($rd-scale, 900);
+$rd-dark: darken($rd, 10%);
+$rd-light: lighten($rd, 10%);
+
+
+// th
+$th-100: map-get($th-scale, 100);
+$th-200: map-get($th-scale, 200);
+$th-300: map-get($th-scale, 300);
+$th-400: map-get($th-scale, 400);
+$th-500: map-get($th-scale, 500);
+$th-600: map-get($th-scale, 600);
+$th-700: map-get($th-scale, 700);
+$th-800: map-get($th-scale, 800);
+$th-900: map-get($th-scale, 900);
+$th-dark: darken($th, 10%);
+$th-light: lighten($th, 10%);
+
+$svg-google: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48' height='48'%3E%3Cg fill='none'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3Cpath fill='none' d='M0 0h48v48H0z'/%3E%3C/g%3E%3C/svg%3E");
+
+@mixin bg-svg-google {
+  background-image: $svg-google;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  width: 1rem;
+  height: 1rem;
+}

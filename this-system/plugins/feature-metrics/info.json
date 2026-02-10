@@ -1,0 +1,7 @@
+{
+    "name": "Feature metrics",
+    "description": "This plugin helps you to measure interesting/clicks/views about features that you have (or not yet).",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": "Alex"
+}

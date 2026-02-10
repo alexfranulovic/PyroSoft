@@ -1,0 +1,33 @@
+.division
+{
+  color: $th-light;
+  font-size: 0.875rem;
+  display: block;
+  font-weight: 500;
+  margin: 1rem 0;
+  position: relative;
+  text-align: center;
+
+  span
+  {
+    line-height: 1;
+    // background-color: $light;
+    background-color: var(--bs-body-bg);
+    display: inline-block;
+    padding: 0 0.5rem;
+    color: var(--bs-body-color);
+    position: relative;
+  }
+
+  &:before
+  {
+    // background-color: $th-light;
+    background-color: var(--bs-border-color);
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+  }
+}

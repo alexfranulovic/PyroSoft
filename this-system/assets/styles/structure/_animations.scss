@@ -1,0 +1,44 @@
+@keyframes rotate_gradient
+{
+  0% {
+    background-position: 0% 0%;
+  }
+  5% {
+    background-position: 4% 4%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  95% {
+    background-position: 4% 4%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes pulser
+{
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slide_right
+{
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+// carousel em movimento
+// https://blog.logto.io/css-only-infinite-scroll

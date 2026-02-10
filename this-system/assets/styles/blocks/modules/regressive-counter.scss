@@ -1,0 +1,34 @@
+.m-regressive-counter
+{
+  .row
+  {
+    .content
+    {
+      margin-left: 1rem;
+      margin-right: 1rem;
+      text-align: center;
+      width: unset;
+      max-width: none;
+
+      .number {
+        display: block;
+        text-align: center;
+        font-weight: 400;
+        font-size: 1.875rem;
+        line-height: 1;
+
+        @media (min-width: 992px) {
+          font-size: 2rem;
+        }
+      }
+
+      .title {
+        font-size: 0.875rem;
+
+        @media (min-width: 992px) {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}

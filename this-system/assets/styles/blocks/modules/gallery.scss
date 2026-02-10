@@ -1,0 +1,152 @@
+.m-gallery {
+
+    .gallery-timeline {
+
+        .title {
+            color: $st;
+        }
+
+        b {
+            color: $nd;
+        }
+
+        img {
+            width: 100%;
+            border-radius: $border-radius;
+            box-shadow: 5px 5px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer {
+            margin-top: 1.2em;
+        }
+
+        li::marker {
+            font-size: 1.2em;
+            color: $nd;
+        }
+
+        .colored-border-1 {
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-image: linear-gradient(to bottom, $st, $nd) 1 100%;
+            border-right: none;
+
+            @include media-breakpoint-down(lg) {
+                border-left: none;
+            }
+        }
+
+        .colored-border-2 {
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-image: linear-gradient(to bottom, $nd, $rd) 1 100%;
+            border-right: none;
+
+            @include media-breakpoint-down(lg) {
+                border-left: none;
+            }
+        }
+
+        .colored-border-3 {
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-image: linear-gradient(to bottom, $rd, $th) 1 100%;
+            border-right: none;
+
+            @include media-breakpoint-down(lg) {
+                border-left: none;
+            }
+        }
+
+        .colored-border-4 {
+            border-left-width: 4px;
+            border-left-style: solid;
+            border-image: linear-gradient(to bottom, $th, $st) 1 100%;
+            border-right: none;
+
+            @include media-breakpoint-down(lg) {
+                border-left: none;
+            }
+        }
+
+        .card-st,
+        .card-body-st {
+            background-color: $st;
+            color: $white;
+
+            .author {
+                font-size: 0.75rem;
+                margin-top: 2.5rem;
+            }
+        }
+
+        .comments {
+
+            .feedback {
+                font-style: italic;
+            }
+
+            .author {
+                color: $st;
+                font-weight: 600;
+                font-size: 0.75rem;
+            }
+
+            .position  {
+                margin-top: 0;
+                font-weight: 600;
+                font-size: 0.75rem;
+            }
+        }
+
+        .card {
+            padding: 1.5rem;
+            width: 100%;
+        }
+
+        .row {
+
+            .col-lg {
+                margin-bottom: 0;
+                display: flex;
+                align-items: center;
+
+                .entry {
+                    padding: 3rem;
+
+                    &.content {
+
+                        @include media-breakpoint-down(lg) {
+                            padding: 3rem 0 0 0;
+                        }
+                    }
+
+                    &.image-card {
+                        display: flex;
+                        align-items: center;
+
+                        @include media-breakpoint-down(lg) {
+                            padding: 3rem 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .gallery-default
+    {
+      img {
+        height: 100%;
+        min-width: 100%;
+        border-radius: $border-radius;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transition: .3s;
+
+        &:hover {
+          transition: .3s;
+          transform: scale(1.05);
+        }
+      }
+    }
+}

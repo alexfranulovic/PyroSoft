@@ -1,0 +1,7 @@
+{
+    "name": "SMTP Brevo API",
+    "description": "Using the Brevo provider youcan send e-mails for your clients.",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": ""
+}

@@ -1,0 +1,110 @@
+.m-comments
+{
+  .testimony-wrap {
+    display: block;
+    position: relative;
+
+    .user-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      position: relative;
+      margin: 0 auto;
+      margin-top: -75px;
+      background-size: cover;
+
+      .quote {
+        position: absolute;
+        bottom: -10px;
+        right: 0;
+        width: 40px;
+        height: 40px;
+        top: 67px;
+        background: #fff;
+        border-radius: 50%;
+
+        svg {
+          color: #999999;
+        }
+      }
+    }
+
+    .name {
+      font-weight: 400;
+      font-size: 18px;
+      margin-bottom: 0;
+      color: #000000;
+    }
+
+    .position {
+      font-weight: 300;
+      font-size: 14px;
+      color: #000000;
+    }
+  }
+}
+
+.author-info
+{
+  display: flex;
+
+  .img {
+    display: flex;
+    align-items: center;
+  }
+
+  img {
+    border-radius: 25rem;
+    box-shadow: 4px 4px 10px rgba(0,0,0,.2);
+    border: 2px solid #fff;
+  }
+
+  .info {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+
+    p {
+      margin-top: 0;
+    }
+
+    .name {
+      color: $st;
+    }
+
+    .position {
+    }
+
+    .social-media {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.comments-default
+{
+  margin-bottom: 1rem;
+
+  .card {
+    box-shadow: $basic-shadow;
+    height: 100%;
+  }
+
+  .feedback {
+    font-weight: 600;
+    font-style: italic;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .author-info {
+    padding-top: 1rem;
+  }
+
+}
