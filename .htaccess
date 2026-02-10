@@ -27,6 +27,7 @@ php_flag display_errors Off
 php_flag display_startup_errors Off
 php_value upload_max_filesize 500M
 php_value post_max_size 500M
+php_value max_input_vars 6000
 php_value memory_limit 200M
 php_value max_execution_time 60
 php_value max_file_uploads 20

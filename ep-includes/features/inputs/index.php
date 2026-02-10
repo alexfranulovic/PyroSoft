@@ -465,9 +465,10 @@ function input(string $type_input, string $type_form, $Attr = [])
     /**
      * Allow inputs without name only for specific structural types.
      */
-    if ($type_input != 'divider')
+    if ($type_input != 'divider' || $type_input != 'shortcode')
     {
-        if (empty($name) && $inputs[$type_input]['needs_name']) {
+        $needs_name = $inputs[$type_input]['needs_name'] ?? false;
+        if (empty($name) && $needs_name) {
             return "<p>You must apply a name to use this function.</p>";
         }
     }

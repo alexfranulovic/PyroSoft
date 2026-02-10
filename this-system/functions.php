@@ -15,11 +15,11 @@ if (!isset($seg)) exit;
  * Notes:
  * - Keys represent the physical table names in the database.
  * - Values are descriptive labels intended for UI/display purposes.
+ *
+ * Example:
+ * $tables['{TABLE-NAME}'] = '{FRIENDLY-TABLE-NAME}';
  */
 global $tables;
-
-$tables['patch_notes']       = 'Notas de atualizações';
-$tables['tb_profile_details'] = 'Detalhes do perfil';
 
 
 /**
@@ -37,5 +37,5 @@ require __DIR__ . '/login-settings.php';
  * Keep imports explicit to preserve load order and avoid hidden side effects.
  *
  * Example:
- * require __BASE_DIR__ . 'modules/example-module.php';
+ * require __BASE_DIR__ . 'this-system/modules/example-module.php';
  */

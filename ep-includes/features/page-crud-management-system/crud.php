@@ -1832,7 +1832,7 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
                /*
                 * Treatment of type_field.
                 */
-               $type_field = $field['type_field'];
+               $type_field = $field['type_field'] ?? '';
 
 
                /*
