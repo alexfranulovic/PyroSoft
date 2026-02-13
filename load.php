@@ -80,10 +80,11 @@ $slug = page_area($page_path, 'path', true)
     ? array_slice($params_url, 1)
     : $params_url;
 
-$page_path = is_user_allowed_to_access_area()
-    ? page_area($page_path, 'path')
-    : page_area('Site', 'path');
+// $page_path = is_user_allowed_to_access_area()
+//     ? page_area($page_path, 'path')
+//     : page_area('Site', 'path');
 
+$page_path = page_area($page_path, 'path');
 
 /**
  * Check if the required `curl` extension is available.

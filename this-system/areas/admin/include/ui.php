@@ -41,8 +41,8 @@ function pageBaseTop(array $hooks_out = [], array $hooks_in = [])
  *
  * Params:
  * - title (string)
- * - number (int|float)           Required
- * - last_number (int|float)      Optional (baseline)
+ * - data (int|float)           Required
+ * - last_data (int|float)      Optional (baseline)
  * - description (string)               Optional period label
  * - obs (string)                 Optional tooltip
  * - formatter (callable|string)  Optional formatter (e.g. BRL)
@@ -60,11 +60,11 @@ function insight_card(array $params = []): string
     $obs       = $params['obs'] ?? '';
     $formatter = $params['formatter'] ?? null;
 
-    $number = isset($params['number']) ? (float) $params['number'] : 0.0;
+    $data = isset($params['data']) ? $params['data'] : 0;
 
     // Baseline is OPTIONAL
-    $has_baseline = array_key_exists('last_number', $params);
-    $last_number  = $has_baseline ? (float) $params['last_number'] : null;
+    $has_baseline = array_key_exists('last_data', $params);
+    $last_data  = $has_baseline ? (float) $params['last_data'] : null;
 
     /**
      * 2) Formatter resolver
@@ -78,7 +78,7 @@ function insight_card(array $params = []): string
         }
     }
 
-    $number_fmt = $fmt ? $fmt($number) : (string) $number;
+    $data_fmt = $fmt ? $fmt($data) : (string) $data;
 
     /**
      * 3) Tooltip
@@ -101,11 +101,11 @@ function insight_card(array $params = []): string
 
     if ($has_baseline) {
 
-        $delta = $number - $last_number;
+        $delta = $data - $last_data;
 
         // Percent only if baseline != 0
-        if ($last_number != 0.0) {
-            $delta_percent = round(($delta / $last_number) * 100, 1);
+        if ($last_data != 0.0) {
+            $delta_percent = round(($delta / $last_data) * 100, 1);
         } else {
             $delta_percent = 0;
         }
@@ -126,7 +126,7 @@ function insight_card(array $params = []): string
         }
 
         $delta_fmt       = $fmt ? $fmt($delta) : (string) $delta;
-        $last_number_fmt = $fmt ? $fmt($last_number) : (string) $last_number;
+        $last_data_fmt = $fmt ? $fmt($last_data) : (string) $last_data;
 
         $comparison_html = "
             <div class='delta delta-{$color}'>
@@ -136,7 +136,7 @@ function insight_card(array $params = []): string
             </div>
 
             <div class='base'>
-                $description <strong>{$last_number_fmt}</strong>
+                $description <strong>{$last_data_fmt}</strong>
             </div>
         ";
     }
@@ -164,7 +164,7 @@ function insight_card(array $params = []): string
             </div>
 
             <div class='body'>
-                <span class='number'>{$number_fmt}</span>
+                <span class='number'>{$data_fmt}</span>
             </div>
 
             {$footer}

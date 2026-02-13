@@ -7,7 +7,7 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 function getEntries(what, returnType = 'object')
 {
-  const baseDir = path.resolve(__dirname, './this-system/ep-areas');
+  const baseDir = path.resolve(__dirname, './this-system/areas');
   const entries = {};
   const paths = [];
 

@@ -1021,6 +1021,8 @@ function generate_SEO_meta()
         ? true
         : false;
 
+    $page_type = $page['page_type'] ?? 'website';
+
     echo "
     <!-- SEO -->
     <meta name='robots' content='". ($page['seo']['robots'] ?? ($config['seo']['robots'] ?? '')) ."' />
@@ -1041,7 +1043,7 @@ function generate_SEO_meta()
     <meta property='og:description' content='". ($page['description'] ?? '') ."'>
     <meta property='og:site_name' content='". ($info['name']) ."'>
     <meta property='og:url' content='". ($page['seo']['canonical'] ?? canonical) ."'>
-    <meta property='og:type' content='". (($page['page_type'] == 'article') ? 'article' : 'website') ."'>
+    <meta property='og:type' content='". (($page_type == 'article') ? 'article' : 'website') ."'>
     <meta property='og:locale' content='pt_BR'>
     <meta property='og:image' content='". ($thumbnail ?? ($config_thumbnail ?? $info['favicon'])) ."'>
 

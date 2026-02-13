@@ -1,7 +1,7 @@
 <?php
 if (!isset($seg)) exit;
 
-$page = [ 'title' => 'Error 404' ];
+$page = [ 'title' => 'Error 404', 'slug' => 'error404', 'seo' => [] ];
 
 include_once 'include/head.php';
 include_once 'include/menu.php';

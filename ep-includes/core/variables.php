@@ -2,7 +2,7 @@
 if (!isset($seg)) exit;
 
 
-define('PYROSOFT_VERSION', '1.0.2');
+define('PYROSOFT_VERSION', '1.0.3');
 
 /**
  * Define itens for CRON operations.
@@ -20,7 +20,7 @@ define('CRON_BASE_ROUTE', 'cron');
  * Define "this system" paths.
  */
 define('THIS_SYSTEM_PATH', "this-system/");
-define('AREAS_PATH', THIS_SYSTEM_PATH ."ep-areas");
+define('AREAS_PATH', THIS_SYSTEM_PATH ."areas");
 define('AREAS_ABSOLUTE_PATH', __BASE_DIR__ . AREAS_PATH);
 
 

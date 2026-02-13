@@ -27,7 +27,14 @@ function posts_showcase(array $Attr = [])
         if (isset($content['image_folder']) && isset($content['image'])) $image = pg ."/uploads/images/{$content['image_folder']}/{$content['image']}";
 
         $comments = (isset($content['total_comments']) && $content['total_comments'] > 0) ? "<div><a href='{$content['url']}' title='Total de comentários' class='meta-chat d-flex'>". icon('fas fa-comments') ."</i>&nbsp;{$content['total_comments']}</a></div>" : '';
-        $date  = !empty($content['date']) ? "<div><a href='{$content['url']}' title='Escrito em: " . strftime('%d/%m/%Y', strtotime($content['date'])) . "'>" . strftime('%d/%m/%Y', strtotime($content['date'])) . "</a></div>" : '';
+        $date = '';
+
+        if (!empty($content['date'])) {
+            $dt = new DateTimeImmutable($content['date']);
+            $formatted = $dt->format('d/m/Y');
+
+            $date = "<div><a href='{$content['url']}' title='Escrito em: {$formatted}'>{$formatted}</a></div>";
+        }
 
         $res.= "
         <article class='posts-showcase-as-blog ". ($content['size'] ?? 'col-md-6 col-lg-4 col-xl-3') ."'>

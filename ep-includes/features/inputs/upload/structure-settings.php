@@ -126,6 +126,22 @@ function inputs_for_upload(string $type_form, $counter, array $data = [])
             ],
         ]
     );
+    $res.= input('basic', $type_form, [
+        'size'      => 'col-6',
+        'div_class' => 'settings-for-audios',
+        'label'     => 'Min seconds',
+        'name'      => "Fields[$counter][min_seconds]",
+        'input_id'  => "min_seconds-$counter",
+        'Value'     => $data['min_seconds'] ?? '',
+    ]);
+    $res.= input('basic', $type_form, [
+        'size'      => 'col-6',
+        'div_class' => 'settings-for-audios',
+        'label'     => 'Max seconds',
+        'name'      => "Fields[$counter][max_seconds]",
+        'input_id'  => "max_seconds-$counter",
+        'Value'     => $data['max_seconds'] ?? '',
+    ]);
     $res.= common_inputs_for_crud($type_form, 'group_options',
         [
             'view_in_list' => $data['view_in_list'] ?? '',

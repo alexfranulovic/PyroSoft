@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 09/02/2026 às 19:48
+-- Tempo de geração: 13/02/2026 às 04:29
 -- Versão do servidor: 10.9.1-MariaDB
 -- Versão do PHP: 8.1.9
 
@@ -90,7 +90,7 @@ CREATE TABLE `tb_cruds` (
 
 INSERT INTO `tb_cruds` (`id`, `piece_name`, `slug`, `type_crud`, `attributes`, `div_attributes`, `form_method`, `form_action`, `views_count`, `submits_count`, `table_crud`, `foreign_key`, `form_settings`, `list_settings`, `limit_results`, `related_to`, `crud_id`, `crud_panel`, `pages_list`, `custom_urls`, `result_page`, `permission_type`, `login_required`, `status_id`, `created_at`, `updated_at`) VALUES
 (176, 'Edit User', 'main-edit-user', 'update', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"default\",\"container\":\"1\",\"steps_form\":{\"save_between_steps\":\"1\",\"one_step_at_a_time\":\"1\",\"show_progess\":\"1\",\"show_steps\":\"1\",\"progess_style\":\"progress_steps_detailed\",\"progress_color\":\"secondary\",\"button_name_send\":\"Enviar\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:16', '2026-02-09 16:48:14'),
-(177, 'List Users', 'main-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"data_table\",\"2\":\"data_table_async\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:17', '2026-02-09 16:48:14'),
+(177, 'List Users', 'main-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"data_table\",\"2\":\"data_table_async\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:17', '2026-02-13 01:28:56'),
 (179, 'Create User', 'main-create-user', 'insert', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 0, 1, '2025-02-12 01:36:22', '2026-02-09 16:41:27'),
 (182, 'User Master', 'main-user-master', 'master', '', '', '', '[]', 0, 0, 'tb_users', 'user_id', '[]', '[]', '', 'table', '', '[]', '{\"list_pg\":\"63\",\"insert\":{\"mode\":\"page\",\"page\":\"310\",\"piece\":\"179\"},\"update\":{\"mode\":\"page\",\"page\":\"77\",\"piece\":\"176\"},\"view\":{\"mode\":\"modal\",\"page\":\"84\",\"piece\":\"231\"}}', '[]', '', 'only_these', 0, 1, '2025-03-29 06:37:49', '2026-02-09 16:42:18'),
 (231, 'View User', 'main-view-user', 'view', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"show_list_pg\",\"2\":\"data_table\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 0, 1, '2025-07-22 01:30:15', '2026-02-01 21:55:25'),
@@ -98,7 +98,7 @@ INSERT INTO `tb_cruds` (`id`, `piece_name`, `slug`, `type_crud`, `attributes`, `
 (240, 'Branding Settings', 'branding-settings', 'update', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', NULL, 'system_info', '239', '[]', '[]', '[]', '', '', 1, 1, '2025-09-30 01:50:13', '2026-02-09 16:48:14'),
 (242, 'Business Settings', 'business-settings', 'update', NULL, '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'system_info', '239', '[]', '[]', '[]', '', '', 1, 1, '2025-10-05 04:59:54', '2026-02-09 16:48:14'),
 (251, 'Maintenance Settings', 'maintenance-settings', 'update', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', NULL, 'system_info', '239', '[]', '[]', '[]', '', '', 0, 4, '2025-10-07 00:33:56', '2026-02-09 16:48:14'),
-(254, '[Summary] List Users', 'main-summary-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"5\"}', '', 'table', '182', '{\"show_panel\":\"1\",\"0\":\"show_name\",\"1\":\"minimize_actions\"}', '[]', '[]', '', '', 1, 1, '2026-02-01 02:52:41', '2026-02-09 16:48:14');
+(254, '[Summary] List Users', 'main-summary-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"5\"}', '', 'table', '182', '{\"show_panel\":\"1\",\"0\":\"show_name\",\"1\":\"minimize_actions\"}', '[]', '[]', '', '', 1, 1, '2026-02-01 02:52:41', '2026-02-13 01:28:56');
 
 -- --------------------------------------------------------
 
@@ -394,22 +394,22 @@ CREATE TABLE `tb_pages` (
 --
 
 INSERT INTO `tb_pages` (`id`, `slug`, `seo`, `title`, `access_count`, `page_settings`, `page_type`, `is_public`, `page_template`, `parent_page_id`, `page_area`, `custom_urls`, `permission_type`, `status_id`, `created_at`, `updated_at`) VALUES
-(1, 'home', NULL, 'Welcome to PyroSoft', 0, '{\"navbar\":{\"format\":\"none\",\"style\":\"transparent-scroll\"},\"footer\":{\"format\":\"none\"}}', 'essential', 1, 'this-system/ep-areas/app/home.php', 0, 'app', '', 'except_these', 1, '2018-02-23 00:00:00', '2026-02-02 21:00:59'),
-(12, 'login', NULL, 'Login', 0, '{\"navbar\":{\"format\":\"medium\",\"style\":\"transparent-absolute\"},\"footer\":{\"format\":\"none\"}}', 'essential', 1, 'this-system/ep-areas/app/login.php', 0, 'app', '', 'except_these', 1, '2021-01-14 14:28:03', '2026-01-28 05:10:13'),
-(47, 'administration', NULL, 'Administration', 0, '{\"navbar\":{\"format\":\"full\",\"style\":\"fixed\"},\"footer\":{\"format\":\"full\"}}', 'essential', 0, 'this-system/ep-areas/admin/admin.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:23:56', '2026-02-09 16:48:14'),
-(49, 'list-pages', NULL, 'List Pages', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/list-pages.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:42:26', '2026-02-09 16:48:14'),
-(60, 'role-management', NULL, 'Role Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/roles-management/custom-pages/roles-management.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:31:58', '2026-02-09 16:48:14'),
-(61, 'manage-permissions', NULL, 'Manage Permissions', 0, '[]', 'not_essential', 0, 'ep-includes/features/permissions-management/custom-pages/permissions-management.php', 60, 'admin', '', 'only_these', 1, '2021-02-09 02:32:59', '2026-02-01 21:55:25'),
-(63, 'list-users', NULL, 'List Users', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:40:21', '2026-02-09 16:48:14'),
-(77, 'edit-user', NULL, 'Edit User', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-09 15:36:25', '2026-02-09 16:48:14'),
-(84, 'view-user', NULL, 'View User', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-10 00:21:51', '2026-02-01 21:55:25'),
-(179, 'crud-management', NULL, 'Manage CRUDs', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/crud-management.php', 0, 'admin', '', 'only_these', 1, '2022-10-13 21:32:38', '2026-02-09 16:48:14'),
-(310, 'create-user', NULL, 'Create User', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2025-02-12 02:15:52', '2026-02-01 21:55:25'),
-(311, 'menu-management', NULL, 'Menu Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/menu-management/custom-pages/menu-management.php', 0, 'admin', '', 'only_these', 1, '2025-03-13 03:43:15', '2026-02-09 16:48:14'),
-(314, 'scheduled-events', NULL, 'Scheduled Events', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/cron-management.php', 0, 'admin', '', 'only_these', 1, '2025-07-31 07:05:35', '2026-02-01 21:55:25'),
-(315, 'page-manager', NULL, 'Page Manager', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/page-management.php', 49, 'admin', '', 'only_these', 1, '2025-09-18 21:48:45', '2026-02-09 16:48:14'),
-(316, 'system-settings', NULL, 'System Settings', 0, '[]', 'not_essential', 0, 'this-system/ep-areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2025-10-02 18:34:07', '2026-02-09 16:48:14'),
-(318, 'plugin-management', NULL, 'Plugin Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/plugins-management/custom-pages/plugins-management.php', 0, 'admin', '', 'only_these', 1, '2025-12-03 03:38:00', '2026-02-09 16:48:14');
+(1, 'home', NULL, 'Welcome to PyroSoft', 0, '{\"navbar\":{\"format\":\"none\",\"style\":\"transparent-scroll\"},\"footer\":{\"format\":\"full\"}}', 'essential', 1, 'this-system/areas/app/home.php', 0, 'app', '', 'except_these', 1, '2018-02-23 00:00:00', '2026-02-13 01:28:56'),
+(12, 'login', NULL, 'Login', 0, '{\"navbar\":{\"format\":\"medium\",\"style\":\"transparent-absolute\"},\"footer\":{\"format\":\"none\"}}', 'essential', 1, 'this-system/areas/app/login.php', 0, 'app', '', 'except_these', 1, '2021-01-14 14:28:03', '2026-01-28 05:10:13'),
+(47, 'administration', NULL, 'Administration', 0, '{\"navbar\":{\"format\":\"full\",\"style\":\"fixed\"},\"footer\":{\"format\":\"full\"}}', 'essential', 0, 'this-system/areas/admin/admin.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:23:56', '2026-02-13 01:28:56'),
+(49, 'list-pages', NULL, 'List Pages', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/list-pages.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:42:26', '2026-02-13 01:28:56'),
+(60, 'role-management', NULL, 'Role Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/roles-management/custom-pages/roles-management.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:31:58', '2026-02-13 01:28:56'),
+(61, 'manage-permissions', NULL, 'Manage Permissions', 0, '[]', 'not_essential', 0, 'ep-includes/features/permissions-management/custom-pages/permissions-management.php', 60, 'admin', '', 'only_these', 1, '2021-02-09 02:32:59', '2026-02-13 01:28:56'),
+(63, 'list-users', NULL, 'List Users', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:40:21', '2026-02-13 01:28:56'),
+(77, 'edit-user', NULL, 'Edit User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-09 15:36:25', '2026-02-13 01:28:56'),
+(84, 'view-user', NULL, 'View User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-10 00:21:51', '2026-02-01 21:55:25'),
+(179, 'crud-management', NULL, 'Manage CRUDs', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/crud-management.php', 0, 'admin', '', 'only_these', 1, '2022-10-13 21:32:38', '2026-02-13 01:28:56'),
+(310, 'create-user', NULL, 'Create User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2025-02-12 02:15:52', '2026-02-13 01:28:56'),
+(311, 'menu-management', NULL, 'Menu Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/menu-management/custom-pages/menu-management.php', 0, 'admin', '', 'only_these', 1, '2025-03-13 03:43:15', '2026-02-01 21:55:25'),
+(314, 'scheduled-events', NULL, 'Scheduled Events', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/cron-management.php', 0, 'admin', '', 'only_these', 1, '2025-07-31 07:05:35', '2026-02-13 01:28:56'),
+(315, 'page-manager', NULL, 'Page Manager', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/page-management.php', 49, 'admin', '', 'only_these', 1, '2025-09-18 21:48:45', '2026-02-13 01:28:56'),
+(316, 'system-settings', NULL, 'System Settings', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2025-10-02 18:34:07', '2026-02-13 01:28:56'),
+(318, 'plugin-management', NULL, 'Plugin Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/plugins-management/custom-pages/plugins-management.php', 0, 'admin', '', 'only_these', 1, '2025-12-03 03:38:00', '2026-02-01 21:55:25');
 
 -- --------------------------------------------------------
 
@@ -722,10 +722,6 @@ INSERT INTO `tb_user_role_permissions` (`id`, `name`, `slug`, `allowed`, `permis
 (59521, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 2),
 (59522, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 3),
 (59523, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 6),
-(59536, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 1),
-(59537, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 2),
-(59538, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 3),
-(59539, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 6),
 (59560, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 1),
 (59561, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 2),
 (59562, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 3),
@@ -889,7 +885,11 @@ INSERT INTO `tb_user_role_permissions` (`id`, `name`, `slug`, `allowed`, `permis
 (60368, NULL, NULL, 1, NULL, 'duplicate', 239, NULL, NULL, 1),
 (60369, NULL, NULL, 0, NULL, 'duplicate', 239, NULL, NULL, 2),
 (60370, NULL, NULL, 0, NULL, 'duplicate', 239, NULL, NULL, 3),
-(60371, NULL, NULL, 0, NULL, 'duplicate', 239, NULL, NULL, 6);
+(60371, NULL, NULL, 0, NULL, 'duplicate', 239, NULL, NULL, 6),
+(60376, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 1),
+(60377, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 2),
+(60378, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 3),
+(60379, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 6);
 
 --
 -- Índices para tabelas despejadas
@@ -1014,7 +1014,7 @@ ALTER TABLE `tb_menus`
 -- AUTO_INCREMENT de tabela `tb_pages`
 --
 ALTER TABLE `tb_pages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=338;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=319;
 
 --
 -- AUTO_INCREMENT de tabela `tb_page_content`
@@ -1050,7 +1050,7 @@ ALTER TABLE `tb_user_role_assignments`
 -- AUTO_INCREMENT de tabela `tb_user_role_permissions`
 --
 ALTER TABLE `tb_user_role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60372;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60380;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

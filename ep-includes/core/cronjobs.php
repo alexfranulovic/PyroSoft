@@ -5,8 +5,8 @@ if(!isset($seg)) exit;
 /** Load Plugin CRONs **/
 load_plugins('cronjobs');
 
-/** Load areas CRONs **/
-load_areas_functions('cronjobs');
+/** This system CRONs **/
+load_this_system_functions('cronjobs');
 
 /** Load Features CRONs **/
 feature('all', 'cronjobs');

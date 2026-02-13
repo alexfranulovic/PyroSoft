@@ -348,6 +348,7 @@ function form_processor(array $payload = [])
      * Start proccessing the tables data.
      *
      */
+    $query_counter = 0;
     $must_break = false;
     $last_table = $order_reg = null;
     $invalid_inputs = $deferred_functions = $processed_ids = [];
@@ -418,7 +419,6 @@ function form_processor(array $payload = [])
 
 
         $last_table = $table_name;
-
         // print_r($fields);
 
 
@@ -505,7 +505,7 @@ function form_processor(array $payload = [])
                  * Run functions before the main query.
                  *
                  */
-                // print_r($data);
+                // print_r($fields[$table_name]);
                 foreach ($fields[$table_name] as $key => $field)
                 {
                     if (!empty($field['run_before_action']) && !empty($field['function_proccess']))
@@ -589,7 +589,7 @@ function form_processor(array $payload = [])
 
                         if (!empty($field['run_after_action']))
                         {
-                            $deferred_functions[] = [
+                            $deferred_functions[$table_name]['functions'][] = [
                                 'function' => $function,
                                 'key'      => $key,
                                 'data'     => $data,
@@ -708,9 +708,10 @@ function form_processor(array $payload = [])
                     if (in_array($key, $available_columns) || $related_to == 'system_info') {
                         $args[$key] = $value;
                     }
+
+                    $query_counter++;
                 }
                 unset($args['register_id']);
-                    // print_r($args);
 
                 if ($must_break) {
                     break;
@@ -791,8 +792,13 @@ function form_processor(array $payload = [])
                  */
                 else
                 {
-                    if ($mode == 'insert') {
-                        if (in_array('created_at', $available_columns)) $args['created_at'] = 'NOW()';
+
+                    if ($mode == 'insert')
+                    {
+                        if (in_array('created_at', $available_columns)) {
+                            $args['created_at'] = 'NOW()';
+                        }
+
                         $args_bd = $args;
                     }
 
@@ -809,7 +815,7 @@ function form_processor(array $payload = [])
                  *
                  * Lights, camera, action.
                  *
-                 * This case serves when the form is not related to system_info.
+                 * This case serves when the form is NOT related to system_info.
                  *
                  */
                 $id_new_register = null;
@@ -828,6 +834,20 @@ function form_processor(array $payload = [])
 
                     if ($is_main_table AND $mode == 'insert') {
                         $current_parent_id = $id_new_register;
+                    }
+
+                    /**
+                     *
+                     * Put 'register_id' for deferred_functions according with actual $table_name
+                     *
+                     */
+                    if (!empty($deferred_functions[$table_name]))
+                    {
+                        $deferred_functions[$table_name]['parent_id'] = $current_parent_id;
+
+                        if (!empty($id_new_register) && ($mode === 'insert')) {
+                            $deferred_functions[$table_name]['register_id'] = $id_new_register;
+                        }
                     }
                 }
 
@@ -1133,21 +1153,37 @@ function form_processor(array $payload = [])
  * @param array $functions    List of deferred functions with keys: 'function', 'key', and 'data'.
  * @param int   $register_id  ID of the record that was inserted or updated.
  */
-function run_after_action_hooks(array $functions, int $register_id = null)
+function run_after_action_hooks(array $tables = [])
 {
-    foreach ($functions as $deferred)
+    // print_r($tables);
+    foreach ($tables as $register)
     {
-        $data = $deferred['data'];
-
-        if (!is_null($register_id)) {
-            $data['register_id'] = $register_id;
+        if (empty($register['functions'])) {
+            continue;
         }
 
-        function_proccess(
-            $deferred['function'] ?? '',
-            $deferred['key'] ?? '',
-            $data
-        );
+        $functions = $register['functions'];
+        $parent_id = $register['parent_id'] ?? null;
+        $register_id = $register['register_id'] ?? null;
+
+        foreach ($functions as $deferred)
+        {
+            $data = $deferred['data'];
+
+            if (!is_null($register_id)) {
+                $data['register_id'] = $register_id;
+            }
+
+            if (!is_null($parent_id)) {
+                $data['parent_id'] = $parent_id;
+            }
+
+            function_proccess(
+                $deferred['function'] ?? '',
+                $deferred['key'] ?? '',
+                $data
+            );
+        }
     }
 }
 

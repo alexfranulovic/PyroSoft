@@ -55,7 +55,7 @@ Contains the CMS engine and built-in features:
 This is the **only folder intended for customization**.
 - `variables.php` – project constants and defaults
 - `functions.php` – project registrations and extensions
-- `ep-areas/` – application areas (e.g. `admin`, `app`)
+- `areas/` – application areas (e.g. `admin`, `app`)
 - `plugins/` – custom project plugins
 
 ---

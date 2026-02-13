@@ -235,9 +235,13 @@ function generate_social_share_link($platform = '', $attr = [])
 function sanitize_string(string $string)
 {
     $original = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜüÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿRr"!@#$%&*()_-+={[}]/?;:,\\\'<>°ºª';
-    $substituir = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr                                ';
+    $replace = 'aaaaaaaceeeeiiiidnoooooouuuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr                                ';
 
-    $string_es = strtr(utf8_decode($string), utf8_decode($original), $substituir);
+    $string_es = strtr(
+        mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8'),
+        mb_convert_encoding($original, 'ISO-8859-1', 'UTF-8'),
+        $replace
+    );
 
     $string_br = str_replace(' ', '-', $string_es);
     $string_tr = str_replace(array('----', '---', '--'), '-', $string_br);

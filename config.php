@@ -16,7 +16,6 @@
  *
  */
 
-
 // ** Setting the DataBase connection ** //
 define( 'DB_HOST',     env('database.host') );      //DataBase's server
 define( 'DB_USER',     env('database.user') );      //DataBase's user
@@ -43,12 +42,6 @@ if (!$conn)
     echo "Database connection error [{$error_code}]: {$error_message}";
     exit;
 }
-
-
-/** DEBUG Mode to Devs **/
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-
 
 
 /* Here you can add something custom beetween this line and the next line. */

@@ -4,7 +4,7 @@ Disallow:
 Disallow:
 Disallow: /cgi-bin/
 Disallow: /this-system/*
-#Disallow: /ep-areas/*
+#Disallow: /areas/*
 Disallow: /ep-includes/*
 Disallow: /node_modules/p*
 Disallow: /config.php

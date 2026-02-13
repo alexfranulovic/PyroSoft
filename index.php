@@ -64,6 +64,13 @@ else
     {
         $page = get_page($config['main_page']['slug']);
         $file = $page['page_template'];
+
+        // Check if the site is closed
+        if ($config['block_system'] == 1 && !is_dev() && $page['slug'] != 'login')
+        {
+            $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
+            header("Location: $redirect");
+        }
     }
 
     /**
@@ -71,65 +78,84 @@ else
      */
     elseif (!empty($page))
     {
-        // Define de basic template
-        $original_file = $file = __BASE_DIR__ . "/{$page['page_template']}";
-
-
-        // Show the 404 page
-        if ($page['page_template'] == NULL) {
-            $file = AREAS_PATH ."/$page_path/error404.php";
-        }
-
-
-        // Check if the page's file exist
-        elseif (file_exists($file) && $page['page_template'] !== null)
+        /**
+         *
+         * In case the user has permission.
+         *
+         */
+        if ($page['has_permission'])
         {
+            // Define de basic template
+            $original_file = $file = __BASE_DIR__ . "/{$page['page_template']}";
 
-            // status: Allow
-            if ($page['status_id'] == 1)
-            {
-                if ((!is_user_logged_in()) AND ($page['is_public'] == 0 OR $page['is_public'] == 2))
-                {
-                    $_SESSION['msg'] = alert_message('ER_RESTRICTED_AREA', 'alert');
 
-                    $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
-                    header("Location: $redirect");
-                }
+            // Show the 404 page
+            if ($page['page_template'] == NULL) {
+                $file = AREAS_PATH ."/$page_path/error404.php";
             }
 
 
-            // status: Unallowed
-            elseif ($page['status_id'] == 2) $file = AREAS_PATH ."/$page_path/error404.php";
-
-
-            // status: Review
-            elseif ($page['status_id'] == 3)
+            // Check if the page's file exist
+            elseif (file_exists($file) && $page['page_template'] !== null)
             {
-                if ((!is_user_logged_in()) OR (!is_dev()))
-                {
-                    $_SESSION['msg'] = alert_message('ER_MAINTENANCE_PAGE', 'alert');
 
-                    $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
-                    header("Location: $redirect");
+                // status: Allow
+                if ($page['status_id'] == 1)
+                {
+                    if ((!is_user_logged_in()) AND ($page['is_public'] == 0 OR $page['is_public'] == 2))
+                    {
+                        $_SESSION['msg'] = alert_message('ER_RESTRICTED_AREA', 'alert');
+
+                        $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
+                        header("Location: $redirect");
+                    }
                 }
+
+
+                // status: Unallowed
+                elseif ($page['status_id'] == 2) $file = AREAS_PATH ."/$page_path/error404.php";
+
+
+                // status: Review
+                elseif ($page['status_id'] == 3)
+                {
+                    if ((!is_user_logged_in()) OR (!is_dev()))
+                    {
+                        $_SESSION['msg'] = alert_message('ER_MAINTENANCE_PAGE', 'alert');
+
+                        $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
+                        header("Location: $redirect");
+                    }
+                }
+
             }
 
+            // Show the ordinary page
+            else $file = AREAS_PATH ."/$page_path/common.php";
+
+
+            // Check if the site is closed
+            if ($config['block_system'] == 1 && !is_dev() && $page['slug'] != 'login')
+            {
+                $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
+                header("Location: $redirect");
+            }
+
+
+            // Plus 0 view to the page
+            if ($file == $original_file) query_it("UPDATE tb_pages SET access_count=access_count+1 WHERE id='{$page['id']}'");
         }
 
-        // Show the ordinary page
-        else $file = AREAS_PATH ."/$page_path/common.php";
-
-
-        // Check if the site is closed
-        if ($config['block_system'] == 1 && !is_dev() && $page['slug'] != 'login')
-        {
-            $redirect = pg .'/login';
+        /**
+         *
+         * If the user has no permission.
+         *
+         */
+        else {
+            $_SESSION['msg'] = alert_message('ER_INVALID_PERMISSION', 'alert');
+            $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
             header("Location: $redirect");
         }
-
-
-        // Plus 0 view to the page
-        if ($file == $original_file) query_it("UPDATE tb_pages SET access_count=access_count+1 WHERE id='{$page['id']}'");
     }
 
     /**
@@ -137,9 +163,8 @@ else
      */
     else
     {
-        $_SESSION['msg'] = alert_message('ER_INVALID_PERMISSION', 'alert');
-        $redirect = pg .'/login';
-        header("Location: $redirect");
+        $file = AREAS_PATH ."/app/error404.php";
+        http_response_code(404);
     }//*/
 
 

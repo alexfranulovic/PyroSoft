@@ -22,8 +22,9 @@ function page(string $file)
         $page,
         $max_upload;
 
-    $page_template = basename($page['page_template']);
+    $page_template = basename($page['page_template'] ?? '');
     $page_template = explode('.php', $page_template)[0];
+    $slug = $page['slug'] ?? '';
 
     $storage_theme_color = $_COOKIE['theme_color'] ?? $area['theme_color'];
     $area_color = $area['theme_color'];
@@ -45,7 +46,7 @@ function page(string $file)
 
     echo "
     <!DOCTYPE html>
-    <html lang='". ($config['lang'] ?? '') ."' class='area-$page_path page-{$page['slug']} template-{$page_template} {$html_class}' data-bs-theme='$area_color'>";
+    <html lang='". ($config['lang'] ?? '') ."' class='area-$page_path page-{$slug} template-{$page_template} {$html_class}' data-bs-theme='$area_color'>";
         include "$file";
     echo "
     </body>
@@ -151,22 +152,8 @@ function get_page_with_permissions(bool $debug = false)
     $sql = "
     SELECT page.*
     FROM tb_pages page
-    LEFT JOIN tb_user_role_permissions permission
-        ON permission.page_id = page.id
-        AND permission.role_id IN ({$ids})
     WHERE (page.slug = '{$path}' OR page.id = '{$path}')
     AND page.page_area = '{$page_area}'
-    {$public}
-    AND (
-        (
-            page.permission_type = 'except_these'
-            AND (permission.allowed IS NULL OR permission.allowed != 1)
-        )
-        OR (
-            page.permission_type = 'only_these'
-            AND permission.allowed = 1
-        )
-    )
     ORDER BY page.status_id ASC
     LIMIT 1";
 
@@ -177,6 +164,10 @@ function get_page_with_permissions(bool $debug = false)
     }
 
     $res = get_result($sql);
+
+    if (!empty($res['id'])) {
+        $res['has_permission'] = load_permission($res['id']);
+    }
 
     return $res;
 }

@@ -2,7 +2,7 @@
 <div class="offcanvas-lg offcanvas-start" tabindex="-1" id="sidebar">
 
   <div class="offcanvas-header">
-    <a class="navbar-brand" href="<?= pg ?>/admin/administrativo" aria-label="<?= $info['name'] ?>" title="<?= $info['name'] ?>">
+    <a class="navbar-brand" href="<?= pg ?>/admin/administration" aria-label="<?= $info['name'] ?>" title="<?= $info['name'] ?>">
       <img class="logotype-light" src="<?= file_url('images/brand', false, 'imagotype-black-st.png') ?>" loading="lazy">
       <img class="logotype-dark" src="<?= file_url('images/brand', false, 'imagotype-white-st.png') ?>" loading="lazy">
     </a>

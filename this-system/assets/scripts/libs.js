@@ -214,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function()
   // Masks (IMask)
   // ─────────────────────────────────────────────────────────────
   var MASK_PATTERNS = [
+    ['.mask-height',             { mask: '0.00' }],
     ['.mask-rg',                 { mask: '00.000.000-0' }],
     ['.mask-cpf',                { mask: '000.000.000-00' }],
     ['.mask-cnpj',               { mask: '00.000.000/0000-00' }],
@@ -906,6 +907,23 @@ function revealContainersFor(el)
  * @param {boolean} [options.revealContainers=true] - Calls revealContainersFor on the first invalid field, if available.
  * @returns {{ allFieldsValid: boolean, firstInvalid: HTMLElement|null }}
  */
+/**
+ * Validates fields inside a form using native constraint validation first,
+ * while keeping special rules for:
+ * - hidden upload JSON inputs ([input-files])
+ * - required radio/checkbox groups
+ *
+ * It also prevents "not focusable" by:
+ * - revealing parent containers
+ * - focusing a truly focusable proxy (TomSelect, visible upload UI, etc.)
+ *
+ * @param {HTMLFormElement} form
+ * @param {Object} [options]
+ * @param {HTMLElement|null} [options.scope=null]
+ * @param {boolean} [options.scrollToFirstInvalid=true]
+ * @param {boolean} [options.revealContainers=true]
+ * @returns {{ allFieldsValid: boolean, firstInvalid: HTMLElement|null }}
+ */
 function validateRequiredFields(form, options)
 {
   const opts = Object.assign({
@@ -916,14 +934,130 @@ function validateRequiredFields(form, options)
 
   const root = opts.scope || form;
 
-  const requiredFields = root.querySelectorAll('[required]');
-  let allFieldsValid = true;
+  // Helper: visible check (prevents "not focusable")
+  function isVisible(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el.type === 'hidden') return false;
+    const cs = window.getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    // offsetParent null can be false-positive for fixed; still ok as extra guard
+    if (el.offsetParent === null && cs.position !== 'fixed') return false;
+    return true;
+  }
+
+  // Helper: choose a focusable target for a given invalid control
+  function resolveFocusableTarget(el)
+  {
+    if (!el) return null;
+
+    // Custom upload: focus the visible UI, not the hidden JSON input
+    if (el.hasAttribute('input-files')) {
+      const filesWrap = el.closest('.files');
+      const profilePhoto = filesWrap?.querySelector('label.box.profile .photo');
+      const addFile = filesWrap?.querySelector('.add-file');
+      return profilePhoto || addFile || filesWrap || null;
+    }
+
+    // TomSelect: <select> becomes hidden, focus its control
+    if (el.tagName === 'SELECT' && el.tomselect) {
+      // control_input is usually the best focus target
+      return el.tomselect.control_input || el.tomselect.control || null;
+    }
+
+    // Normal field
+    return el;
+  }
+
+  // Helper: mark invalid UI classes + optional bootstrap feedback
+  function markInvalid(el, message)
+  {
+    if (!el) return;
+
+    el.classList.add('is-invalid');
+    const ig = el.closest('.input-group');
+    if (ig) ig.classList.add('is-invalid');
+
+    // Keep your existing feedback behavior when we have a message
+    if (message) {
+      try { applyInvalidFeedback(el, message); } catch (_) {}
+    }
+  }
+
+  function clearInvalid(el)
+  {
+    if (!el) return;
+    el.classList.remove('is-invalid');
+    const ig = el.closest('.input-group');
+    if (ig) ig.classList.remove('is-invalid');
+  }
+
+  // --- 1) Special cases: required radio/checkbox groups + upload JSON fields ---
   let firstInvalid = null;
+  let allFieldsValid = true;
 
   const processedGroups = new Set();
 
-  requiredFields.forEach(function (el) {
-    // Skip native file inputs when there is an [input-files] holder in the same .files
+  // Validate required radio/checkbox groups inside scope
+  root.querySelectorAll('input[required][type="radio"], input[required][type="checkbox"]').forEach((el) =>
+  {
+    const name = el.name || '';
+    const key = el.type + '::' + name;
+
+    if (name) {
+      if (processedGroups.has(key)) return;
+      processedGroups.add(key);
+
+      const group = root.querySelectorAll(`input[type="${el.type}"][name="${CSS.escape(name)}"]`);
+      const ok = Array.prototype.some.call(group, i => i.checked);
+
+      if (!ok) {
+        allFieldsValid = false;
+        markInvalid(el, el.validationMessage || 'Please select an option.');
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        // clear group marks
+        Array.prototype.forEach.call(group, clearInvalid);
+      }
+    } else {
+      if (!el.checked) {
+        allFieldsValid = false;
+        markInvalid(el, el.validationMessage || 'Please select an option.');
+        if (!firstInvalid) firstInvalid = el;
+      } else {
+        clearInvalid(el);
+      }
+    }
+  });
+
+  // Validate upload hidden JSON inputs that are required (or data-required turned into required earlier)
+  root.querySelectorAll('input[input-files]').forEach((el) =>
+  {
+    // only enforce if required
+    if (!el.hasAttribute('required')) return;
+
+    let arr = [];
+    try { arr = JSON.parse(el.value || '[]'); } catch (_) { arr = []; }
+    const ok = Array.isArray(arr) && arr.length > 0;
+
+    if (!ok) {
+      allFieldsValid = false;
+      markInvalid(el, 'Please select at least one file.');
+      if (!firstInvalid) firstInvalid = el;
+    } else {
+      clearInvalid(el);
+    }
+  });
+
+  // --- 2) Native HTML5 constraints: find first :invalid control (works for minlength/maxlength/step/pattern/type/etc.) ---
+  // We validate only controls that the browser considers validatable.
+  const controls = root.querySelectorAll('input, select, textarea');
+
+  controls.forEach((el) =>
+  {
+    // Skip disabled + non-validatable
+    if (!el || el.disabled) return;
+
+    // Skip file inputs that are “mirrored” by your custom [input-files] in the same .files wrapper
     if (
       el.type === 'file' &&
       el.closest('.files') &&
@@ -932,140 +1066,70 @@ function validateRequiredFields(form, options)
       return;
     }
 
-    let invalid = false;
-    const isUploadHidden = el.hasAttribute('input-files');
+    // Skip radio/checkbox here (handled above when required)
+    if (el.type === 'radio' || el.type === 'checkbox') return;
 
-    if (isUploadHidden) {
-      // Upload validation: value must be a JSON array with at least one filename
-      let arr = [];
-      try {
-        arr = JSON.parse(el.value || '[]');
-      } catch (_) {
-        arr = [];
-      }
-      invalid = !Array.isArray(arr) || arr.length === 0;
+    // Skip custom upload hidden (handled above)
+    if (el.hasAttribute('input-files')) return;
 
-    } else if (el.type === 'radio' || el.type === 'checkbox') {
-      const name = el.name || '';
+    // If browser can validate it, use it
+    if (el.willValidate) {
+      const ok = el.checkValidity();
 
-      if (name) {
-        const key = el.type + '::' + name;
-        if (processedGroups.has(key)) return;
-        processedGroups.add(key);
-
-        const group = form.querySelectorAll(
-          `input[type="${el.type}"][name="${CSS.escape(name)}"]`
-        );
-        invalid = !Array.prototype.some.call(group, i => i.checked);
+      if (!ok) {
+        allFieldsValid = false;
+        markInvalid(el, el.validationMessage || '');
+        if (!firstInvalid) firstInvalid = el;
       } else {
-        invalid = !el.checked;
-      }
-
-    } else if (el.tagName === 'SELECT') {
-      invalid = (el.value == null || el.value === '');
-
-    } else {
-      invalid = ((el.value || '').trim() === '');
-    }
-
-    // ---- HTML5 constraint validation ----
-    if (!isUploadHidden && el.type !== 'radio' && el.type !== 'checkbox') {
-      if (el.willValidate) {
-        invalid = invalid || !el.checkValidity();
-      }
-    }
-
-    // Marca classes de erro
-    if (invalid) {
-      allFieldsValid = false;
-
-      el.classList.add('is-invalid');
-      const ig = el.closest('.input-group');
-      if (ig) ig.classList.add('is-invalid');
-
-      if (!firstInvalid) firstInvalid = el;
-
-    } else {
-      el.classList.remove('is-invalid');
-      const ig2 = el.closest('.input-group');
-      if (ig2) ig2.classList.remove('is-invalid');
-    }
-
-    // Extra visual feedback for upload fields
-    if (isUploadHidden) {
-      const filesWrap = el.closest('.files');
-      const uploadType = (el.dataset.type || '').toLowerCase(); // images, archives, videos, audios
-      const profilePhoto = filesWrap?.querySelector('label.box.profile .photo');
-
-      if (profilePhoto) {
-        if (invalid) profilePhoto.classList.add('is-invalid');
-        else profilePhoto.classList.remove('is-invalid');
-      }
-
-      if (uploadType === 'audios') {
-        const controls = filesWrap?.querySelector('.audio-controls');
-        if (controls) {
-          if (invalid) controls.classList.add('is-invalid');
-          else controls.classList.remove('is-invalid');
-        }
-      } else {
-        // 🔥 NOVO: se for profile, NÃO depende de .add-file (muitas vezes nem existe)
-        if (!profilePhoto) {
-          const addFile = filesWrap?.querySelector('.add-file');
-          if (addFile) {
-            if (invalid) addFile.classList.add('is-invalid');
-            else addFile.classList.remove('is-invalid');
-          }
-        }
+        clearInvalid(el);
       }
     }
   });
 
-  if (!allFieldsValid && firstInvalid) {
-    if (opts.scrollToFirstInvalid) {
-      if (typeof revealContainersFor === 'function' && opts.revealContainers) {
-        try { revealContainersFor(firstInvalid); } catch (_) {}
-      }
+  // --- 3) Reveal + focus + native bubble (when possible) ---
+  if (!allFieldsValid && firstInvalid)
+  {
+    if (opts.revealContainers && typeof revealContainersFor === 'function') {
+      try { revealContainersFor(firstInvalid); } catch (_) {}
+    }
 
+    const focusTarget = resolveFocusableTarget(firstInvalid);
+
+    if (opts.scrollToFirstInvalid) {
       setTimeout(() =>
       {
-        let scrollTarget = firstInvalid;
+        const scrollTarget =
+          focusTarget?.closest?.('.input-group') || focusTarget || firstInvalid;
 
-        // se for input-group, evidencia o group inteiro
-        const ig = firstInvalid.closest('.input-group');
-        if (ig) scrollTarget = ig;
+        try { scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
 
-        // se for upload hidden (input-files), scroll no elemento visível
-        if (firstInvalid.hasAttribute('input-files')) {
-          const filesWrap = firstInvalid.closest('.files');
-          const profilePhoto = filesWrap?.querySelector('label.box.profile .photo');
-          const addFile = filesWrap?.querySelector('.add-file');
-          scrollTarget = profilePhoto || addFile || filesWrap || firstInvalid;
-        }
-
-        scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        // tenta focar algo focável; upload hidden não dá focus
+        // Focus only if it is actually focusable/visible
         try {
-          if (firstInvalid.type !== 'hidden' && !firstInvalid.hasAttribute('input-files')) {
-            firstInvalid.focus({ preventScroll: true });
+          if (focusTarget && isVisible(focusTarget) && typeof focusTarget.focus === 'function') {
+            focusTarget.focus({ preventScroll: true });
           }
         } catch (_) {}
 
-        // mensagem nativa quando aplicável
+        // Try native message bubble on the real control
+        // (If it's hidden, reportValidity may throw; then we fallback to bootstrap feedback already applied)
+        try {
+          if (firstInvalid.willValidate && typeof firstInvalid.reportValidity === 'function') {
+            firstInvalid.reportValidity();
+          }
+        } catch (_) {}
+      }, 60);
+    } else {
+      try {
         if (firstInvalid.willValidate && typeof firstInvalid.reportValidity === 'function') {
           firstInvalid.reportValidity();
         }
-      }, 50);
-    } else {
-      if (firstInvalid.willValidate && typeof firstInvalid.reportValidity === 'function') {
-        firstInvalid.reportValidity();
-      }
+      } catch (_) {}
     }
   }
 
   return { allFieldsValid, firstInvalid };
 }
+
 
 
 

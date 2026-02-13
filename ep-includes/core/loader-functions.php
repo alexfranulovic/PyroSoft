@@ -155,35 +155,56 @@ function list_plugins(bool $for_selects = false)
  * @param bool $debug When true, prints which files are being included (or missing).
  * @return bool True on success, false if the areas root is missing or unreadable.
  */
-function load_areas_functions(string $action = 'functions', bool $debug = false): bool
+function load_this_system_functions(string $action = 'functions', bool $debug = false): bool
 {
-    // Keep globals available if area functions rely on them
+    // Keep globals available if included files rely on them
     global $seg, $config, $info;
 
-    $areas_root = AREAS_ABSOLUTE_PATH;
+    $root = __DIR__ . '/this-system';
 
-    if (!is_dir($areas_root)) {
-        if ($debug) echo "Areas root not found: {$areas_root}\n";
+    if (!is_dir($root)) {
+        if ($debug) echo "this-system root not found: {$root}\n";
         return false;
     }
 
     $allowed_actions = [
         'api',
         'cronjobs',
-        'ui',
         'functions',
     ];
 
-    if (!in_array($action, $allowed_actions)) {
-        echo 'Load area action does not exist. You can do: '. implode(', ', $allowed_actions);
+    if (!in_array($action, $allowed_actions, true)) {
+        echo 'Load action does not exist. You can do: ' . implode(', ', $allowed_actions);
         return false;
     }
 
-    $area_dirs = array_filter(glob($areas_root . '/*'), 'is_dir');
-    foreach ($area_dirs as $dir)
+    // Find: **/include/{action}.php
+    $pattern = $root . '/*/include/' . $action . '.php';
+
+    // Recursive glob without helpers: use RecursiveDirectoryIterator
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::SELF_FIRST
+    );
+
+    $included_any = false;
+
+    foreach ($iterator as $item)
     {
-        $file = $dir ."/include/{$action}.php";
+        if (!$item->isDir()) {
+            continue;
+        }
+
+        // Only folders named "include" matter
+        if ($item->getFilename() !== 'include') {
+            continue;
+        }
+
+        $file = $item->getPathname() . DIRECTORY_SEPARATOR . $action . '.php';
+
         if (file_exists($file)) {
+            $included_any = true;
+
             if ($debug) var_dump("'{$file}' included.");
             include_once $file;
         } else {
@@ -191,8 +212,9 @@ function load_areas_functions(string $action = 'functions', bool $debug = false)
         }
     }
 
-    return true;
+    return $included_any;
 }
+
 
 
 /**

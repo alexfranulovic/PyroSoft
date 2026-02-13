@@ -1,6 +1,10 @@
 <?php
 if(!isset($seg)) exit;
 
+/** DEBUG Mode to Devs **/
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+
 
 /**
  * Inputs
@@ -24,12 +28,3 @@ if (!defined('TIME_TO_DELETE_TEMP_FILES'))  define('TIME_TO_DELETE_TEMP_FILES', 
  * User
  */
 if (!defined('USER_PASSWORD_RECOVERY_TIME'))    define('USER_PASSWORD_RECOVERY_TIME', 3600);
-
-global $user_status;
-$user_status[] =
-[
-    'id'    => 5,
-    'name'  => 'Testde',
-    'slug'  => 'asd',
-    'color' => 'subtle-light',
-];

@@ -670,8 +670,8 @@ function crud_piece(array $Attr = [])
      */
     $crud_panel = [
         'form_name'        => $crud['piece_name'],
-        'show_name'        => in_array('show_name', $crud_panel),
-        'minimize_actions' => in_array('minimize_actions', $crud_panel),
+        'show_name'        => $crud_panel['show_name'] ?? '',
+        'minimize_actions' => $crud_panel['minimize_actions'] ?? '',
         'show_panel'       => !empty($crud_panel['show_panel']),
     ];
 

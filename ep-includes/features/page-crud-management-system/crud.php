@@ -1090,8 +1090,18 @@ function get_crud_piece_to_edit($id = 0)
                 'name' => 'crud_panel[]',
                 'input_id' => 'crud_panel',
                 'Options' => [
-                    [ 'value' => 'show_name', 'display' => 'Exibir nome do elemento' ],
-                    [ 'value' => 'minimize_actions', 'display' => 'Minimizar ações (botões)' ],
+                    [
+                        'value' => '1',
+                        'name' => 'crud_panel[show_name]',
+                        'display' => 'Exibir nome do elemento',
+                        'checked' => $crud['crud_panel']['show_name'] ?? '',
+                    ],
+                    [
+                        'value' => '1',
+                        'name' => 'crud_panel[minimize_actions]',
+                        'display' => 'Minimizar ações (botões)',
+                        'checked' => $crud['crud_panel']['minimize_actions'] ?? '',
+                    ],
                 ],
                 'Value' => $crud['crud_panel'] ?? '',
             ]

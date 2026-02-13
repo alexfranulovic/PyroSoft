@@ -4,8 +4,8 @@ if(!isset($seg)) exit;
 /** Load Plugin APIs **/
 load_plugins('api');
 
-/** Load areas APIs **/
-load_areas_functions('api');
+/** This system APIs **/
+load_this_system_functions('api');
 
 /** Load Features APIs **/
 feature('all', 'api');
