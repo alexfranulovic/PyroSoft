@@ -854,6 +854,7 @@ register_rest_route('ajax-upload-temp', [
       'size'         => $field['image_size']   ?? null,
       'allowed_exts' => $field['allowed_exts'] ?? null,
       'force_webp'   => $field['force_webp'] ?? null,
+      'quality'      => $field['quality'] ?? null,
       'final_name'   => $field['final_name'] ?? null,
       'upload_to_s3' => $upload_to_s3,
       'visibility'   => $field['visibility'] ?? DEFAULT_FILES_VISIBILITY,

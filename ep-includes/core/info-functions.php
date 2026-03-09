@@ -18,6 +18,26 @@ function _sql_in_list(array $keys): string
 }
 
 
+/**
+ * Deletes option(s) from tb_info by option_name.
+ *
+ * @param string|array $option Option name or list of option names.
+ * @param bool $debug Optional debug flag.
+ * @return mixed Result from query_it().
+ */
+function delete_option($option, bool $debug = false)
+{
+    $keys = is_array($option) ? $option : [$option];
+
+    $in = _sql_in_list($keys);
+
+    $sql = "DELETE FROM tb_info WHERE option_name IN ($in)";
+
+    return query_it($sql, false, $debug);
+}
+
+
+
 /** Executes a SELECT for tb_info by a list of option names (prefers prepared helper if available). */
 function _fetch_tb_info_by_keys(array $keys): array
 {

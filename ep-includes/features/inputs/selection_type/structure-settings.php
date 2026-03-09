@@ -57,6 +57,7 @@ function inputs_for_selection_type(string $type_form, $counter, array $data = []
                 [ 'value' => 'balloons', 'display' => 'Balões' ],
                 [ 'value' => 'btn-group', 'display' => 'Grupo de botões' ],
                 [ 'value' => 'block', 'display' => 'Blocos' ],
+                [ 'value' => 'group-block', 'display' => 'Grupo de blocos' ],
                 [ 'value' => 'multiple', 'display' => 'Múltiplo' ],
             ],
             'Value' => $data['variation'] ?? 'original',

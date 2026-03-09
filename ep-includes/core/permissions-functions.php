@@ -1,6 +1,44 @@
 <?php
 if(!isset($seg)) exit;
 
+function get_roles(string $mode = '', array $attr = [])
+{
+    $id = $attr['id'] ?? '';
+
+    if ($mode == 'list') {
+        return get_results("SELECT id as value, name as display FROM tb_user_roles WHERE type = 'role'");
+    }
+
+    if ($mode == 'crud')
+    {
+        $trigger = $attr['trigger'] ?? '';
+
+        return get_results("
+            SELECT role_id as value FROM tb_user_role_permissions
+            WHERE
+                crud_id = '{$id}'
+                AND allowed = 1
+                AND action_trigger = '{$trigger}'
+        ");
+    }
+
+    if ($mode == 'page')
+    {
+        return get_results("
+            SELECT role_id as value FROM tb_user_role_permissions
+            WHERE page_id = '{$id}' AND allowed = 1");
+    }
+
+    if ($mode == 'custom')
+    {
+        return get_results("
+            SELECT role_id as value FROM tb_user_role_permissions
+            WHERE permission_id = '{$id}' AND allowed = 1");
+    }
+
+    return get_results("SELECT * FROM tb_user_roles WHERE type = 'role'");
+}
+
 
 /**
  * Check if a user or the current user is in the development environment.

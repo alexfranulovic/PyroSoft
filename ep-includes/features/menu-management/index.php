@@ -294,9 +294,9 @@ function menu_inputs_for_page(string $type_form, $counter, array $data = [])
             'type' => 'search',
             'size' => 'col-12',
             'label' => 'Página de listagem',
-            'name' => "menu-item[$counter][url]",
+            'name' => "menu-item[$counter][page_id]",
             'Options' => $pages_to_choose,
-            'Value' => $data['url'] ?? '',
+            'Value' => $data['page_id'] ?? '',
             'Required' => true
         ]
     );
@@ -556,8 +556,8 @@ function manage_menu_form(string $type_form = 'insert', int $counter = 1)
             [
                 'size' => 'col-6',
                 'label' => 'Slug',
-                'name' => 'url',
-                'Value' => ($type_form=='update') ? $menu['url'] : '',
+                'name' => 'slug',
+                'Value' => ($type_form=='update') ? $menu['slug'] : '',
                 'Required' => true
             ])?>
 
@@ -599,6 +599,99 @@ function manage_menu_form(string $type_form = 'insert', int $counter = 1)
     unset($_SESSION['FormData']);
 }
 
+
+/**
+ * Handles menu items routine (insert/update) using a single params array.
+ *
+ * Params:
+ * - menu_id (int) REQUIRED
+ * - menu_order (array) REQUIRED
+ * - mode ('insert'|'update') REQUIRED
+ * - from ('in'|'out') optional (default 'in')
+ * - debug (bool) optional
+ *
+ * @param array $params
+ * @return array
+ * @throws Exception
+ */
+function manage_menu_items(array $params, bool $debug = false): array
+{
+    $menu_id    = (int)($params['menu_id'] ?? 0);
+    $menu_order = $params['menu_order'] ?? [];
+    $mode       = (string)($params['mode'] ?? '');
+    $from       = (string)($params['from'] ?? 'in');
+
+    if ($menu_id <= 0) throw new Exception("Missing/invalid menu_id.");
+    if (!in_array($mode, ['insert','update'], true)) throw new Exception("Invalid mode.");
+    if (!is_array($menu_order)) $menu_order = [];
+
+    if ($mode == 'update' && $from == 'out')
+    {
+        $items = get_results("SELECT * FROM tb_menus WHERE menu_id = '$menu_id' ORDER BY order_reg ASC");
+        $menu_order = array_merge($items, $menu_order);
+    }
+
+    $updated_menu_order = [];
+    $stack = [];
+    $order_reg = 1;
+
+    foreach ($menu_order as $menu)
+    {
+        $depth = isset($menu['depth']) ? (int)$menu['depth'] : 0;
+
+        while (!empty($stack) && end($stack)['depth'] >= $depth) {
+            array_pop($stack);
+        }
+
+        $parent_id = empty($stack) ? 0 : end($stack)['id'];
+
+        $menu_mode = !empty($menu['id']) ? 'update' : 'insert';
+
+        $args_item = [
+            'depth'         => $depth,
+            'order_reg'     => $order_reg,
+            'menu_id'       => $menu_id,
+            'parent_id'     => $parent_id,
+            'title'         => $menu['title'] ?? '',
+            'icon'          => $menu['icon'] ?? '',
+            'url'           => $menu['url'] ?? '',
+            'slug'          => $menu['slug'] ?? null,
+            'page_id'       => $menu['page_id'] ?? null,
+            'function_view' => $menu['function_view'] ?? null,
+            'type'          => $menu['type'] ?? 'list',
+            'which_users'   => $menu['which_users'] ?? 'everyone',
+            'style'         => $menu['style'] ?? 'generic',
+        ];
+
+        if ($menu_mode == 'insert')
+        {
+            $args_item['created_at'] = 'NOW()';
+            insert('tb_menus', $args_item, false, $debug);
+            $current_id = inserted_id();
+        }
+        else
+        {
+            $args_item['updated_at'] = 'NOW()';
+            $args_item['data']  = $args_item;
+            $args_item['where'] = where_equal_id($menu['id']);
+            update('tb_menus', $args_item, false, $debug);
+            $current_id = $menu['id'];
+        }
+
+        $stack[] = ['id' => $current_id, 'depth' => $depth];
+        $updated_menu_order[] = ['id' => $current_id, 'depth' => $depth];
+
+        $order_reg++;
+    }
+
+    return [
+        'updated_menu_order' => $updated_menu_order,
+    ];
+}
+
+function get_menu_id_by_slug(string $slug = '') {
+    return get_col("SELECT id FROM tb_menus WHERE slug = '{$slug}'");
+}
 
 /**
  * Manage menu data in a content management system.
@@ -666,54 +759,21 @@ function manage_menu_system(array $data, string $mode, bool $debug = false)
             $prev = $parent_id = 0;
 
             $menu_order = $valid_data['menu-item'] ?? [];
-            $updated_menu_order = $stack = [];
-            $order_reg  = 1;
 
-            foreach ($menu_order as $menu)
+            if ($mode == 'update')
             {
-                $depth = isset($menu['depth']) ? (int)$menu['depth'] : 0;
-
-                while (!empty($stack) && end($stack)['depth'] >= $depth) {
-                    array_pop($stack);
-                }
-
-                $parent_id = empty($stack) ? 0 : end($stack)['id'];
-
-                $menu_mode = !empty($menu['id']) ? 'update' : 'insert';
-
-                $args_item = [
-                    'depth'         => $depth,
-                    'order_reg'     => $order_reg,
-                    'menu_id'       => $menu_id,
-                    'parent_id'     => $parent_id,
-                    'title'         => $menu['title'] ?? '',
-                    'icon'          => $menu['icon'] ?? '',
-                    'url'           => $menu['url'] ?? '',
-                    'function_view' => $menu['function_view'] ?? '',
-                    'type'          => $menu['type'] ?? 'list',
-                    'which_users'   => $menu['which_users'] ?? 'everyone',
-                    'style'         => $menu['style'] ?? 'generic',
-                ];
-
-                if ($menu_mode == 'insert') {
-                    $args_item['created_at'] = 'NOW()';
-                    insert('tb_menus', $args_item, false, $debug);
-                    $current_id = inserted_id();
-                }
-
-                else {
-                    $args_item['updated_at'] = 'NOW()';
-                    $args_item['data']     = $args_item;
-                    $args_item['where']    = where_equal_id($menu['id']);
-                    update('tb_menus', $args_item, false, $debug);
-                    $current_id = $menu['id'];
-                }
-
-                $stack[] = ['id' => $current_id, 'depth' => $depth];
-                $updated_menu_order[] = ['id' => $current_id, 'depth' => $depth];
-
-                $order_reg++;
+                $items = get_results("SELECT * FROM tb_menus WHERE menu_id = '$menu_id'");
+                $menu_order = array_merge($menu_order);
             }
+
+            $itemsRes = manage_menu_items([
+              'menu_id' => $menu_id,
+              'menu_order' => $menu_order,
+              'mode' => $mode,
+              'from' => 'in',
+            ], $debug);
+
+            $updated_menu_order = $itemsRes['updated_menu_order'] ?? [];
 
             $msg = alert_message("SC_TO_". strtoupper($mode), $msg_type);
 

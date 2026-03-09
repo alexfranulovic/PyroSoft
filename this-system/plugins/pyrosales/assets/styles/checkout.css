@@ -1,0 +1,126 @@
+.template-checkout nav {
+    box-shadow: unset;
+}
+
+    .template-checkout main {
+        padding-top: 2.5rem !important;
+    }
+@media (min-width: 992px) {
+}
+
+.template-checkout .steps-form {
+    /*padding: 0 !important;*/
+    padding-left: calc(var(--bs-gutter-x) * .5);
+    padding-right: calc(var(--bs-gutter-x) * .5);
+    order: 2;
+}
+
+@media (min-width: 992px) {
+    .template-checkout .steps-form {
+        /*order: 1 !important;*/
+        padding-right: 2rem;
+    }
+}
+
+@media (min-width: 992px) {
+    .template-checkout .order-details {
+        order: 2 !important;
+    }
+}
+
+
+.m-regressive-counter {
+    background-color: var(--bs-secondary);
+    border-top-left-radius: .5rem !important;
+    border-top-right-radius: .5rem !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.m-regressive-counter .m-header {
+    margin-bottom: 0  !important;
+    font-size: 0.8rem !important;
+    font-weight: 700;
+}
+
+.m-regressive-counter .row {
+    margin: 0;
+}
+
+.m-regressive-counter .content {
+    margin: 0 .313rem !important;
+    padding: 0 .313rem !important;
+    background-color: #fff;
+    border-radius: .5rem;
+}
+
+.m-regressive-counter .content.hours {
+    display: none;
+}
+
+.m-regressive-counter .content .number {
+    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    /*line-height: 1rem !important;*/
+}
+
+.m-regressive-counter .title {
+    font-size: .625rem !important;
+    /*line-height: 1rem !important;*/
+}
+
+.template-checkout .order-details .card {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    border-radius: .5rem;
+}
+
+.template-checkout .order-details .card-body {
+    /*text-align: center;*/
+    align-items: stretch;
+    border-radius: .75rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    display: flex;
+    padding: 1rem;
+}
+
+.template-checkout .order-details .card-body h2 {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.template-checkout .value-row {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between
+}
+
+.template-checkout .value-row span {
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.template-checkout .value-row .amount {
+    font-size: 1.25rem !important;
+    line-height: 1.75rem !important;
+    font-weight: 700;
+}
+
+.template-checkout .order-details p {
+    margin: 0;
+    text-align: center;
+}
+
+.template-checkout .order-details small {
+    font-size: 10px;
+    line-height: 1;
+    text-align: justify;
+    color: var(--bs-gray-600);
+}
+
+.template-checkout .order-details .secure {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--bs-green);
+}

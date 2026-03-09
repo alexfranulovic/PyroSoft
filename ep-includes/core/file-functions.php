@@ -156,17 +156,20 @@ function get_php_files_in(string $dir, bool $ForSelects = false)
  * @param bool $debug Indicates whether to display the uploaded image for debugging purposes. Defaults to false.
  * @return string|false The full path of the uploaded image if successful, false otherwise.
  */
-function media_upload_temp(array $params = [])
+function media_upload_temp(array $params = [], bool $debug = false)
 {
     $files        = $params['files'] ?? [];
     $folder       = $params['folder'] ?? 'uploads/temp/';
     $size         = $params['size'] ?? null; // only for images
-    $debug        = $params['debug'] ?? false;
     $allowed_exts = $params['allowed_exts'] ?? [];
     $force_webp   = isset($params['force_webp']) ? (bool)$params['force_webp'] : false;
-
     $upload_to_s3 = !empty($params['upload_to_s3']);
     $visibility   = $params['visibility'] ?? DEFAULT_FILES_VISIBILITY;
+
+    $quality = isset($params['quality']) ? (int)$params['quality'] : IMAGE_QUALITY;
+
+    if ($quality < 0) $quality = 0;
+    if ($quality > 100) $quality = 100;
 
     // Normalize allowed_exts
     if (is_string($allowed_exts)) {
@@ -325,6 +328,7 @@ function media_upload_temp(array $params = [])
                 $saved = save_image_temp([
                     'tmp_name'   => $file['tmp_name'],
                     'mime'       => $mime,
+                    'quality'    => $quality,
                     'dest_path'  => $destPath,
                     'size'       => $size,
                     'force_webp' => $force_webp,
@@ -332,12 +336,15 @@ function media_upload_temp(array $params = [])
 
                 if (!$saved) continue;
 
-            } else {
-                // ARCHIVE FLOW
+            }
+
+            else
+            {
                 if (!move_uploaded_file($file['tmp_name'], $destPath)) {
                     continue;
                 }
             }
+
 
             if ($debug) {
                 echo "<p>Saved: {$destPath}</p>";
@@ -389,6 +396,10 @@ function save_image_temp(array $p): bool
     $dest_path  = (string)($p['dest_path'] ?? '');
     $size       = $p['size'] ?? null;
     $force_webp = !empty($p['force_webp']);
+    $quality = isset($p['quality']) ? (int)$p['quality'] : IMAGE_QUALITY;
+
+    if ($quality < 0) $quality = 0;
+    if ($quality > 100) $quality = 100;
 
     if ($tmp_name === '' || $dest_path === '') return false;
 
@@ -447,20 +458,31 @@ function save_image_temp(array $p): bool
     }
 
     $ok = false;
-    switch ($ext) {
+
+    switch ($ext)
+    {
         case 'jpg':
         case 'jpeg':
-            $ok = imagejpeg($resized, $dest_path);
+            $ok = imagejpeg($resized, $dest_path, $quality);
             break;
-        case 'png':
-            $ok = imagepng($resized, $dest_path);
-            break;
+
         case 'webp':
-            $ok = imagewebp($resized, $dest_path, 100);
+            $ok = imagewebp($resized, $dest_path, $quality);
             break;
+
+        case 'png':
+            // Convert 0–100 quality into PNG compression 0–9 (inverted scale)
+            $png_level = 9 - (int)ceil(($quality / 100) * 9);
+            if ($png_level < 0) $png_level = 0;
+            if ($png_level > 9) $png_level = 9;
+
+            $ok = imagepng($resized, $dest_path, $png_level);
+            break;
+
         case 'gif':
             $ok = imagegif($resized, $dest_path);
             break;
+
         case 'bmp':
             $ok = imagebmp($resized, $dest_path);
             break;

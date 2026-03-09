@@ -371,6 +371,7 @@ function input(string $type_input, string $type_form, $Attr = [])
         $info,
         $inputs,
         $area,
+        $seg,
         $config;
 
     /**

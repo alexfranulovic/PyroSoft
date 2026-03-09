@@ -3,6 +3,7 @@ Disallow:
 #Disallow:/
 Disallow:
 Disallow: /cgi-bin/
+Disallow: /.git/
 Disallow: /this-system/*
 #Disallow: /areas/*
 Disallow: /ep-includes/*

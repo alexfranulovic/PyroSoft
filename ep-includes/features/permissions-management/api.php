@@ -88,10 +88,8 @@ register_rest_route('form-manage-custom-permission', [
         'label' => 'Liberar para:',
         'name' => 'allowed[]',
         'variation' => 'inline',
-        'Query' => 'SELECT id as value, name as display FROM tb_user_roles',
-        'Value' => get_results("
-          SELECT role_id as value FROM tb_user_role_permissions
-          WHERE permission_id = '{$id}' AND allowed = 1"),
+        'Options' => get_roles('list'),
+        'Value' => get_roles('custom', [ 'id' => $id ]),
       ]);
     }
 
@@ -104,10 +102,8 @@ register_rest_route('form-manage-custom-permission', [
         'label' => 'Liberar para:',
         'name' => 'allowed[]',
         'variation' => 'inline',
-        'Query' => 'SELECT id as value, name as display FROM tb_user_roles',
-        'Value' => get_results("
-          SELECT role_id as value FROM tb_user_role_permissions
-          WHERE page_id = '{$id}' AND allowed = 1"),
+        'Options' => get_roles('list'),
+        'Value' => get_roles('page', [ 'id' => $id ]),
       ]);
     }
 
@@ -123,10 +119,8 @@ register_rest_route('form-manage-custom-permission', [
           'label' => "Liberar \"{$trigger}\" para:",
           'name' => "allowed[{$name}][]",
           'variation' => 'inline',
-          'Query' => 'SELECT id as value, name as display FROM tb_user_roles',
-          'Value' => get_results("
-            SELECT role_id as value FROM tb_user_role_permissions
-            WHERE crud_id = '{$id}' AND allowed = 1 AND action_trigger = '{$name}'"),
+          'Options' => get_roles('list'),
+          'Value' => get_roles('crud', [ 'trigger' => $name, 'id' => $id ]),
         ]);
 
         $form.= "<strong>Código da permissão:</strong>

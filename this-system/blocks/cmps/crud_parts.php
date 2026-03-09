@@ -286,9 +286,10 @@ function form(array $Attr = [])
 
     $inputs        = $Attr['contents']['inputs'];
     $data          = $Attr['contents']['data'] ?? [];
+    $size          = $Attr['size'] ?? 'col-12';
     $type_form     = $Attr['type_crud'] ?? '';
     $form_method   = $Attr['form_method'] ?? 'post';
-    $view_mode     = $Attr['view_mode'] ?? 'post';
+    $view_mode     = $Attr['view_mode'] ?? 'default';
     $register_id   = $Attr['register_id'] ?? null;
 
     $form_action    = $Attr['form_action'] ?? '';
@@ -335,18 +336,18 @@ function form(array $Attr = [])
      * Choose form view.
      */
     if ($view_mode == 'default' || $view_mode == 'only_fields' || $view_mode == 'only_form') {
-        $res = default_form($Attr);
+        return default_form($Attr);
     }
 
     elseif ($view_mode == 'steps_form') {
-        $res = steps_form($Attr);
+        return steps_form($Attr);
     }
 
     elseif ($view_mode == 'tabs_form') {
-        $res = tabs_form($Attr);
+        return tabs_form($Attr);
     }
 
-    return $res;
+    return $res ?? '';
 }
 
 
@@ -365,6 +366,7 @@ function default_form(array $Attr = [])
 
     $inputs         = $Attr['contents']['inputs'];
     $data           = $Attr['contents']['data'] ?? [];
+    $size           = $Attr['size'] ?? 'col-12';
     $form_method    = $Attr['form_method'] ?? '';
     $register_id    = $Attr['register_id'] ?? null;
     $view_mode      = $Attr['view_mode'] ?? 'default';
@@ -455,7 +457,7 @@ function default_form(array $Attr = [])
     if ($view_mode != 'only_fields')
     {
         $res.= "
-        <section class='col-12 crud crud-form' $div_attributes>
+        <section class='$size crud crud-form' $div_attributes>
         <div class='card'>
             ". (!empty($Attr['crud_panel']['show_panel']) ? crud_panel($Attr['crud_panel'] ?? []) : '')."
             <div class='crud-body'>
@@ -488,6 +490,7 @@ function steps_form(array $Attr = [])
     // Tabs (each item has 'title' & 'childs')
     $steps          = $Attr['contents']['inputs'];
     $data           = $Attr['contents']['data'] ?? [];
+    $size          = $Attr['size'] ?? 'col-12';
     $type_form      = $Attr['type_crud'] ?? '';
     $register_id    = $Attr['register_id'] ?? null;
     $form_method    = $Attr['form_method'] ?? '';
@@ -667,7 +670,7 @@ function steps_form(array $Attr = [])
      */
     $html = '';
     $html.= "
-    <section class='module steps-form col-12'>";
+    <section class='module steps-form $size'>";
     if($container) $html.= "<div class='container-lg'>";
 
         $html.= "<form $delay step-form class='carousel-fade step-form' {$without_reload} method='{$form_method}' {$form_action} {$attr_form}>";
@@ -794,6 +797,7 @@ function tabs_form(array $Attr = [])
     // Tabs (each item has 'title' & 'childs')
     $tabs          = $Attr['contents']['inputs'];
     $data          = $Attr['contents']['data'] ?? [];
+    $size          = $Attr['size'] ?? 'col-12';
     $type_form     = $Attr['type_crud'] ?? '';
     $register_id   = $Attr['register_id'] ?? null;
     $form_method    = $Attr['form_method'] ?? '';

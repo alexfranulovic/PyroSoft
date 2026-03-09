@@ -1805,7 +1805,6 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
         <div class="card-body">
             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#edit-modules">Gerenciar campos</button>
         </div>
-
         </div>
 
         <?= SEO_form($type_form, [
@@ -2022,8 +2021,8 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
                     'size' => 'col-md-6',
                     'label' => 'Liberar para:',
                     'name' => 'allowed[]',
-                    'Query' => 'SELECT id as value, name as display FROM tb_user_roles',
-                    'Value' => ($type_form=='update') ? get_results("SELECT role_id as value FROM tb_user_role_permissions WHERE page_id = '{$id}' AND allowed = 1") : null,
+                    'Options' => get_roles('list'),
+                    'Value' => ($type_form=='update') ? get_roles('page', [ 'id' => $id ]) : null,
                     'Required' => true
                 ]
             );
@@ -2100,6 +2099,229 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
 }
 
 
+function get_page_id_by_slug(string $slug = '') {
+    return get_col("SELECT id FROM tb_pages WHERE slug = '{$slug}'");
+}
+
+
+/**
+ * Handles Modules routine (insert/update tb_page_content + move images).
+ *
+ * @param int $page_id
+ * @param array $valid_data
+ * @param string $mode 'insert'|'update'
+ * @param bool $debug
+ * @return array [updated_order=>array]
+ */
+function manage_page_modules(array $params, bool $debug = false): array
+{
+    $page_id    = (int)($params['page_id'] ?? 0);
+    $Modules    = $params['Modules'] ?? [];
+    $mode       = (string)($params['mode'] ?? '');
+    $from       = (string)($params['from'] ?? 'in');
+
+    if ($page_id <= 0) throw new Exception("Missing/invalid page_id.");
+    if (!in_array($mode, ['insert','update'], true)) throw new Exception("Invalid mode.");
+    if (!is_array($Modules)) $Modules = [];
+
+    if ($mode == 'update' && $from == 'out')
+    {
+        $items = get_results("SELECT * FROM tb_page_content WHERE page_id = '$page_id' ORDER BY order_reg ASC");
+        $Modules = array_merge($items, $Modules);
+    }
+
+    $order_reg = 1;
+    $updated_order = [];
+
+    foreach ($Modules as $Module)
+    {
+        $args_bd = [];
+        $pending_moves = [];
+
+        /*
+         * Treatment of TypeModule
+         */
+        $TypeModule = $Module['TypeModule'] ?? '';
+        unset($Module['TypeModule']);
+
+        /**
+         * Run the module content routine
+         */
+        if (isset($Module['contents']) && is_array($Module['contents']))
+        {
+            foreach ($Module['contents'] as $arr_key => $Content)
+            {
+                $args_module = [];
+
+                if (!empty($Content['image']))
+                {
+                    $image = is_json($Content['image'])
+                        ? json_decode($Content['image'], true)
+                        : $Content['image'];
+
+                    $image = (is_array($image) && isset($image[0])) ? $image[0] : $image;
+
+                    if (!empty($image))
+                    {
+                        $Content['image'] = $image;
+
+                        $pending_moves[] =
+                        [
+                            'temp_dir'   => TEMP_FILES_FOLDER,
+                            'dest_base'  => 'uploads/images/modules/',
+                            'files'      => [$image],
+                            'is_update'  => ($mode === 'update'),
+                            'field'      => 'image',
+                            'type'       => 'images',
+                        ];
+                    }
+                    else $Content['image'] = null;
+                }
+
+                /**
+                 * Compile the content's data.
+                 */
+                foreach ($Content as $label => $value)
+                {
+                    if ($label == 'size' AND is_array($value))
+                    {
+                        $args_module[$label] = implode(' ', $value);
+                        continue;
+                    }
+
+                    $args_module[$label] = (is_array($value) OR is_object($value))
+                        ? json_encode($value)
+                        : $value;
+                }
+
+                $args_bd['contents'][] = filter_empty_values($args_module);
+            }
+
+            $contents = json_encode($args_bd['contents']);
+        }
+        else $contents = isset($Module['contents']) ? $Module['contents'] : '';
+
+        /**
+         * Upload the background image.
+         */
+        if (!empty($Module['background']['image']))
+        {
+            $image = is_json($Module['background']['image'])
+                ? json_decode($Module['background']['image'], true)
+                : $Module['background']['image'];
+
+            $image = (is_array($image) && isset($image[0])) ? $image[0] : $image;
+
+            if (!empty($image))
+            {
+                $Module['background']['image'] = $image;
+
+                $pending_moves[] =
+                [
+                    'temp_dir'   => TEMP_FILES_FOLDER,
+                    'dest_base'  => 'uploads/images/modules/',
+                    'files'      => [$image],
+                    'is_update'  => ($mode === 'update'),
+                    'field'      => 'image',
+                    'type'       => 'images',
+                ];
+            }
+            else $Module['background']['image'] = null;
+        }
+
+        /**
+         * Compile the module's data.
+         */
+        foreach ($Module as $key => $value)
+        {
+            if ($key == 'status_id' OR (isset($upload_bd) AND $key == 'image')) continue;
+
+            if ($key == 'size' AND is_array($value))
+            {
+                $args_bd[$key] = implode(' ', $value);
+                continue;
+            }
+
+            $args_bd[$key] = (is_array($value) OR is_object($value))
+                ? json_encode($value)
+                : $value;
+        }
+
+        /**
+         * Group by settings.
+         */
+        $res = filter_empty_values($args_bd);
+        unset($res['contents'], $args_bd);
+        unset($res['id']);
+
+        /**
+         * Add the args.
+         */
+        $args_bd['contents']         = $contents;
+        $args_bd['settings']         = json_encode($res);
+        $args_bd['page_id']          = $page_id;
+        $args_bd['crud_id']          = $res['crud_id'] ?? null;
+        $args_bd['order_reg']        = $order_reg;
+        $args_bd['TypeModule']       = $TypeModule;
+        $args_bd['subscribers_only'] = $Module['subscribers_only'] ?? '';
+        $args_bd['status_id']        = $Module['status_id'] ?? 1;
+        unset($res['crud_id']);
+
+        /**
+         * Insert new module or update existing.
+         */
+        if ($mode == 'insert' OR empty($Module['id']))
+        {
+            insert('tb_page_content', $args_bd, $debug);
+            $current_id = inserted_id();
+        }
+        else
+        {
+            $args_bd['data']  = $args_bd;
+            $args_bd['where'] = where_equal_id($Module['id']);
+
+            update('tb_page_content', $args_bd, true, false);
+            $current_id = $Module['id'];
+        }
+
+        $updated_order[] = ['id' => $current_id, 'depth' => $depth ?? 0];
+
+        /**
+         * Move images
+         */
+        if (!empty($pending_moves))
+        {
+            foreach ($pending_moves as $mv)
+            {
+                if (empty($mv['files'])) continue;
+
+                $dest = rtrim($mv['dest_base'], '/') . '/';
+
+                if (!is_dir($dest)) mkdir($dest, 0755, true);
+
+                foreach ($mv['files'] as $fname)
+                {
+                    if (!$fname) continue;
+
+                    $origin = rtrim($mv['temp_dir'], '/') . "/{$fname}";
+                    $target = $dest . $fname;
+
+                    if (file_exists($origin)) {
+                        @rename($origin, $target);
+                    }
+                }
+            }
+        }
+
+        $order_reg++;
+    }
+
+    return [
+        'updated_order' => $updated_order,
+    ];
+}
+
+
 
 /**
  * Manage page data in a content management system.
@@ -2150,6 +2372,9 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
             $valid_data['seo']['image'] = $fileName ?? null;
         }
 
+        $page_id = '';
+        $id = $valid_data['id'] ?? '';
+
         $args = [
             'title'           => $valid_data['title'] ?? '',
             'slug'            => !empty($valid_data['slug']) ? sanitize_string($valid_data['slug']) : '',
@@ -2173,7 +2398,7 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
         {
             $args['updated_at'] = 'NOW()';
             $args['data']  = $args;
-            $args['where'] = where_equal_id($valid_data['id']);
+            $args['where'] = where_equal_id($id);
         }
 
         // Lights, camera & action.
@@ -2187,7 +2412,7 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
          */
         if ($verifyer()) :
 
-            $page_id = ($mode == 'insert') ? inserted_id() : $valid_data['id'];
+            $page_id = ($mode == 'insert') ? inserted_id() : $id;
             unset($_SESSION['FormData']);
 
 
@@ -2234,232 +2459,14 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
             $Modules   = isset($valid_data['Modules']) ? $valid_data['Modules'] : [];
             $order_reg = 1;
 
-            $updated_order = [];
-            foreach ($Modules as $Module)
-            {
-                $args_bd = [];
+            $modulesRes = manage_page_modules([
+              'page_id' => $page_id,
+              'Modules' => $Modules,
+              'mode' => $mode,
+              'from' => 'in',
+            ], $debug);
 
-
-                /*
-                 * Treatment of TypeModule
-                 */
-                $TypeModule = $Module['TypeModule'];
-                unset($Module['TypeModule']);
-
-
-                /**
-                 *
-                 * Run the module content routine
-                 *
-                 */
-                if (isset($Module['contents']) && is_array($Module['contents']))
-                {
-                    foreach ($Module['contents'] as $arr_key => $Content)
-                    {
-                        $args_module = [];
-
-
-                        if (!empty($Content['image']))
-                        {
-                            $image = is_json($Content['image'])
-                                ? json_decode($Content['image'], true)
-                                : $Content['image'];
-
-                            $image = (is_array($image) && isset($image[0]))
-                                ? $image[0]
-                                : $image;
-
-
-                            if (!empty($image))
-                            {
-                                $Content['image'] = $image;
-
-                                $pending_moves[] =
-                                [
-                                    'temp_dir'   => TEMP_FILES_FOLDER,
-                                    'dest_base'  => 'uploads/images/modules/',
-                                    'files'      => [$image],
-                                    'is_update'  => ($mode === 'update'),
-                                    'field'      => 'image',
-                                    'type'       => 'images',
-                                ];
-                            }
-
-                            else $Content['image'] = null;
-                        }
-
-
-                        /**
-                         *
-                         * This compile the content's datas.
-                         *
-                         */
-                        foreach ($Content as $label => $value)
-                        {
-                            if ($label == 'size' AND is_array($value))
-                            {
-                                $args_module[$label] = implode(' ', $value);
-                                continue;
-                            }
-
-                            $args_module[$label] = (is_array($value) OR is_object($value))
-                                ? json_encode($value)
-                                : $value;
-                        }
-
-                        $args_bd['contents'][] = filter_empty_values($args_module);
-                    }
-
-                    // Encode the Module content
-                    $contents = json_encode($args_bd['contents']);
-                }
-
-                // Depending of the context, just put the content straight.
-                else $contents = isset($Module['contents']) ? $Module['contents'] : '';
-
-
-                /**
-                 *
-                 * Upload the background image.
-                 *
-                 */
-                if (!empty($Module['background']['image']))
-                {
-                    $image = is_json($Module['background']['image'])
-                        ? json_decode($Module['background']['image'], true)
-                        : $Module['background']['image'];
-
-                    $image = (is_array($image) && isset($image[0]))
-                        ? $image[0]
-                        : $image;
-
-
-                    if (!empty($image))
-                    {
-                        $Module['background']['image'] = $image;
-
-                        $pending_moves[] =
-                        [
-                            'temp_dir'   => TEMP_FILES_FOLDER,
-                            'dest_base'  => 'uploads/images/modules/',
-                            'files'      => [$image],
-                            'is_update'  => ($mode === 'update'),
-                            'field'      => 'image',
-                            'type'       => 'images',
-                        ];
-                    }
-
-                    else $Module['background']['image'] = null;
-                }
-
-
-                /**
-                 *
-                 * This compile the module's datas.
-                 *
-                 */
-                foreach ($Module as $key => $value)
-                {
-                    if ($key == 'status_id' OR (isset($upload_bd) AND $key == 'image')) continue;
-                    if ($key == 'size' AND is_array($value))
-                    {
-                        $args_bd[$key] = implode(' ', $value);
-                        continue;
-                    }
-                    $args_bd[$key] = (is_array($value) OR is_object($value)) ? json_encode($value) : $value;
-                }
-
-
-                /**
-                 *
-                 * Group by settings.
-                 *
-                 */
-                $res = filter_empty_values($args_bd);
-                unset($res['contents'], $args_bd);
-                unset($res['id']);
-
-
-                /**
-                 *
-                 * Add the args.
-                 *
-                 */
-                $args_bd['contents']         = $contents;
-                $args_bd['settings']         = json_encode($res);
-                $args_bd['page_id']          = $page_id;
-                $args_bd['crud_id']          = $res['crud_id'] ?? null;
-                $args_bd['order_reg']        = $order_reg;
-                $args_bd['TypeModule']       = $TypeModule;
-                $args_bd['subscribers_only'] = $Module['subscribers_only'] ?? '';
-                $args_bd['status_id']        = $Module['status_id'] ?? 1;
-                unset($res['crud_id']);
-
-                // print_r($args_bd);
-                // exit;
-
-                /**
-                 *
-                 * Verify If insert a new module.
-                 *
-                 */
-                if ($mode == 'insert'
-                    OR empty($Module['id'])
-                ) {
-                    insert('tb_page_content', $args_bd, $debug);
-                    $current_id = inserted_id();
-                }
-
-                /**
-                 *
-                 * OR edit an existent.
-                 *
-                 */
-                else
-                {
-                    $args_bd['data']       = $args_bd;
-                    $args_bd['where']      = where_equal_id($Module['id']);
-
-                    update('tb_page_content', $args_bd, true, false);
-                        // print_r($args_bd);
-                    $current_id = $Module['id'];
-                }
-
-                $updated_order[] = ['id' => $current_id, 'depth' => $depth ?? 0];
-
-
-                /**
-                 *
-                 * Move images
-                 *
-                 */
-                if (!empty($pending_moves))
-                {
-                    foreach ($pending_moves as $mv)
-                    {
-                        if (empty($mv['files'])) continue;
-
-                        $dest = rtrim($mv['dest_base'], '/').'/';
-
-                        if (!is_dir($dest)) mkdir($dest, 0755, true);
-
-                        foreach ($mv['files'] as $fname)
-                        {
-                            if (!$fname) continue;
-
-                            // SEM subpastas no temp — origem direta:
-                            $origin = rtrim($mv['temp_dir'], '/')."/{$fname}";
-                            $target = $dest . $fname;
-
-                            if (file_exists($origin)) {
-                                @rename($origin, $target);
-                            }
-                        }
-                    }
-                }
-
-                $order_reg++;
-            }
+            $updated_order = $modulesRes['updated_order'] ?? [];
 
 
             /**
@@ -2508,6 +2515,7 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
             'type' => $msg_type,
             'msg' => $msg,
         ],
+        'page_id' => $page_id
     ];
 
     $res['updated_items_order'] = $updated_order ?? [];

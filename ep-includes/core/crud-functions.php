@@ -496,6 +496,7 @@ function crud_piece(array $Attr = [])
     global $page, $current_user, $info;
 
     $piece_id = $Attr['piece_id'] ?? null;
+    $size     = $Attr['size'] ?? null;
 
 
     /**
@@ -801,10 +802,10 @@ function crud_piece(array $Attr = [])
                 {
                     if ($input['type'] == 'GET')
                     {
-                        if (empty($_GET[$input['name']])) {
+                        if (empty($_GET[$input['pointer']])) {
                             continue;
                         } else {
-                            $input_value = $_GET[$input['name']];
+                            $input_value = $_GET[$input['pointer']];
                         }
                     }
 
@@ -930,6 +931,7 @@ function crud_piece(array $Attr = [])
          *
          */
         $form = [
+            'size'           => $size,
             'register_id'    => $register_id ?? ($id ?? null),
             'view_mode'      => $form_settings['view_mode'],
             'without_reload' => isset($form_settings['without_reload']),

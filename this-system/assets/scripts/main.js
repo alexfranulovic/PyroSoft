@@ -275,7 +275,14 @@ if (all_final_moments != null)
   {
     var final_moment = current_moment.getAttribute('data-final-moment');
     var slipted_moment = final_moment.split(/[\s:-]+/);
-    var final_hour = new Date(slipted_moment[0], slipted_moment[1] - 1, slipted_moment[2], slipted_moment[3], slipted_moment[4], slipted_moment[5] || 0);
+    var final_hour = new Date(
+      slipted_moment[0],
+      slipted_moment[1] - 1,
+      slipted_moment[2],
+      slipted_moment[3],
+      slipted_moment[4],
+      slipted_moment[5] || 0
+    );
 
     var interval = setInterval(function()
     {
@@ -284,22 +291,34 @@ if (all_final_moments != null)
       }));
 
       var diference = final_hour - sp_now;
-      var viewer_years = current_moment.querySelector('[data-years]');
-      var viewer_months = current_moment.querySelector('[data-months]');
-      var viewer_days = current_moment.querySelector('[data-days]');
-      var viewer_hours = current_moment.querySelector('[data-hours]');
+
+      var viewer_years   = current_moment.querySelector('[data-years]');
+      var viewer_months  = current_moment.querySelector('[data-months]');
+      var viewer_days    = current_moment.querySelector('[data-days]');
+      var viewer_hours   = current_moment.querySelector('[data-hours]');
       var viewer_minutes = current_moment.querySelector('[data-minutes]');
       var viewer_seconds = current_moment.querySelector('[data-seconds]');
+
+      // helper: safely set text
+      function setText(el, value) {
+        if (el) el.textContent = value;
+      }
+
+      // helper: safely hide parent
+      function hideParent(el) {
+        if (el && el.parentNode) el.parentNode.style.display = 'none';
+      }
 
       if (diference <= 0)
       {
         clearInterval(interval);
-        viewer_years.textContent   = '00';
-        viewer_months.textContent  = '00';
-        viewer_days.textContent    = '00';
-        viewer_hours.textContent   = '00';
-        viewer_minutes.textContent = '00';
-        viewer_seconds.textContent = '00';
+
+        setText(viewer_years, '0');
+        setText(viewer_months, '0');
+        setText(viewer_days, '0');
+        setText(viewer_hours, '0');
+        setText(viewer_minutes, '0');
+        setText(viewer_seconds, '0');
         return;
       }
 
@@ -310,12 +329,18 @@ if (all_final_moments != null)
       var minutes = Math.floor((diference % (1000 * 60 * 60)) / (1000 * 60));
       var seconds = Math.floor((diference % (1000 * 60)) / 1000);
 
-      (years !== 0) ? viewer_years.textContent = `${years}`.padStart(2, '0') : viewer_years.parentNode.style.display = 'none';
-      (months !== 0) ? viewer_months.textContent = `${months}`.padStart(2, '0') : viewer_months.parentNode.style.display = 'none';
-      (days !== 0) ? viewer_days.textContent = `${days}`.padStart(2, '0') : viewer_days.parentNode.style.display = 'none';
-      viewer_hours.textContent = `${hours}`.padStart(2, '0');
-      viewer_minutes.textContent = `${minutes}`.padStart(2, '0');
-      viewer_seconds.textContent = `${seconds}`.padStart(2, '0');
+      if (years !== 0) setText(viewer_years, `${years}`.padStart(1, '0'));
+      else hideParent(viewer_years);
+
+      if (months !== 0) setText(viewer_months, `${months}`.padStart(1, '0'));
+      else hideParent(viewer_months);
+
+      if (days !== 0) setText(viewer_days, `${days}`.padStart(1, '0'));
+      else hideParent(viewer_days);
+
+      setText(viewer_hours,   `${hours}`.padStart(1, '0'));
+      setText(viewer_minutes, `${minutes}`.padStart(1, '0'));
+      setText(viewer_seconds, `${seconds}`.padStart(1, '0'));
     }, 500);
   });
 }

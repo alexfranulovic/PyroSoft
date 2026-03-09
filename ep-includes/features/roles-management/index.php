@@ -160,7 +160,7 @@ function manage_roles_form(string $type_form = 'insert', int $counter = 1)
                 'name' => 'type',
                 'Options' => [
                     [ 'value' => 'role', 'display' => 'Função' ],
-                    [ 'value' => 'signature', 'display' => 'Assinatura' ],
+                    [ 'value' => 'plan', 'display' => 'Plano' ],
                 ],
                 'Value' => ($type_form=='update') ? $role['type'] : '',
                 'Required' => true

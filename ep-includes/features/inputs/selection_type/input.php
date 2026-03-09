@@ -176,8 +176,11 @@ function input_selection_type(string $type_form, array $Attr = [])
                 <label for='$option_id'>$display</label>";
             }
 
-            elseif ($variation == 'block')
+            elseif ($variation == 'block' OR $variation == 'group-block')
             {
+                $image = !empty($option['image'])
+                    ? "<img src='{$option['image']}' loading='lazy' alt='$display'>"
+                    : '';
                 $highlight = !empty($option['highlight'])
                     ? "<div class='highlight'><span>{$option['highlight']}</span></div>"
                     : '';
@@ -189,10 +192,11 @@ function input_selection_type(string $type_form, array $Attr = [])
                     : '';
 
                 $res.= "
-                <label class='block' for='$option_id'>
+                <label class='$variation' for='$option_id'>
                 {$highlight}
                 <div class='content'>
                 <input $attributes type='$type' name='$name' id='$option_id' value='{$option_value}' $check>
+                $image
                 <span class='description'>
                     <span class='title'>$display</span>
                     {$description}

@@ -1,0 +1,7 @@
+{
+    "name": "Cart",
+    "description": "Core cart system for managing product insertion, quantity updates and removal for guests (session) and authenticated users (database).",
+    "version": "1.0.0",
+    "plugin_uri": "",
+    "author": "Alex Franulovic"
+}

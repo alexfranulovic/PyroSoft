@@ -286,7 +286,7 @@ function filter_empty_values_new(array $data)
 function filter_empty_values(array $data)
 {
    $trim_recursive = function($value) use (&$trim_recursive) {
-       return is_array($value) ? array_map($trim_recursive, $value) : trim($value);
+       return is_array($value) ? array_map($trim_recursive, $value) : trim($value ?? '');
    };
 
    $trimmed_data = array_map($trim_recursive, $data);

@@ -2,7 +2,7 @@
 if (!isset($seg)) exit;
 
 
-define('PYROSOFT_VERSION', '1.0.3');
+define('PYROSOFT_VERSION', '1.0.4');
 
 /**
  * Define itens for CRON operations.
@@ -48,6 +48,7 @@ define('APP_LOG_FILE', APP_LOG_DIR . '/app.log');
 /**
  * Inputs
  */
+if (!defined('IMAGE_QUALITY'))         define('IMAGE_QUALITY', 30);      // seconds
 if (!defined('MIN_TIME_AUDIO'))        define('MIN_TIME_AUDIO', 1);       // seconds
 if (!defined('MAX_TIME_AUDIO'))        define('MAX_TIME_AUDIO', 10);      // seconds
 if (!defined('EVENT_DEFAULT_HOUR'))    define('EVENT_DEFAULT_HOUR', "09:00");

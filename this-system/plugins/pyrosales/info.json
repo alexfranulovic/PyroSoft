@@ -1,0 +1,7 @@
+{
+    "name": "PyroSales",
+  "description": "Order and payment management system for products, plans and mixed transactions. Includes checkout processing, financial snapshots, coupons, fees and payment gateway integration.",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": "Alex"
+}

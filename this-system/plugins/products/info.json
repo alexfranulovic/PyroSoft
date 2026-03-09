@@ -1,0 +1,7 @@
+{
+    "name": "Products",
+    "description": "Provides a complete product management system with support for simple, variable and downloadable products, categories, media gallery and stock control.",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": "Alex"
+}

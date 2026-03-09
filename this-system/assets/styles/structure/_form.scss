@@ -337,6 +337,7 @@ fieldset
             }
         }
 
+        .group-block,
         .block
         {
             border: 1px solid #000;
@@ -392,8 +393,13 @@ fieldset
                 font-size: 1.313rem;
             }
 
+            img {
+                max-width: 25px;
+                margin-right: .75rem;
+            }
+
             p {
-                margin-top: .313rem;
+                margin-top: 0;
                 font-size: .813rem;
                 // font-weight: 400;
             }
@@ -401,6 +407,18 @@ fieldset
             small {
                 font-size: italic;
                 margin-top: .5rem;
+            }
+        }
+
+        .group-block
+        {
+            width: 100%;
+            border-radius: 0;
+            margin: 0;
+            border-color: var(--bs-border-color);
+
+            .title {
+                font-size: 1rem;
             }
         }
     }

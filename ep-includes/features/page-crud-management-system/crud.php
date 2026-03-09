@@ -618,7 +618,8 @@ function get_crud_piece_to_edit($id = 0)
      * Show the setp form settings.
      *
      */
-    $display_steps_form= !in_array('steps_form', $crud['form_settings'])
+    $form_settings = $crud['form_settings'] ?? [];
+    $display_steps_form= !in_array('steps_form', $form_settings)
         ? 'style="display: none;"'
         : '';
     $display_steps_form.= 'steps-form-settings';
@@ -630,7 +631,7 @@ function get_crud_piece_to_edit($id = 0)
             'size' => 'col-12',
             'name' => "form_settings[container]",
             'Options' => "1|| 1|| Container;",
-            'Value' => $crud['form_settings']['container'] ?? null,
+            'Value' => $form_settings['container'] ?? null,
         ]
     ) . input('selection_type', 'update',
         [
@@ -645,7 +646,7 @@ function get_crud_piece_to_edit($id = 0)
                 [ 'name' => 'form_settings[steps_form][show_progess]', 'value' => '1', 'display' => 'Mostrar progresso' ],
                 [ 'name' => 'form_settings[steps_form][show_steps]', 'value' => '1', 'display' => 'Mostrar passos' ],
             ],
-            'Value' => $crud['form_settings']['steps_form'] ?? [],
+            'Value' => $form_settings['steps_form'] ?? [],
             // 'Required' => true
         ]
     ) . input('selection_type', 'update',
@@ -663,7 +664,7 @@ function get_crud_piece_to_edit($id = 0)
                 [ 'value' => 'progress_steps_detailed_vertical' ],
                 [ 'value' => 'progress_steps_summary_vertical' ],
             ],
-            'Value' => $crud['form_settings']['steps_form']['progess_style'] ?? 'progress_bar'
+            'Value' => $form_settings['steps_form']['progess_style'] ?? 'progress_bar'
         ]
     ) . input('selection_type', 'update',
         [
@@ -671,7 +672,7 @@ function get_crud_piece_to_edit($id = 0)
             'label' => 'Cor do progresso',
             'name' => "form_settings[steps_form][progress_color]",
             'Options' => theme_background_colors(true),
-            'Value' => $crud['form_settings']['steps_form']['progress_color'] ?? '',
+            'Value' => $form_settings['steps_form']['progress_color'] ?? '',
             // 'Required' => true
         ]
     ) . input('basic', 'update',
@@ -679,7 +680,7 @@ function get_crud_piece_to_edit($id = 0)
             'size' => 'col-12',
             'label' => 'Nome botão de salvar',
             'name' => "form_settings[steps_form][button_name_send]",
-            'Value' => $crud['form_settings']['steps_form']['button_name_send'] ?? '',
+            'Value' => $form_settings['steps_form']['button_name_send'] ?? '',
         ]
     );
     $steps_form.= "</div>";
@@ -1499,10 +1500,8 @@ function manage_crud_form(string $type_form = 'insert', int $counter = 1)
                 'label' => "Liberar \"{$trigger}\" para:",
                 'name' => "allowed[{$name}][]",
                 'variation' => 'inline',
-                'Query' => 'SELECT id as value, name as display FROM tb_user_roles',
-                'Value' => get_results("
-                    SELECT role_id as value FROM tb_user_role_permissions
-                    WHERE crud_id = '{$id}' AND allowed = 1 AND action_trigger = '{$name}'"),
+                'Options' => get_roles('list'),
+                'Value' => get_roles('crud', [ 'trigger' => $name, 'id' => $id ]),
                 ]);
             }?>
 
@@ -1732,6 +1731,174 @@ function manage_crud_form(string $type_form = 'insert', int $counter = 1)
 }
 
 
+function get_crud_id_by_slug(string $slug = '') {
+    return get_col("SELECT id FROM tb_cruds WHERE slug = '{$slug}'");
+}
+
+
+/**
+ * Handles CRUD Fields routine (insert/update tb_cruds_fields + optional bd_action).
+ * Extracted from manage_crud_system() without changing your logic.
+ *
+ * @param int $crud_id
+ * @param array $valid_data
+ * @param string $mode 'insert'|'update'
+ * @param string $type_crud
+ * @param bool $debug
+ * @return array [updated_order=>array]
+ */
+function manage_crud_fields(array $params, bool $debug = false): array
+{
+    $crud_id    = (int)($params['crud_id'] ?? 0);
+    $Fields     = $params['Fields'] ?? [];
+    $type_crud  = (string)($params['type_crud'] ?? '');
+    $mode       = (string)($params['mode'] ?? '');
+    $from       = (string)($params['from'] ?? 'in');
+
+    if ($crud_id <= 0) throw new Exception("Missing/invalid crud_id.");
+    if (!in_array($mode, ['insert','update'], true)) throw new Exception("Invalid mode.");
+    if (!is_array($Fields)) $Fields = [];
+
+    if ($mode == 'update' && $from == 'out')
+    {
+        $items = get_results("SELECT * FROM tb_cruds_fields WHERE crud_id = '$crud_id' ORDER BY order_reg ASC");
+        $Fields = array_merge($items, $Fields);
+    }
+
+    $order_reg = 1;
+    $updated_order = [];
+
+    foreach ($Fields as $field)
+    {
+        $type_field = $field['type_field'] ?? '';
+
+        $args_bd = [];
+        $exceptions = [
+            'status_id',
+            'view_in_list',
+            'type_field',
+            'name',
+            'id',
+        ];
+
+        foreach ($field as $key => $value)
+        {
+            if (in_array($key, $exceptions, true)) continue;
+
+            if ($key === 'size' && is_array($value)) {
+                $args_bd[$key] = implode(' ', $value);
+                continue;
+            }
+
+            $args_bd[$key] = (is_array($value) || is_object($value))
+                ? json_encode($value)
+                : $value;
+        }
+
+        $args_bd = filter_empty_values($args_bd);
+        $args_bd['Query'] = isset($args_bd['Query']) ? $args_bd['Query'] : '';
+
+        $res = $args_bd;
+        unset(
+            $res['contents'],
+            $res['old_name'],
+            $args_bd
+        );
+
+        $args_bd['name']             = $field['name'] ?? '';
+        $args_bd['settings']         = json_encode($res);
+        $args_bd['view_in_list']     = $field['view_in_list'] ?? '';
+        $args_bd['subscribers_only'] = $field['subscribers_only'] ?? '';
+        $args_bd['status_id']        = $field['status_id'] ?? 1;
+        $args_bd['crud_id']          = $crud_id;
+        $args_bd['order_reg']        = $order_reg;
+        $args_bd['type_field']       = $type_field;
+
+        // Insert new field
+        if ($mode == 'insert' || empty($field['id']))
+        {
+            $input_mode_was = 'insert';
+
+            insert('tb_cruds_fields', $args_bd, false, $debug);
+            $current_id = inserted_id();
+        }
+        // Update existing
+        else
+        {
+            $input_mode_was = 'update';
+
+            $args_bd['data']  = $args_bd;
+            $args_bd['where'] = where_equal_id($field['id']);
+
+            update('tb_cruds_fields', $args_bd, false, $debug);
+            $current_id = $field['id'];
+        }
+
+        $updated_order[] = [
+            'id' => $current_id,
+            'depth' => $depth ?? 0
+        ];
+
+        /**
+         * Add/Rename DB column if required.
+         */
+        if (!empty($type_field) && isset($field['bd_action']) && $type_crud != 'master')
+        {
+            $name     = $field['name'] ?? null;
+            $old_name = $field['old_name'] ?? null;
+
+            $idCrud     = get_col("SELECT crud_id FROM tb_cruds WHERE id = {$valid_data['id']}");
+            $table_crud = get_col("SELECT table_crud FROM tb_cruds WHERE id = {$idCrud} AND type_crud = 'master'");
+
+            $table = !empty($field['table'])
+                ? $field['table']
+                : ($table_crud ?? '');
+
+            if (in_array($type_field, ['hidden','basic','address_form'], true)) {
+                $type = 'VARCHAR(250)';
+            } elseif (in_array($type_field, ['textarea','upload'], true)) {
+                $type = 'longtext';
+            } elseif ($type_field === 'status_selector') {
+                $type = 'VARCHAR(11)';
+            } else {
+                $type = 'VARCHAR(50)';
+            }
+
+            $search_col = ($input_mode_was == 'update') ? $old_name : $name;
+
+            $field_exist = if_exist_col_bd($table, $search_col);
+
+            if (!$field_exist) {
+                add_col_bd($table, $name, $type);
+            }
+            elseif ($field_exist && ($old_name != $name))
+            {
+                rename_col_bd($table, $old_name, $name, $type);
+
+                $sql = "
+                UPDATE tb_cruds_fields AS f
+                SET f.name = '{$name}'
+                WHERE f.name = '{$old_name}'
+                  AND f.crud_id IN (
+                    SELECT c.id
+                    FROM tb_cruds AS c
+                    INNER JOIN tb_cruds AS m ON m.id = c.crud_id
+                    WHERE m.type_crud = 'master'
+                      AND m.table_crud = '{$table_crud}'
+                  )";
+                query_it($sql);
+            }
+        }
+
+        $order_reg++;
+    }
+
+    return [
+        'updated_order' => $updated_order,
+    ];
+}
+
+
 /**
  * Manage crud data in a content management system.
  *
@@ -1748,8 +1915,8 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
     $error        = false;
     $valid_data   = $data;
 
-
     // print_r($valid_data);
+    // die;
 
     $msg_type = 'toast';
 
@@ -1759,6 +1926,9 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
     if     ($mode == 'insert') $verifyer = 'inserted_id';
     elseif ($mode == 'update') $verifyer = 'affected_rows';
     else                       $error    = true;
+
+    $crud_id = '';
+    $id = $valid_data['id'] ?? '';
 
 
     // Verify If there's an error
@@ -1789,7 +1959,7 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
            'custom_urls'        => $valid_data['custom_urls'] ?? [],
            // 'limit_results'     => $valid_data['limit_results'] ?? null,
            'foreign_key'        => $valid_data['foreign_key'] ?? null,
-           'permission_type'   => $valid_data['permission_type'] ?? null,
+           'permission_type'   => $valid_data['permission_type'] ?? 'only_these',
            'status_id'         => $valid_data['status_id'] ?? null,
            'login_required'    => $valid_data['login_required'] ?? null,
         ];
@@ -1808,12 +1978,12 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
         {
            $args['updated_at'] = 'NOW()';
            $args['data']  = $args;
-           $args['where'] = where_equal_id($valid_data['id']);
+           $args['where'] = where_equal_id($id);
         }
 
 
         // Lights, camera & action.
-        $mode('tb_cruds', $args, $debug);
+        $mode('tb_cruds', $args, false, $debug);
 
 
         /*
@@ -1821,199 +1991,56 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
         */
         if ($verifyer())
         {
-           $crud_id = ($mode == 'insert')
-               ? inserted_id()
-               : $valid_data['id'];
+            $crud_id = ($mode == 'insert')
+                ? inserted_id()
+                : $id;
 
-           unset($_SESSION['FormData']);
-
-
-           $Fields      = $valid_data['Fields'] ?? [];
-           $order_reg   = 1;
-
-           // print_r($Fields);
-
-           /*
-            * Run the routine of the fields.
-            */
-           $updated_order = [];
-           foreach ($Fields as $field)
-           {
-               /*
-                * Treatment of type_field.
-                */
-               $type_field = $field['type_field'] ?? '';
+            unset($_SESSION['FormData']);
 
 
-               /*
-                * This compile the field's datas.
-                */
-               $args_bd = [];
-               $exceptions = [
-                   'status_id',
-                   'view_in_list',
-                   'type_field',
-                   'name',
-                   'id',
-               ];
+            $Fields      = $valid_data['Fields'] ?? [];
+            $order_reg   = 1;
 
-               foreach ($field as $key => $value)
-               {
-                   if (in_array($key, $exceptions)) continue;
+            // print_r($Fields);
 
-                   if ($key === 'size' && is_array($value)) {
-                       $args_bd[$key] = implode(' ', $value);
-                       continue;
-                   }
-
-                   $args_bd[$key] = (is_array($value) || is_object($value)) ? json_encode($value) : $value;
-               }
+            /**
+             * Run the routine of the fields.
+             */
+            // $fieldsRes = manage_crud_fields((int)$crud_id, $valid_data, $mode, $type_crud, $debug);
+            $fieldsRes = manage_crud_fields([
+              'crud_id' => $crud_id,
+              'Fields' => $Fields,
+              'mode' => $mode,
+              'type_crud' => $type_crud,
+              'from' => 'in',
+            ], $debug);
+            $updated_order = $fieldsRes['updated_order'] ?? [];
 
 
-                /*
-                 * Group by settings.
-                 */
-                $args_bd  = filter_empty_values($args_bd);
-                $args_bd['Query'] = isset($args_bd['Query']) ? $args_bd['Query'] : '';
-
-                $res = $args_bd;
-                unset(
-                    $res['contents'],
-                    $res['old_name'],
-                    $args_bd
-                );
-
-
-                /*
-                 * This add more infos to the field's datas.
-                 */
-                $args_bd['name']             = $field['name'] ?? '';
-                $args_bd['settings']         = json_encode($res);
-                $args_bd['view_in_list']     = $field['view_in_list'] ?? '';
-                $args_bd['subscribers_only'] = $field['subscribers_only'] ?? '';
-                $args_bd['status_id']        = $field['status_id'] ?? 1;
-                $args_bd['crud_id']          = $crud_id;
-                $args_bd['order_reg']        = $order_reg;
-                $args_bd['type_field']        = $type_field;
-
-
-                // Verify If insert a new field
-                if ($mode == 'insert'
-                    OR empty($field['id'])
-                 ) {
-                    // This var is used to 'bd_action' flow.
-                    $input_mode_was = 'insert';
-
-                    insert('tb_cruds_fields', $args_bd, false, $debug);
-                    $current_id = inserted_id();
-                }
-
-                // OR edit an existent
-                else
-                {
-                    // This var is used to 'bd_action' flow.
-                    $input_mode_was = 'update';
-
-                    $args_bd['data']  = $args_bd;
-                    $args_bd['where'] = where_equal_id($field['id']);
-
-                    update('tb_cruds_fields', $args_bd, false, $debug);
-                    $current_id = $field['id'];
-                }
-
-                $updated_order[] = [
-                    'id' => $current_id,
-                    'depth' => $depth ?? 0
+            /*
+             * Create pages if it is selected.
+             */
+            if ($mode == 'insert' AND isset($valid_data['create-all-pages']))
+            {
+                $page = [
+                    'title' => $valid_data['piece_name'],
+                    'slug' => $valid_data['piece_name'],
+                    'allowed' => $valid_data['allowed'],
+                    'Modules' => [
+                        '1' => [
+                            'TypeModule' => 'crud-1',
+                            'section_attributes' => " class='col-12 module pt-0'",
+                            'Crud' => $crud_id,
+                            'status_id' => 1,
+                        ],
+                    ],
                 ];
-
-
-                /*
-                 * Do the routine that add the column if is required.
-                 */
-                if (!empty($type_field) && isset($field['bd_action']) && $type_crud != 'master')
-                {
-                    $name           = $field['name'] ?? null;
-                    $old_name       = $field['old_name'] ?? null;
-
-                    $idCrud         = get_col("SELECT crud_id FROM tb_cruds WHERE id = {$valid_data['id']}");
-                    $table_crud      = get_col("SELECT table_crud FROM tb_cruds WHERE id = {$idCrud} AND type_crud = 'master'");
-
-                    $table = !empty($field['table'])
-                       ? $field['table']
-                       : ($table_crud ?? '');
-
-
-                    if (in_array($type_field, ['hidden','basic','address_form'], true)) {
-                        $type = 'VARCHAR(250)';
-                    } elseif (in_array($type_field, ['textarea','upload'], true)) {
-                        $type = 'longtext';
-                    } elseif ($type_field === 'status_selector') {
-                        $type = 'VARCHAR(11)';
-                    } else {
-                        $type = 'VARCHAR(50)';
-                    }
-
-
-                    $search_col = ($input_mode_was == 'update')
-                        ? $old_name
-                        : $name;
-
-                    $field_exist = if_exist_col_bd($table, $search_col);
-
-                    // Add the column in the wished Table
-                    if (!$field_exist){
-                        add_col_bd($table, $name, $type);
-                    }
-
-                    // Rename the column in the wished Table
-                    elseif ($field_exist && ($old_name != $name))
-                    {
-                        rename_col_bd($table, $old_name, $name, $type);
-
-                        // Change the name field in fields that has the same table.
-                        $sql = "
-                        UPDATE tb_cruds_fields AS f
-                        SET f.name = '{$name}'
-                        WHERE f.name = '{$old_name}'
-                          AND f.crud_id IN (
-                            SELECT c.id
-                            FROM tb_cruds AS c
-                            INNER JOIN tb_cruds AS m ON m.id = c.crud_id
-                            WHERE m.type_crud = 'master'
-                              AND m.table_crud = '{$table_crud}'
-                          )";
-                        query_it($sql);
-                    }
-                }
-
-                $order_reg++;
-            }
-
-
-           /*
-            * Create pages if it is selected.
-            */
-           if ($mode == 'insert' AND isset($valid_data['create-all-pages']))
-           {
-               $page = [
-                   'title' => $valid_data['piece_name'],
-                   'slug' => $valid_data['piece_name'],
-                   'allowed' => $valid_data['allowed'],
-                   'Modules' => [
-                       '1' => [
-                           'TypeModule' => 'crud-1',
-                           'section_attributes' => " class='col-12 module pt-0'",
-                           'Crud' => $crud_id,
-                           'status_id' => 1,
-                       ],
-                   ],
-               ];
 
                // Lights, camera & action.
                manage_page_system($page, 'insert', $debug);
-           }
+            }
 
-           $msg = alert_message("SC_TO_". strtoupper($mode), $msg_type);
+            $msg = alert_message("SC_TO_". strtoupper($mode), $msg_type);
         }
 
         else
@@ -2056,6 +2083,7 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
             'type' => $msg_type,
             'msg' => $msg,
         ],
+        'crud_id' => $crud_id
     ];
 
     $res['updated_items_order'] = $updated_order ?? [];

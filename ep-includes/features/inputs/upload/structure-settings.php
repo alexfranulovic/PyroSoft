@@ -127,6 +127,14 @@ function inputs_for_upload(string $type_form, $counter, array $data = [])
         ]
     );
     $res.= input('basic', $type_form, [
+        'size'      => 'col-md-12',
+        'div_class' => 'settings-for-images',
+        'label'     => 'Quality',
+        'name'      => "Fields[$counter][quality]",
+        'input_id'  => "quality-$counter",
+        'Value'     => $data['quality'] ?? '',
+    ]);
+    $res.= input('basic', $type_form, [
         'size'      => 'col-6',
         'div_class' => 'settings-for-audios',
         'label'     => 'Min seconds',

@@ -1,0 +1,6 @@
+{
+  "name": "Roles as Subscription Plans",
+  "description": "Transforms user roles into subscription plan definitions by adding pricing, billing interval, trial configuration and subscription lifecycle fields. Integrates plan ownership and user assignment tracking without separating permissions from monetization.",
+  "version": "1.0.0",
+  "author": "Alex Franulovic"
+}

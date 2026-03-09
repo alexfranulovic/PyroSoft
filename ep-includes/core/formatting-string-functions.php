@@ -152,6 +152,30 @@ function format_cnpj_cpf($value)
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
 }
 
+/**
+ * Formats a CPF (Cadastro de Pessoas Físicas) number.
+ *
+ * @param string $value The CPF number to format.
+ * @return string The formatted CPF number.
+ */
+function CPF($cpf)
+{
+    $cpf = preg_replace("/\D/", '', $cpf);
+    return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cpf);
+}
+
+
+/**
+ * Formats a CNPJ (Cadastro Nacional da Pessoa Jurídica) number.
+ *
+ * @param string $value The CNPJ number to format.
+ * @return string The formatted CNPJ number.
+ */
+function CNPJ($cnpj)
+{
+    $cnpj = preg_replace("/\D/", '', $cnpj);
+    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj);
+}
 
 /**
  * Formats a phone number.

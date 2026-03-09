@@ -1,0 +1,7 @@
+{
+    "name": "Pagbank Gateway",
+    "description": "Integration with Pagbank",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": "Alex"
+}

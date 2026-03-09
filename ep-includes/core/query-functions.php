@@ -22,7 +22,6 @@ function query_it(string $sql, bool $show_warnigs = false, bool $debug = false)
     try {
         $mysqli = mysqli_query($conn, $sql);
     }
-
     catch (Throwable $e)
     {
         $code = 'error';
@@ -38,19 +37,19 @@ function query_it(string $sql, bool $show_warnigs = false, bool $debug = false)
     if ($show_warnigs)
     {
         $warnings = mysqli_get_warnings($conn);
-        if ($warnings && $warnings instanceof mysqli_warning)
+
+        if ($warnings instanceof mysqli_warning)
         {
             $code    = 'alert';
             $message = "<strong>Warning:</strong><br>";
 
-            while ($warnings)
+            // mysqli_warning::next() returns bool and moves internally
+            while (true)
             {
-                if (!empty($warnings->errno)) $message .= "#{$warnings->errno} ";
-                if (!empty($warnings->message)) $message .= "<i>{$warnings->message}</i><br><br>";
+                if (!empty($warnings->errno))    $message .= "#{$warnings->errno} ";
+                if (!empty($warnings->message))  $message .= "<i>{$warnings->message}</i><br><br>";
 
-                $next = $warnings->next();
-                if ($next) $warnings = $next;
-                else break;
+                if (!$warnings->next()) break;
             }
         }
     }
@@ -61,6 +60,7 @@ function query_it(string $sql, bool $show_warnigs = false, bool $debug = false)
         'mysqli' => $mysqli
     ];
 }
+
 
 
 

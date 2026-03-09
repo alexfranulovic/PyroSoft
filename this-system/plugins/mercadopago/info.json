@@ -1,0 +1,7 @@
+{
+    "name": "Mercado Pago Gateway",
+    "description": "Integration with Mercado Pago",
+    "version": "v1.0.0",
+    "plugin_uri": "",
+    "author": "Alex"
+}

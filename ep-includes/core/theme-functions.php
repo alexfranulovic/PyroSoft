@@ -257,6 +257,7 @@ function get_menu($id = null, bool $debug = false)
         subitem.title,
         subitem.icon,
         subitem.url,
+        subitem.page_id,
         subitem.type,
         subitem.depth,
         subitem.style,
@@ -268,7 +269,7 @@ function get_menu($id = null, bool $debug = false)
 
     FROM tb_menus menu
     LEFT JOIN tb_menus subitem ON menu.id = subitem.menu_id
-    LEFT JOIN tb_pages page ON page.id = subitem.url
+    LEFT JOIN tb_pages page ON page.id = subitem.page_id
     LEFT JOIN tb_user_role_permissions permission
         ON permission.page_id = page.id
         AND permission.role_id IN ({$ids})
@@ -341,7 +342,7 @@ function get_menu($id = null, bool $debug = false)
     $tree = $stack = [];
     foreach ($menu as $item)
     {
-        $item['active'] = ($page_id == $item['url']) ? 'active' : '';
+        $item['active'] = ($page_id == $item['page_id']) ? 'active' : '';
         $item['childs'] = [];
 
         while (!empty($stack) && end($stack)['depth'] >= $item['depth']) {
