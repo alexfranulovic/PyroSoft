@@ -6,7 +6,7 @@ SaaS platform built on **PyroSoft CMS** (proprietary PHP framework by EUPHORIA S
 
 ```
 index.php → load.php → config.php
-                     → ep-includes/   (core — NEVER EDIT)
+                     → ep-includes/   (core — edit here)
                      → this-system/   (project — edit here)
 ```
 
