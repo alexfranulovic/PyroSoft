@@ -21,7 +21,7 @@ It follows a layered architecture inspired by platforms like WordPress, where **
 index.php
  └── load.php
      ├── config.php
-     ├── ep-includes/      (core system – SAFE TO EDIT)
+     ├── ep-includes/      (core system – DO NOT EDIT)
      └── this-system/      (your project – SAFE TO EDIT)
 ```
 
