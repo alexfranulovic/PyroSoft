@@ -1,180 +1,6 @@
 <?php
 if (!isset($seg)) exit;
 
-function format_payment_gateways($is_settings_form = true)
-{
-    global $config, $payment_gateways;
-
-    $active_payment_methods = $config['active_payment_methods'] ?? [];
-
-    $res = [];
-    foreach (($payment_gateways ?? []) as $key => $method)
-    {
-        if ($is_settings_form)
-        {
-            $res[] = [
-                'value'   => $key,
-                'display' => icon($method['icon'] ?? '') ." {$key}",
-                'checked' => in_array($key, $active_payment_methods, true),
-                'description' => $method['description'] ?? null
-            ];
-        }
-
-        elseif (!$is_settings_form && in_array($key, $active_payment_methods, true))
-        {
-            $res[] = [
-                'value'   => $method['method'],
-                'display' => icon($method['icon'] ?? '') ." {$method['label']}",
-                'description' => $method['description'] ?? null,
-                'required' => true,
-            ];
-        }
-    }
-
-    return $res;
-}
-
-function list_providers()
-{
-    global $config, $payment_gateways;
-
-    $res = [];
-    foreach (($payment_gateways ?? []) as $key => $gateway) {
-        $key = explode('.', $key);
-        $res[] = $key[0];
-    }
-
-    return array_unique($res);
-}
-
-function format_user_payment_gateways($is_settings_form = true)
-{
-    global $config, $current_user, $payment_gateways;
-
-    $user_id = $current_user['id'] ?? null;
-    $active_payment_methods = $config['active_payment_methods'] ?? [];
-
-    $providers = list_providers();
-    $providers = implode("','", $providers);
-
-    $sql = "
-    SELECT *
-    FROM tb_user_payment_methods
-    WHERE
-        user_id = '{$user_id}'
-        AND provider IN ('{$providers}')
-    ";
-    $methods = get_results($sql);
-
-
-    $res = [];
-    if (!empty($methods))
-    {
-        foreach ($methods as $key => $method)
-        {
-            $res[] = [
-                'value'   => "{$method['method']}:{$method['id']}",
-                'display' => "{$method['issuer_name']} ** {$method['last4']}",
-                'description' => "{$method['exp_month']}/{$method['exp_year']}",
-                'image' => card_icon_url($method['issuer_name'], $method['brand']),
-                'required' => true,
-            ];
-        }
-    }
-
-    return $res;
-}
-
-
-function card_icon_url(?string $issuerName, ?string $brand, string $color = '000000'): string
-{
-    $issuer = strtolower(trim((string)$issuerName));
-    $brand  = strtolower(trim((string)$brand));
-
-    // Normalize spaces
-    $issuer = preg_replace('/\s+/', ' ', $issuer);
-
-    /**
-     * Issuer (bank) mapping
-     */
-    $issuerMap = [
-        'nubank'       => 'nubank',
-        'nu'           => 'nubank',
-        // 'itaú'         => 'itau',
-        // 'itau'         => 'itau',
-        // 'bradesco'     => 'bradesco',
-        // 'santander'    => 'santander',
-        // 'banco inter'  => 'bancointer',
-        // 'inter'        => 'bancointer',
-        // 'c6 bank'      => 'c6bank',
-        // 'c6'           => 'c6bank',
-        'picpay'       => 'picpay',
-        // 'caixa'        => 'caixa',
-        // 'bb'           => 'bankofbrazil',
-        // 'banco do brasil' => 'bankofbrazil',
-    ];
-
-    /**
-     * Brand (card network) mapping
-     */
-    $brandMap = [
-        'master'      => 'mastercard',
-        'mastercard'  => 'mastercard',
-        'visa'        => 'visa',
-        'amex'        => 'americanexpress',
-        'american_express' => 'americanexpress',
-        // 'elo'         => 'elo',
-        // 'debelo'      => 'elo',
-        'hipercard'   => 'hipercard',
-        'diners'      => 'dinersclub',
-        'dinersclub'  => 'dinersclub',
-        'discover'    => 'discover',
-        'jcb'         => 'jcb',
-    ];
-
-    // 1️⃣ Try issuer
-    if (!empty($issuerMap[$issuer])) {
-        $slug = $issuerMap[$issuer];
-        return "https://cdn.simpleicons.org/{$slug}/{$color}";
-    }
-
-    // 2️⃣ Fallback to brand
-    if (!empty($brandMap[$brand])) {
-        $slug = $brandMap[$brand];
-        return "https://cdn.simpleicons.org/{$slug}/{$color}";
-    }
-
-    // 3️⃣ Generic fallback
-    return "https://cdn.simpleicons.org/creditcard/{$color}";
-}
-
-/**
- * Returns a card icon URL based on issuer (bank) first,
- * falling back to card brand, and finally to generic credit card.
- *
- * @param string|null $issuerName
- * @param string|null $brand
- * @param string $color Hex color without # (default black)
- * @return string
- */
-function card_icon_path_local(string $slug): ?string
-{
-    $slug = strtolower($slug);
-
-    $baseDir = "pyrosales/assets/icons/issuers/{$slug}.svg";
-    $full = plugin_path($baseDir);
-
-    if (is_file($full)) {
-        return plugin_path($baseDir, 'url');
-    }
-
-    return null;
-}
-
-
-
-
-
 /**
  * Validates a create-order payload with minimal rules:
  * - Must have items (non-empty array)
@@ -194,40 +20,42 @@ function validate_order_payload(array $payload): array
         empty($payload['plan_id']) && empty($payload['product_id'])
         && (empty($payload['items']) || !is_array($payload['items']))
     ) {
-        $errors[] = "Missing or invalid 'items'.";
+        $errors[] = "Você precisa informar pelo menos um item no pedido.";
     }
     elseif (!empty($payload['items']) && is_array($payload['items']))
     {
         foreach ($payload['items'] as $i => $it)
         {
+            $itemNumber = $i + 1;
             $type = $it['item_type'] ?? '';
 
             if (empty($type)) {
-                $errors[] = "items[$i].item_type is required.";
+                $errors[] = "O tipo do item {$itemNumber} é obrigatório.";
             }
 
             if ($type !== 'plan' && (empty($it['quantity']) || (int)$it['quantity'] < 1)) {
-                $errors[] = "items[$i].quantity must be >= 1.";
+                $errors[] = "A quantidade do item {$itemNumber} deve ser maior que zero.";
             }
 
             if ($type === 'product' && empty($it['product_id'])) {
-                $errors[] = "items[$i].product_id is required for product items.";
+                $errors[] = "O produto do item {$itemNumber} não foi informado.";
             }
 
             if ($type === 'plan' && empty($it['plan_id'])) {
-                $errors[] = "items[$i].plan_id is required for plan items.";
+                $errors[] = "O plano do item {$itemNumber} não foi informado.";
             }
 
             if ($type === 'one_off') {
-                if (empty($it['item_name'])) $errors[] = "items[$i].item_name is required for one_off items.";
-                if (!isset($it['unit_price'])) $errors[] = "items[$i].unit_price is required for one_off items.";
+                if (empty($it['item_name'])) {
+                    $errors[] = "O nome do produto {$itemNumber} é obrigatório.";
+                }
+
+                if (!isset($it['unit_price'])) {
+                    $errors[] = "O valor unitário do produto {$itemNumber} é obrigatório.";
+                }
             }
         }
     }
-
-    // if (empty($payload['payment_method']) || !is_string($payload['payment_method'])) {
-    //     $errors[] = "Missing or invalid 'payment_method'.";
-    // }
 
     $total_preview = 0.0;
 
@@ -250,7 +78,7 @@ function validate_order_payload(array $payload): array
     if ($total_preview > 0)
     {
         if (empty($payload['payment_method']) || !is_string($payload['payment_method'])) {
-            $errors[] = "payment_method is required when order total is greater than zero.";
+            $errors[] = "A forma de pagamento é obrigatória para pedidos com valor maior que zero.";
         }
     }
 
@@ -258,12 +86,13 @@ function validate_order_payload(array $payload): array
     $has_customer = !empty($payload['customer']) && is_array($payload['customer']);
 
     if (!$has_user && !$has_customer) {
-        $errors[] = "You must provide 'user_id' or 'customer'.";
+        $errors[] = "Você precisa informar um usuário ou os dados do cliente.";
     }
 
     if (!$has_user && $has_customer)
     {
         $c = $payload['customer'];
+
         if (!empty($c['name']))
         {
             $c['name'] = explode(' ', $c['name']);
@@ -275,24 +104,31 @@ function validate_order_payload(array $payload): array
             $c['last_name'] = $c['name'];
         }
 
-        if (empty($c['first_name']))  $errors[] = "customer.first_name is required.";
-        if (empty($c['last_name']))  $errors[] = "customer.last_name is required.";
-        if (empty($c['email'])) $errors[] = "customer.email is required.";
+        if (empty($c['first_name'])) {
+            $errors[] = "O primeiro nome do cliente é obrigatório.";
+        }
+
+        if (empty($c['last_name'])) {
+            $errors[] = "O sobrenome do cliente é obrigatório.";
+        }
+
+        if (empty($c['email'])) {
+            $errors[] = "O e-mail do cliente é obrigatório.";
+        }
+
         // phone/doc optional by schema
         if (!empty($c['document_type']) && empty($c['document_number'])) {
-            $errors[] = "customer.document_number is required when customer.document_type is provided.";
+            $errors[] = "O número do documento do cliente é obrigatório quando o tipo de documento for informado.";
         }
     }
 
     $requires_address = !empty($payload['requires_address']) ? 1 : 0;
+
     if ($requires_address === 1) {
         if (empty($payload['address']) || !is_array($payload['address'])) {
-            $errors[] = "address is required when requires_address=1.";
+            $errors[] = "O endereço é obrigatório para este pedido.";
         }
     }
-
-    // print_r($payload);
-    // die;
 
     return ['ok' => empty($errors), 'errors' => $errors];
 }
@@ -316,7 +152,10 @@ function build_customer_snapshot(?int $user_id, ?array $customer): array
     {
         // Adjust field names to your tb_users schema:
         $u = get_result("SELECT id, first_name, last_name, email, phone, document_type, document_number FROM tb_users WHERE id = '{$user_id}' LIMIT 1");
-        if (!$u) throw new Exception("User not found: {$user_id}");
+        if (!$u) {
+            // throw new Exception("User not found: {$user_id}");
+            return ['errors' => "User not found: {$user_id}"];
+        }
 
         $first_name = (string)($u['first_name'] ?? '');
         $last_name = (string)($u['last_name'] ?? '');
@@ -328,9 +167,9 @@ function build_customer_snapshot(?int $user_id, ?array $customer): array
             'customer_first_name'      => $first_name,
             'customer_last_name'       => $last_name,
             'customer_email'           => (string)($u['email'] ?? ''),
-            'customer_phone'           => $u['phone'] ?? null,
+            'customer_phone'           => clean_number($u['phone'] ?? ''),
             'customer_document_type'   => $u['document_type'] ?? null,
-            'customer_document_number' => $u['document_number'] ?? null,
+            'customer_document_number' => clean_number(($u['document_number'] ?? '')),
         ];
     }
 
@@ -351,9 +190,9 @@ function build_customer_snapshot(?int $user_id, ?array $customer): array
         'customer_first_name'      => (string)($c['first_name'] ?? ''),
         'customer_last_name'       => (string)($c['last_name'] ?? ''),
         'customer_email'           => (string)($c['email'] ?? ''),
-        'customer_phone'           => $c['phone'] ?? null,
+        'customer_phone'           => clean_number($c['phone'] ?? ''),
         'customer_document_type'   => $c['document_type'] ?? null,
-        'customer_document_number' => $c['document_number'] ?? null,
+        'customer_document_number' => clean_number($c['document_number'] ?? ''),
     ];
 }
 
@@ -469,41 +308,35 @@ function resolve_item_snapshot(array $item): array
         $line_discount = round(max(0, $line_subtotal - $line_total), 2);
 
         return [
-            'product_id'         => $id,
-            'plan_id'            => null,
-            'item_type'          => 'product',
-            'item_name'          => $name,
-            'quantity'           => $qty,
-
-            'unit_price'         => number_format($unit, 2, '.', ''),
-            'regular_unit_price' => number_format($regular_unit, 2, '.', ''),
-
-            'line_subtotal'      => number_format($line_subtotal, 2, '.', ''),
-            'line_total'         => number_format($line_total, 2, '.', ''),
-
-            // Optional but useful for auditing; remove if your schema doesn't support it.
-            'line_discount'      => number_format($line_discount, 2, '.', ''),
-
-            'meta_json'          => $item['meta_json'] ?? null,
+            'formatted' => [
+                'product_id'         => $id,
+                'plan_id'            => null,
+                'item_type'          => 'product',
+                'item_name'          => $name,
+                'quantity'           => $qty,
+                'unit_price'         => number_format($unit, 2, '.', ''),
+                'regular_unit_price' => number_format($regular_unit, 2, '.', ''),
+                'line_subtotal'      => number_format($line_subtotal, 2, '.', ''),
+                'line_total'         => number_format($line_total, 2, '.', ''),
+                // Optional but useful for auditing; remove if your schema doesn't support it.
+                'line_discount'      => number_format($line_discount, 2, '.', ''),
+                'meta_json'          => $item['meta_json'] ?? null,
+            ]
         ];
     }
 
     if ($type === 'plan')
     {
-        $id = (int)($item['plan_id'] ?? 0);
-        if ($id <= 0) throw new Exception("plan_id is required for plan item.");
+        $id = (string)($item['plan_id'] ?? '');
+        if (empty($id)) throw new Exception("plan_id is required for plan item.");
 
         // Plans are always quantity = 1 (force BEFORE any math)
         $qty = 1;
 
-        $p = get_result("
-            SELECT id, name, regular_price, sale_price, activation_function
-            FROM tb_user_roles
-            WHERE id = '{$id}' AND type = 'plan'
-            LIMIT 1
-        ");
+        $p = get_result("SELECT * FROM tb_plans WHERE id = '{$id}' OR slug = '{$id}' LIMIT 1");
         if (!$p) throw new Exception("plan not found: {$id}");
 
+        $id = $p['id'];
         $regular_price = (float)$p['regular_price'];
         $sale_price    = (float)$p['sale_price'];
 
@@ -524,23 +357,23 @@ function resolve_item_snapshot(array $item): array
         $line_discount = round(max(0, $line_subtotal - $line_total), 2);
 
         return [
-            'product_id'          => null,
-            'plan_id'             => $id,
-            'item_type'           => 'plan',
-            'item_name'           => $name,
-            'quantity'            => $qty,
-            'activation_function' => $p['activation_function'] ?? null,
-
-            'unit_price'          => number_format($unit, 2, '.', ''),
-            'regular_unit_price'  => number_format($regular_unit, 2, '.', ''),
-
-            'line_subtotal'       => number_format($line_subtotal, 2, '.', ''),
-            'line_total'          => number_format($line_total, 2, '.', ''),
-
-            // Optional but usefu l for auditing; remove if your schema doesn't support it.
-            'line_discount'       => number_format($line_discount, 2, '.', ''),
-
-            'meta_json'           => $item['meta_json'] ?? null,
+            'formatted' => [
+                'product_id'          => null,
+                'plan_id'             => $id,
+                'item_type'           => 'plan',
+                'item_name'           => $name,
+                'quantity'            => $qty,
+                // 'activation_function' => $p['activation_function'] ?? null,
+                // 'deactivation_function' => $p['deactivation_function'] ?? null,
+                'unit_price'          => number_format($unit, 2, '.', ''),
+                'regular_unit_price'  => number_format($regular_unit, 2, '.', ''),
+                'line_subtotal'       => number_format($line_subtotal, 2, '.', ''),
+                'line_total'          => number_format($line_total, 2, '.', ''),
+                // Optional but usefu l for auditing; remove if your schema doesn't support it.
+                'line_discount'       => number_format($line_discount, 2, '.', ''),
+                'meta_json'           => $item['meta_json'] ?? null,
+            ],
+            'full' => $p
         ];
     }
 
@@ -562,22 +395,26 @@ function resolve_item_snapshot(array $item): array
         $line_discount = round(max(0, $line_subtotal - $line_total), 2);
 
         return [
-            'product_id'         => null,
-            'plan_id'            => null,
-            'item_type'          => 'one_off',
-            'item_name'          => $name,
-            'quantity'           => $qty,
-
-            'unit_price'         => number_format($unit, 2, '.', ''),
-            'regular_unit_price' => number_format($regular_unit, 2, '.', ''),
-
-            'line_subtotal'      => number_format($line_subtotal, 2, '.', ''),
-            'line_total'         => number_format($line_total, 2, '.', ''),
-
-            // Optional but useful for auditing; remove if your schema doesn't support it.
-            'line_discount'      => number_format($line_discount, 2, '.', ''),
-
-            'meta_json'          => $item['meta_json'] ?? null,
+            'formatted' => [
+                'product_id'            => null,
+                'plan_id'               => null,
+                'item_type'             => 'one_off',
+                'item_name'             => $name,
+                'slug'                  => (string)($item['slug'] ?? ''),
+                'quantity'              => $qty,
+                'unit_price'            => number_format($unit, 2, '.', ''),
+                'regular_unit_price'    => number_format($regular_unit, 2, '.', ''),
+                'line_subtotal'         => number_format($line_subtotal, 2, '.', ''),
+                'line_total'            => number_format($line_total, 2, '.', ''),
+                // Optional but useful for auditing; remove if your schema doesn't support it.
+                'line_discount'         => number_format($line_discount, 2, '.', ''),
+                'meta_json'             => $item['meta_json'] ?? null,
+                // Frozen on the order item itself (tb_order_items already has these
+                // columns) so create_order/cancel-refund/notification can run them
+                // later without depending on the cart cookie still being around.
+                'activation_function'   => trim((string)($item['activation_function'] ?? '')),
+                'deactivation_function' => trim((string)($item['deactivation_function'] ?? '')),
+            ]
         ];
     }
 
@@ -590,11 +427,6 @@ function resolve_item_snapshot(array $item): array
  * - coupon_lines: array of ['code'=>...]
  * - fees: array of ['name'=>..., 'amount'=>..., 'tax_status'=>...]
  * Uses global $coupons as the coupon registry (as per your requirement).
- *
- * Returns:
- * - order_totals array for tb_orders
- * - normalized fee rows for tb_order_fees (only if provided)
- * - normalized coupon rows for tb_order_coupons (only if provided)
  *
  * @param array $resolvedItems
  * @param array|null $couponLines
@@ -738,6 +570,8 @@ function calculate_order_totals(array $resolvedItems, ?array $couponLines, ?arra
  */
 function build_payment_line(array $params): array
 {
+    global $info;
+
     $required = ['order_id', 'method', 'provider', 'amount'];
 
     foreach ($required as $key) {
@@ -748,25 +582,97 @@ function build_payment_line(array $params): array
 
     $now = date('Y-m-d H:i:s');
 
+    $statement_descriptor = (string)($params['statement_descriptor'] ?? ($info['short_name'] ?? 'PAYMENT'));
+    $statement_descriptor = preg_replace('/[^A-Z0-9 ]/', '', strtoupper($statement_descriptor));
+    $statement_descriptor = substr(trim($statement_descriptor), 0, 17);
+
     return [
-        'order_id'            => $params['order_id'],
-        'status_id'           => $params['status_id'] ?? 1,
-        'method'              => (string)$params['method'],
-        'provider'            => (string)$params['provider'],
-        'currency'            => strtoupper($params['currency'] ?? DEFAULT_CURRENCY),
-        'amount'              => number_format((float)$params['amount'], 2, '.', ''),
-        'gateway_fee'         => isset($params['gateway_fee']) ? number_format((float)$params['gateway_fee'], 2, '.', '') : null,
-        'net_amount'          => isset($params['net_amount']) ? number_format((float)$params['net_amount'], 2, '.', '') : null,
-        'installments'        => isset($params['installments']) ? (int)$params['installments'] : null,
-        'installment_amount'  => isset($params['installment_amount']) ? number_format((float)$params['installment_amount'], 2, '.', '') : null,
-        'payment_link'        => $params['payment_link'] ?? null,
-        'provider_payment_id' => $params['provider_payment_id'] ?? null,
-        'provider_type_code'  => $params['provider_type_code'] ?? null,
-        'raw_response_json'   => isset($params['raw_response_json'])
-            ? json_encode($params['raw_response_json'], JSON_UNESCAPED_UNICODE)
+        'order_id'               => $params['order_id'],
+        'status_id'              => $params['status_id'] ?? 1,
+        'method'                 => (string)$params['method'],
+        'provider'               => (string)$params['provider'],
+        'currency'               => strtoupper($params['currency'] ?? DEFAULT_CURRENCY),
+        'amount'                 => number_format((float)$params['amount'], 2, '.', ''),
+        'gateway_fee'            => isset($params['gateway_fee']) ? number_format((float)$params['gateway_fee'], 2, '.', '') : null,
+        'net_amount'             => isset($params['net_amount']) ? number_format((float)$params['net_amount'], 2, '.', '') : null,
+        'installments'           => isset($params['installments']) ? (int)$params['installments'] : null,
+        'installment_amount'     => isset($params['installment_amount']) ? number_format((float)$params['installment_amount'], 2, '.', '') : null,
+        'code'                   => $params['code'] ?? null,
+        'payment_link'           => $params['payment_link'] ?? null,
+        'provider_order_id'      => $params['provider_order_id'] ?? null,
+        'provider_payment_id'    => $params['provider_payment_id'] ?? null,
+        'provider_type_code'     => $params['provider_type_code'] ?? null,
+        'raw_response_json'      => isset($params['raw_response_json'])
+            ? json_encode(array_reverse($params['raw_response_json']), JSON_UNESCAPED_UNICODE)
             : null,
-        'created_at'          => $now,
-        'updated_at'          => $now,
+        'payment_hash'           => $params['payment_hash'] ?? null,
+        'expires_at'             => $params['expires_at'] ?? null,
+        'provider_reference'     => $params['provider_reference'] ?? null,
+        'statement_descriptor'   => $statement_descriptor,
+        'user_payment_method_id' => $params['user_payment_method_id'] ?? null,
+        'created_at'             => $now,
+        'updated_at'             => $now,
+    ];
+}
+
+/**
+ * Persists whatever UTM parameters capture_utm_params() (core -- runs on
+ * every page view, well before any plugin/route code, and stashes captured
+ * tags in $_SESSION with a $_COOKIE fallback for a returning visit) has for
+ * the CURRENT visitor, snapshotted against the order that was just created.
+ *
+ * One row per order (not per visit): this is called once, right after the
+ * order insert in create_order() (index.php), so the UTM values are frozen
+ * at the exact moment of purchase, the same way tb_orders itself freezes
+ * ip_address/user_agent/origin -- a later visit with different tags (or no
+ * tags at all) never rewrites what an already-placed order was attributed
+ * to.
+ *
+ * @param int $order_id
+ * @return array
+ */
+function save_order_utm_data(int $order_id): array
+{
+    if ($order_id <= 0) {
+        return ['code' => 'error', 'msg' => ['reason' => 'Invalid order_id']];
+    }
+
+    // Same default key list as capture_utm_params() -- these are also the
+    // exact tb_order_utm_data column names. invite_code rides along the
+    // same session/cookie mechanism (see capture_utm_params(), core) and
+    // is what create_order() (index.php) resolves into vendor_id.
+    $allowed_params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_resource', 'invite_code'];
+
+    $utm = [];
+    foreach ($allowed_params as $key)
+    {
+        $value = trim((string)($_SESSION[$key] ?? ''));
+        if ($value !== '') {
+            $utm[$key] = $value;
+        }
+    }
+
+    // Nothing captured for this visitor (direct/organic traffic, or the
+    // cookie/session already expired) -- skip the row entirely rather than
+    // insert one with every column empty; get_order() already treats "no
+    // tb_order_utm_data row" the same as "no UTM data" either way.
+    if (empty($utm)) {
+        return ['code' => 'success', 'skipped' => true];
+    }
+
+    $insert = array_merge(
+        ['order_id' => $order_id],
+        array_fill_keys($allowed_params, null),
+        $utm,
+        ['created_at' => date('Y-m-d H:i:s')]
+    );
+
+    insert('tb_order_utm_data', $insert);
+    $id = inserted_id();
+
+    return [
+        'code' => $id ? 'success' : 'error',
+        'id'   => $id,
     ];
 }
 
@@ -786,6 +692,76 @@ function detect_device_type(string $userAgent): string
 }
 
 
+function prepare_payment_data(array $payload): array
+{
+    $user_id        = !empty($payload['user_id']) ? (int)$payload['user_id'] : null;
+    $payment_data   = (array)($payload['payment_data'] ?? []);
+    $calc           = (array)($payload['calc'] ?? []);
+
+    $method = strtolower(
+        trim((string) ($payload['payment_method'] ?? ''))
+    );
+
+    $currency               = $payload['currency'] ?? get_system_info('default_currency');
+    $method                 = explode(":", $method);
+    $user_payment_method_id = $payment_data['user_payment_method_id'] ?? ($method[1]??null);
+
+    // Provider resolution (payload only sends method)
+    $method = $method[0];
+    $payment_data['method'] = $method;
+
+    $provider = resolve_provider_by_method($method);
+    $payment_data['provider'] = $provider;
+
+    $payment_hash = hash('sha256', token_generate([
+        'mode'   => 'hex',
+        'length' => 32,
+    ]));
+
+    // Payment row is prepared after order insert (needs order_id). We'll return a template.
+    $paymentTemplate = [
+        'method' => $method,
+        'provider' => $provider,
+        'currency' => $currency,
+        'amount' => (float)$calc['order_totals']['total_amount'],
+        'payment_hash' => $payment_hash,
+    ];
+
+    /**
+     * Get user peyment method.
+     */
+    if (!empty($user_payment_method_id))
+    {
+        $provider_card_id = get_col("
+            SELECT
+                provider_card_id
+            FROM tb_user_payment_methods
+            WHERE
+                id = '{$user_payment_method_id}'
+                AND user_id = {$user_id}"
+        );
+
+        $payment_data['user_payment_method_id'] = $user_payment_method_id;
+        $payment_data['provider_card_id'] = $provider_card_id;
+    }
+
+    else
+    {
+        $provider_card = find_user_payment_method($user_id, $payment_data);
+
+        if (!empty($provider_card['provider_card_id'])) {
+            $payment_data['user_payment_method_id'] = $provider_card['id'];
+            $payment_data['provider_card_id'] = $provider_card['provider_card_id'];
+        }
+    }
+
+    return [
+        'payment_template' => $paymentTemplate,
+        'payment_data' => $payment_data,
+    ];
+}
+
+
 /**
  * Main orchestrator that:
  * - Validates payload
@@ -793,14 +769,6 @@ function detect_device_type(string $userAgent): string
  * - Resolves items snapshots
  * - Calculates totals
  * - Returns ready-to-insert rows for all tables
- *
- * IMPORTANT:
- * - This function DOES NOT INSERT into DB. It returns arrays for you to persist.
- * - You should insert within a transaction:
- *   1) insert tb_orders -> $orderId
- *   2) insert tb_order_items (with $orderId)
- *   3) optionally insert coupons/fees (only if present in payload and non-empty)
- *   4) insert tb_order_payments (and then call provider adapter to create payment_link/provider_payment_id)
  *
  * @param array $payload
  * @param array $payment_gateway
@@ -811,9 +779,31 @@ function prepare_order_create(array $payload): array
 {
     global $payment_gateways;
 
+    /**
+     * One-off order: the item isn't sent by the client -- it's whatever is
+     * currently frozen in the one-off cart cookie. The `one_off` flag is
+     * forced into the checkout form as a hidden field (see plan-checkout-template.php),
+     * the actual name/price/functions always come from the cookie (server-side),
+     * never trusted from payload directly.
+     *
+     * This must run BEFORE validate_order_payload(): unlike plan_id/product_id
+     * (checked directly by the validator), items[] is what's actually
+     * validated here, so it needs to already be populated -- an empty/expired
+     * cookie then naturally falls through to the normal "no item" validation error.
+     */
+    if (!empty($payload['one_off']) && empty($payload['items']))
+    {
+        $one_off_item = get_one_off_cart_item();
+
+        if (!empty($one_off_item)) {
+            $payload['items'][] = $one_off_item;
+        }
+    }
+
     $v = validate_order_payload($payload);
     if (!$v['ok']) {
-        throw new Exception("Invalid payload: " . implode(' | ', $v['errors']));
+        // throw new Exception("Invalid payload: " . implode(' | ', $v['errors']));
+        return $v;
     }
 
     if (!empty($payload['plan_id']) && empty($payload['items']))
@@ -834,7 +824,9 @@ function prepare_order_create(array $payload): array
         ];
     }
 
-    $user_id = !empty($payload['user_id']) ? (int)$payload['user_id'] : null;
+    $user_id = !empty($payload['user_id'])
+        ? (int)$payload['user_id']
+        : (!empty($_SESSION['current_user']['id']) ? $_SESSION['current_user']['id'] : null);
     $customer_snapshot = build_customer_snapshot($user_id, $payload['customer'] ?? null);
     $requires_address = !empty($payload['requires_address']) ? 1 : 0;
     $address = normalize_address($payload['address'] ?? null, $requires_address);
@@ -846,9 +838,16 @@ function prepare_order_create(array $payload): array
     if (strlen($currency) !== 3) $currency = DEFAULT_CURRENCY;
 
     // Resolve items
+    $items_full = [];
     $resolvedItems = [];
-    foreach ($payload['items'] as $it) {
-        $resolvedItems[] = resolve_item_snapshot($it);
+    foreach ($payload['items'] as $it)
+    {
+        $it = resolve_item_snapshot($it);
+        $resolvedItems[] = $it['formatted'];
+
+        if (!empty($it['full'])) {
+            $items_full[] = $it['full'];
+        }
     }
 
     // Calculate totals + normalized coupon/fee rows
@@ -873,10 +872,29 @@ function prepare_order_create(array $payload): array
 
     $deviceType = $userAgent ? detect_device_type($userAgent) : null;
 
+    /**
+     * (Only order type plan) Search if user is already subscriber.
+     */
+    if (
+        $order_type == 'plan' &&
+        empty($payload['subscription_id']) &&
+        !empty($user_id)
+    ){
+        $payload['subscription_id'] = user_is_already_sub($user_id, $payload['plan_id']);
+    }
+
+    $vendor_id = !empty($payload['vendor_id'])
+        ? (int)$payload['vendor_id']
+        : null;
+    $commission_activation_function = !empty($vendor_id)
+        ? (get_system_info('pyrosales_commission_activation_function') ?? null)
+        : null;
+
     $orderRow = array_merge([
         'ip_address' => $ipAddress,
         'user_agent' => $userAgent,
         'origin' => $origin,
+        'subscription_id' => ((int)($payload['subscription_id'] ?? null)),
         'device_type' => $deviceType,
         'user_id' => $user_id,
         'status_id' => (int)($payload['status_id'] ?? 1), // default pending
@@ -885,65 +903,24 @@ function prepare_order_create(array $payload): array
         'address' => $address ? json_encode($address, JSON_UNESCAPED_UNICODE) : null,
         'currency' => $currency,
         'commission_amount' => isset($payload['commission_amount']) ? number_format((float)$payload['commission_amount'], 2, '.', '') : null,
-        'vendor_id' => !empty($payload['vendor_id']) ? (int)$payload['vendor_id'] : null,
+        'vendor_id' => $vendor_id,
+        'commission_activation_function' => $commission_activation_function,
         'notes' => $payload['notes'] ?? null,
+        'order_purpose' => $payload['order_purpose'] ?? 'charge',
         'created_at' => $now,
         'updated_at' => $now,
     ], $customer_snapshot, $calc['order_totals']);
 
-
-    $method = strtolower(
-        trim((string) ($payload['payment_method'] ?? ''))
-    );
-
-    $method = explode(":", $method);
-    $user_payment_method = $method[1] ?? null;
-
-    // Provider resolution (payload only sends method)
-    $method = $method[0];
-    $provider = resolve_provider_by_method($method);
-
-
-    // Payment row is prepared after order insert (needs order_id). We'll return a template.
-    $paymentTemplate = [
-        'method' => $method,
-        'provider' => $provider,
-        'currency' => $currency,
-        'amount' => (float)$calc['order_totals']['total_amount'],
-    ];
-
-    if (!empty($user_payment_method)) {
-        $payload['payment_data']['user_payment_method'] = $user_payment_method;
-    }
-
     return [
         'order' => $orderRow,
         'items_lines' => $resolvedItems,
+        'items_full' => $items_full,
         'coupon_lines' => (is_array($payload['coupon_lines'] ?? null) && !empty($payload['coupon_lines'])) ? $calc['coupon_lines'] : [],
-        'fee_lines'    => (is_array($payload['fee_lines'] ?? null) && !empty($payload['fee_lines'])) ? $calc['fee_lines'] : [],
-        'payment_template' => $paymentTemplate,
-        'payment_data' => $payload['payment_data'] ?? [],
+        'fee_lines' => (is_array($payload['fee_lines'] ?? null) && !empty($payload['fee_lines'])) ? $calc['fee_lines'] : [],
+        'calc' => $calc,
     ];
 }
 
-function checkout_load_gateways_head()
-{
-    global $config, $payment_gateways;
-
-    $active_payment_methods = $config['active_payment_methods'] ?? [];
-
-    $res = [];
-    foreach (($payment_gateways ?? []) as $key => $gateway)
-    {
-        $key = explode('.', $key);
-        $gateway_method = implode('_', $key);
-
-        $gateway_method = "{$gateway_method}_head";
-        if (function_exists($gateway_method)) {
-            $gateway_method();
-        }
-    }
-}
 
 /**
  * Simple checkout config calculator.
@@ -1008,44 +985,4 @@ function checkout_amount_config(array $params = [])
       'fee_mode' => $fee_mode,
       'max_interest_free_installments' => $max_no_interest,
     ];
-}
-
-
-/**
- * Persist saved card in your DB.
- * Requires tb_user_payment_methods with UNIQUE(provider, provider_card_id).
- */
-function save_user_payment_method(string $user_id, array $pm, bool $makeDefault = true, bool $debug = false): ?int
-{
-    if ($user_id <= 0) return null; // only save if you can link to a user
-
-    $now = date('Y-m-d H:i:s');
-
-    // Optional: if default, unset others
-    if ($makeDefault) {
-        query_it("UPDATE tb_user_payment_methods SET is_default = 0 WHERE user_id = '{$user_id}'");
-    }
-
-    insert('tb_user_payment_methods', [
-        'user_id'              => $user_id,
-        'provider'             => $pm['provider'],
-        'method'               => $pm['method'],
-        'provider_customer_id' => $pm['provider_customer_id'] ?? null,
-        'provider_card_id'     => $pm['provider_card_id'],
-        'brand'                => $pm['brand'] ?? null,
-        'brand_name'           => $pm['brand_name'] ?? null,
-        'issuer_name'          => $pm['issuer_name'] ?? null,
-        'last4'                => $pm['last4'] ?? null,
-        'exp_month'            => !empty($pm['exp_month']) ? (int)$pm['exp_month'] : null,
-        'exp_year'             => !empty($pm['exp_year']) ? (int)$pm['exp_year'] : null,
-        'holder_name'          => $pm['holder_name'] ?? null,
-        'is_default'           => $makeDefault ? 1 : 0,
-        'status_id'            => 1,
-        'meta_json'            => null,
-        'created_at'           => $now,
-        'updated_at'           => $now,
-    ], true, $debug);
-
-    $id = inserted_id();
-    return $id ? (int)$id : null;
 }

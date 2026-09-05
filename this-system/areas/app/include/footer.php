@@ -1,5 +1,5 @@
 <?php
-require_once "script_libs.php";
+include_once AREAS_PATH .'/app/include/script_libs.php';
 
 $footer_format = $page['page_settings']['footer']['format'] ?? ($config['branding']['footer']['format'] ?? 'full');
 ?>
@@ -76,3 +76,6 @@ $footer_format = $page['page_settings']['footer']['format'] ?? ($config['brandin
   <span>Todos os direitos reservados.</span>
 </footer>
 <?php endif; ?>
+
+</body>
+</html>

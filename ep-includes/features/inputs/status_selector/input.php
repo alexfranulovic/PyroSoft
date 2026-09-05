@@ -5,7 +5,7 @@ function input_status_selector(string $type_form, array $Attr = [])
     extract($Attr);
     $res = '';
 
-    $function_proccess = $function_proccess ?? 'general_status';
+    $function_process = $function_process ?? 'general_status';
 
     return input(
         'selection_type',
@@ -18,7 +18,7 @@ function input_status_selector(string $type_form, array $Attr = [])
             'label' => 'Status de registro',
             'name' => $name ?? 'status_id',
             'input_id' => $input_id ?? 'status_id',
-            'Options' => $function_proccess(true),
+            'Options' => $function_process(true),
             'Value' => $Value ?? null,
             'Required' => $Required,
             'data_required' => $data_required

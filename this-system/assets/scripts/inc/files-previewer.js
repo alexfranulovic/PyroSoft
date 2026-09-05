@@ -1481,6 +1481,22 @@ async function buildAudioConstraintsWithInternalMic() {
 
 const __recordersBound = new WeakSet();
 
+function pickRecorderMimeType() {
+  const candidates = [
+    'audio/webm;codecs=opus',
+    'audio/webm',
+    'audio/mp4',
+    'audio/aac'
+  ];
+  return candidates.find(t => window.MediaRecorder?.isTypeSupported?.(t)) || '';
+}
+function extFromMime(mime) {
+  if (!mime) return 'webm';
+  if (mime.includes('mp4')) return 'm4a';
+  if (mime.includes('aac')) return 'aac';
+  return 'webm';
+}
+
 function initAudioRecorder(rec) {
   if (!rec || __recordersBound.has(rec)) return;
   __recordersBound.add(rec);
@@ -1517,7 +1533,11 @@ function initAudioRecorder(rec) {
       // 🔹 Força uso do mic interno quando possível + avisa se houver Bluetooth
       const constraints = await buildAudioConstraintsWithInternalMic();
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      mediaRecorder = new MediaRecorder(stream);
+      // mediaRecorder = new MediaRecorder(stream);
+      const chosenType = pickRecorderMimeType();
+        mediaRecorder = chosenType
+          ? new MediaRecorder(stream, { mimeType: chosenType })
+          : new MediaRecorder(stream);
 
       // meter
       const audioCtx = new AudioContext();
@@ -1540,7 +1560,9 @@ function initAudioRecorder(rec) {
       mediaRecorder.onstop = async () => {
         if (isCancelled) return;
 
-        const blob = new Blob(chunks, { type: 'audio/webm' });
+        // const blob = new Blob(chunks, { type: 'audio/webm' });
+        const actualType = mediaRecorder.mimeType || 'audio/webm';
+        const blob = new Blob(chunks, { type: actualType });
         if (blob.size > maxUploadSize) {
           alert(`Áudio muito grande: ${(blob.size / 1024 / 1024).toFixed(2)}MB. Máx: ${(maxUploadSize / 1024 / 1024).toFixed(2)}MB`);
           return;
@@ -1573,10 +1595,15 @@ function initAudioRecorder(rec) {
             hiddenInput?.getAttribute('field') ||
             '';
 
+          // const data = await uploadTempBlob(blob, {
+          //   field,
+          //   filename: `audio-${Date.now()}.webm`,
+          //   mime: 'audio/webm'
+          // });
           const data = await uploadTempBlob(blob, {
             field,
-            filename: `audio-${Date.now()}.webm`,
-            mime: 'audio/webm'
+            filename: `audio-${Date.now()}.${extFromMime(actualType)}`,
+            mime: actualType
           });
 
           const filename = extractUploadFilename(data);

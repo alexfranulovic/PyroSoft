@@ -19,6 +19,7 @@ function page(string $file)
         $user,
         $cleaned_url,
         $page_path,
+        $params_url,
         $page,
         $max_upload;
 
@@ -51,6 +52,48 @@ function page(string $file)
     echo "
     </body>
     </html>";
+}
+
+
+function load_html_settings()
+{
+    global
+        $slug,
+        $area,
+        $config,
+        $page_path,
+        $page;
+
+    $page_template = basename($page['page_template'] ?? '');
+    $page_template = explode('.php', $page_template)[0];
+    $slug = $page['slug'] ?? '';
+
+    $storage_theme_color = $_COOKIE['theme_color'] ?? $area['theme_color'];
+    $area_color = $area['theme_color'];
+
+    if ($area['allow_change_color_mode'])
+    {
+        $area_color = ($storage_theme_color == 'auto')
+            ? $area['theme_color']
+            : $storage_theme_color;
+    }
+
+    $area_color_icon = [
+        'auto' => 'fas fa-circle-half-stroke',
+        'dark' => 'fas fa-moon',
+        'light' => 'fas fa-sun',
+    ];
+
+    $html_class = html_class();
+
+    return [
+        'lang' => $config['lang'] ?? '',
+        'html_class' => "area-$page_path page-{$slug} template-{$page_template} {$html_class}",
+        'theme_color' => $area_color,
+        'area_color_icon'  => $area_color_icon,
+        'storage_theme_color' => $storage_theme_color,
+        'area_color' => $area_color,
+    ];
 }
 
 /**
@@ -223,10 +266,11 @@ function get_pages(array $attr = [])
             ? $page['title']." - ".$page['page_area']
             : $page['title'];
 
-        $row['id']           = $page['id'];
-        $row['title']        = $page['title'];
-        $row['slug']         = $page['slug'];
-        $row['status_id']    = $page['status_id'];
+        $row['id']        = $page['id'];
+        $row['title']     = $page['title'];
+        $row['slug']      = $page['slug'];
+        $row['status_id'] = $page['status_id'];
+        $page['full_url'] = site_url('/'. page_area($page['page_area'], 'url') .$page['slug']);
 
         $return[] = $for_select
             ? [ 'value' => $page[$value_is], 'display' => $page['title'] ]

@@ -51,7 +51,7 @@ function login_update_password(array $args = [])
 
     $msg      = '';
     $error    = false;
-    $verifyer = false;
+    $verifier = false;
     $tokenRow = null;
 
     if (!empty($args))
@@ -128,10 +128,10 @@ function login_update_password(array $args = [])
             ];
 
             update('tb_users', $args_bd, false);
-            $verifyer = affected_rows();
+            $verifier = affected_rows();
 
             $msg = alert_message('ER_NEW_PASSWORD', 'toast');
-            if ($verifyer)
+            if ($verifier)
             {
                 $msg = alert_message('SC_NEW_PASSWORD', 'toast');
 
@@ -154,7 +154,7 @@ function login_update_password(array $args = [])
         ],
     ];
 
-    if ($verifyer) {
+    if ($verifier) {
         $res['redirect'] = pg . '/login';
     }
 
@@ -318,7 +318,7 @@ function login_forgot_password()
 
     $current_user = get_result("SELECT id, first_name, email FROM tb_users WHERE email = '" . addslashes($email) . "' LIMIT 1");
 
-    if (isset($current_user['email']))
+    if (!empty($current_user['email']))
     {
         // TTL (em segundos) pode vir de config; se não vier, usa 1h
         $ttl_seconds = !empty($login_settings['password_recovery']['ttl_seconds'])
@@ -343,33 +343,21 @@ function login_forgot_password()
         else
         {
             $token = $tokenData['token'];
-            $url   = pg . "/login?forgot-password&key=" . urlencode($token);
 
-            $message = "
-            <p>Prezado(a) <strong>{$current_user['first_name']}</strong>,</p>
-            <p>Para continuar o processo de recuperação de sua senha, clique no botão abaixo ou cole o endereço abaixo no seu navegador:</p>
-            <p>Seguindo o link abaixo você poderá alterar sua senha:</p>
-            <div class='align-itens-center'>
-                <a class='btn' href='{$url}'>Recuperar senha agora</a>
-            </div>
-            <p>Se você não solicitou essa alteração, nenhuma ação é necessária. Sua senha permanecerá a mesma até que você ative este código e recupere a senha.</p>
-            <p>Atenciosamente,</p>";
-
-            $email_data = [
-                'to' => [
-                    [
-                        'name'  => $current_user['first_name'],
-                        'email' => $current_user['email'],
-                    ],
-                ],
-                'subject'   => 'Recuperação de senha',
-                'body'      => $message,
-                'signature' => [
-                    'humanized' => false,
-                ],
+            $message = [
+                'template' => 'password-link-recover',
+                'provider' => 'brevo',
+                'to' => [[
+                    'name'  => $current_user['first_name'],
+                    'email' => $current_user['email'],
+                ]],
+                'template_params' => [
+                    'first_name' => $current_user['first_name'],
+                    'url' => site_url("/login?forgot-password&key=". urlencode($token))
+                ]
             ];
 
-            $msg = send_email($email_data)
+            $msg = queue_message($message)
                 ? alert_message("SC_SEND_EMAIL", 'toast')
                 : alert_message("ER_SEND_EMAIL", 'toast');
         }

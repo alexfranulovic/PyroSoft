@@ -8,14 +8,14 @@ pageBaseTop();
 
 $content = "icon(fas fa-warning) &nbsp; This is the admin`s demo page.";
 
-echo alert_message("IF_UNLOADED_FORM", 'toast');
+// echo "<div class='toast-container'>". alert_message("IF_UNLOADED_FORM", 'toast').'</div>';
 
 echo block('alert',
 [
     'body' => $content,
     'variation' => 'alert-3',
     'close_button' => false,
-    'color' => 'info'
+    'color' => 'warning'
 ]);
 ?>
 
@@ -32,8 +32,8 @@ echo block('alert',
         'formatter' => 'BRL',
     ];
 
-    echo insight_card($params);
-    echo insight_card($params);
+    echo block('insight_card', $params);
+    echo block('insight_card', $params);
     ?>
 
 </section><!--row -->

@@ -93,21 +93,21 @@ function input_selection_type(string $type_form, array $Attr = [])
             $option = (array) $option;
 
             $option_value = $option['value'] ?? '';
-            if ($option_value === '' && $option_value !== 0 && $option_value !== '0') continue;
+            // if ($option_value === '' && $option_value !== 0 && $option_value !== '0') continue;
 
             // Priority: checked explicitly in the option
             $checked = array_key_exists('checked', $option)
                 ? (bool) $option['checked']
                 : null;
 
-            $name      = !empty($option['name']) ? $option['name'] : $name;
-            $option_id = "$name-{$option_value}";
+            $name      = !empty($option['name']) ? $option['name'] : ($name??'');
+            $option_id = !empty($name) ? "$name-{$option_value}" : $option_value;
 
             $attributes = !empty($option['attributes'])
                 ? parse_html_tag_attributes($option['attributes'])
                 : '';
 
-            $display = !empty($option['display'])
+            $display = isset($option['display'])
                 ? format_text($option['display'])
                 : $option_value;
 
@@ -164,7 +164,7 @@ function input_selection_type(string $type_form, array $Attr = [])
 
                 $res.= "
                 <div class='form-check $inline form-{$type_class}'>
-                <input $attributes type='$type' name='$name' id='$option_id' value='{$option_value}' $check>
+                <input $attributes type='$type' $Required name='$name' id='$option_id' value='{$option_value}' $check>
                 <label for='$option_id'>$display</label>
                 </div>";
             }
@@ -172,7 +172,7 @@ function input_selection_type(string $type_form, array $Attr = [])
             elseif ($variation == 'balloons' OR $variation == 'btn-group')
             {
                 $res.= "
-                <input $attributes type='$type' name='$name' id='$option_id' value='{$option_value}' $check>
+                <input $attributes type='$type' $Required name='$name' id='$option_id' value='{$option_value}' $check>
                 <label for='$option_id'>$display</label>";
             }
 
@@ -195,7 +195,7 @@ function input_selection_type(string $type_form, array $Attr = [])
                 <label class='$variation' for='$option_id'>
                 {$highlight}
                 <div class='content'>
-                <input $attributes type='$type' name='$name' id='$option_id' value='{$option_value}' $check>
+                <input $attributes type='$type' $Required name='$name' id='$option_id' value='{$option_value}' $check>
                 $image
                 <span class='description'>
                     <span class='title'>$display</span>
@@ -215,9 +215,32 @@ function input_selection_type(string $type_form, array $Attr = [])
 
     elseif ($type == 'select' OR $type == 'search')
     {
-        $attributes.= ($type=='search')
-            ? (($variation == 'multiple') ? ' data-search-multiple' : ' data-search')
-            : '';
+        if ($variation == 'multiple' && is_json($Value)) {
+            $Value = json_decode($Value, true);
+        }
+
+        if ($type == 'search')
+        {
+            $attributes.= ($variation == 'multiple') ? ' data-search-multiple' : ' data-search';
+
+            if (!empty($field_search)) {
+                $attributes.= " field-search='{$field_search}'";
+            } elseif (!empty($field_id)) {
+                $attributes.= " field-id='{$field_id}'";
+            }
+
+            $attributes.= !empty($data_allow_create)
+                ? " data-allow-create"
+                : "";
+
+            if (empty($Options) && !empty($Value))
+            {
+                load_input('selection_type', 'process');
+                $Options = resolve_searchable_options_by_value($field_id ?? null, $field_search ?? null, $Value);
+            }
+
+            add_asset('footer', "<script src='".base_url."/dist/scripts/searchableFields.js' defer></script>");
+        }
 
         if ($variation == 'multiple') {
             $attributes.= " multiple='multiple'";
@@ -308,7 +331,11 @@ function build_select_options($options, $name = '', $Value = null)
                 isset($_SESSION['FormData'][$name]) &&
                 $_SESSION['FormData'][$name] == $Value
             ) { $sel = 'selected'; }
-            elseif ($option_value == $Value)  $sel = 'selected';
+            // Multi-select: $Value é um array de valores selecionados —
+            // "$option_value == $Value" nunca bate nesse caso (escalar
+            // comparado a array é sempre false), por isso cada option
+            // precisa ser conferida individualmente com in_array().
+            elseif (is_array($Value) ? in_array($option_value, $Value) : $option_value == $Value) $sel = 'selected';
             elseif ($option['checked'] != null) $sel = 'selected';
 
             $res .= "<option {$attributes} value='". htmlspecialchars($option_value, ENT_QUOTES, 'UTF-8') ."' {$sel} {$disabled}>"

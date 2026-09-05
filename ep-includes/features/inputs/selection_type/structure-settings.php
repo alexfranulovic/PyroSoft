@@ -78,7 +78,7 @@ function inputs_for_selection_type(string $type_form, $counter, array $data = []
 
     $advanced_options = "<div class='form-row p-3'>";
     $advanced_options.= common_inputs_for_crud($type_form, 'table', $data['table'] ?? '', $counter);
-    $advanced_options.= common_inputs_for_crud($type_form, 'function_proccess', $data['function_proccess'] ?? '', $counter);
+    $advanced_options.= common_inputs_for_crud($type_form, 'function_process', $data['function_process'] ?? '', $counter);
     $advanced_options.= common_inputs_for_crud($type_form, 'function_view', $data['function_view'] ?? '', $counter);
     $advanced_options.= common_inputs_for_crud($type_form, 'div_class', $data['div_class'] ?? '', $counter);
     $advanced_options.= common_inputs_for_crud($type_form, 'div_attributes', $data['div_attributes'] ?? '', $counter);

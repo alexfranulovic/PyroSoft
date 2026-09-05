@@ -7,8 +7,8 @@ if (!function_exists('view_status_selector_field'))
         extract($params);
 
         $value = !$permissions['update']
-            ? general_stats($field_value, $function_proccess)
-            : status_buttons($id, $field_value, $table_crud, $function_proccess);
+            ? general_stats($field_value, $function_process)
+            : status_buttons($id, $field_value, $table_crud, $function_process);
 
         return $value ?? null;
     }

@@ -517,13 +517,13 @@ function crud_piece(array $Attr = [])
     /**
      * Preconfigure the CRUD panel and list settings.
      */
-    $type_crud      = $crud['type_crud'];
+    $type_crud     = $crud['type_crud'];
     $crud_panel    = $crud['crud_panel'];
     $list_settings = $crud['list_settings'];
     $form_settings = $crud['form_settings'];
     $related_to    = $crud['related_to'] ?? 'table';
     $view_mode     = $form_settings['view_mode'] ?? 'default';
-    $custom_urls    = $crud['custom_urls'];
+    $custom_urls   = $crud['custom_urls'];
     $pages_list    = $crud['pages_list'];
 
 
@@ -592,7 +592,7 @@ function crud_piece(array $Attr = [])
 
         if (!is_null($token))
         {
-            $type_crud               = 'update';
+            $type_crud              = 'update';
             $Attr['register_id']    = $token['resource_id'];
             $crud['login_required'] = false;
 
@@ -1116,7 +1116,7 @@ function crud_piece(array $Attr = [])
 
 
                         $function_view     = $field['function_view'] ?? '';
-                        $function_proccess = $field['function_proccess'] ?? '';
+                        $function_process = $field['function_process'] ?? '';
 
 
                         $name = $field['name'];
@@ -1148,7 +1148,7 @@ function crud_piece(array $Attr = [])
                                 'data' => $tables[$table],
                                 'table_crud' => $table_crud,
                                 'function_view' => $function_view,
-                                'function_proccess' => $function_proccess,
+                                'function_process' => $function_process,
                             ];
 
                             load_input($type_field, 'view');
@@ -1449,7 +1449,7 @@ function prepare_crud_list($params)
                 foreach ($columns as $field)
                 {
                     $function_view     = $field['function_view'] ?? '';
-                    $function_proccess = $field['function_proccess'] ?? '';
+                    $function_process = $field['function_process'] ?? '';
 
                     $type_field = $field['type_field'] ?? '';
 
@@ -1470,7 +1470,7 @@ function prepare_crud_list($params)
                         'data' => $data,
                         'table_crud' => $table_crud,
                         'function_view' => $function_view,
-                        'function_proccess' => $function_proccess,
+                        'function_process' => $function_process,
                     ];
 
                     load_input($type_field, 'view');

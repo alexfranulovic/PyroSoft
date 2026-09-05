@@ -11,6 +11,11 @@ register_rest_route('form-manage-custom-permission', [
   {
     global $crud_action_triggers;
 
+    $permission = load_permission('manage-permissions', 'custom');
+    if (!$permission) {
+      return invalid_permission_response();
+    }
+
     // Capture form data
     $id = $_POST['id'] ?? 0;
     $mode = $_POST['mode'] ?? 'insert';
@@ -179,6 +184,11 @@ register_rest_route('manage-custom-permission', [
   'callback' => function()
   {
     global $seg, $crud_action_triggers;
+
+    $permission = load_permission('manage-permissions', 'custom');
+    if (!$permission) {
+      return invalid_permission_response();
+    }
 
     $id = $_POST['id'] ?? null;
 

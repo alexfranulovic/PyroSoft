@@ -183,7 +183,7 @@ function common_inputs_for_page(string $type_form, string $selector, $data = nul
     return input('status_selector', $type_form,
         [
             'size' => 'col-md-6 col-lg-4',
-            'function_proccess' => 'general_status',
+            'function_process' => 'general_status',
             'name' => "Modules[$counter][status_id]",
             'input_id' => "status_id-$counter",
             'Value' => $data,
@@ -1639,7 +1639,7 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
 
     $panel['hooks_out'][] = [
         'title' => 'Listar',
-        'url'  => get_url_page('listar-paginas', 'full'),
+        'url'  => get_url_page('list-pages', 'full'),
         'color' => 'outline-info',
         'pre_icon' => 'fas fa-list',
     ];
@@ -1949,7 +1949,7 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
             $group.= input('status_selector', $type_form,
                 [
                     'size' => 'col-sm-6',
-                    'function_proccess' => 'general_status',
+                    'function_process' => 'general_status',
                     'name' => 'status_page_id',
                     'input_id' => 'status_page_id',
                     'Value' => ($type_form=='update') ? $page['status_id'] : '4',
@@ -1967,6 +1967,16 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
                     'Query' => "SELECT id as value, CONCAT(title, ' - ', page_area) as display FROM tb_pages ORDER BY page_area, title ASC",
                     'Options' => [['value' => 0, 'display' => 'Não depende de outra página']],
                     'Value' => ($type_form=='update') ? $page['parent_page_id'] : '',
+                ]
+            );
+            $group.= input('textarea', $type_form,
+                [
+                    'size' => 'col-12',
+                    'label' => 'Descrição',
+                    'name' => 'description',
+                    'Value' => ($type_form=='update') ? $page['description'] : '',
+                    // 'Required' => true,
+                    'Alert' => "É bom para dar contexto para agentes de IA internos.",
                 ]
             );
 
@@ -2023,7 +2033,7 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
                     'name' => 'allowed[]',
                     'Options' => get_roles('list'),
                     'Value' => ($type_form=='update') ? get_roles('page', [ 'id' => $id ]) : null,
-                    'Required' => true
+                    // 'Required' => true
                 ]
             );
 
@@ -2048,7 +2058,7 @@ function manage_page_form(string $type_form = 'insert', int $counter = 1)
                         'name' => 'is_public',
                         'Options' => [[ 'value' => 1, 'display' => 'Sim' ]],
                         'Value' => ($type_form=='update') ? $page['is_public'] : '0',
-                        'Required' => true
+                        // 'Required' => true
                     ]
                 );
             }
@@ -2337,15 +2347,19 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
     $error        = false;
     $msg          = '';
     $valid_data   = $data;
+    $msg_type     = 'toast';
 
-    $msg_type = 'toast';
+    $permission = load_permission('manage-pages', 'custom');
+    if (!$permission) {
+      return invalid_permission_response();
+    }
 
 
     /*
-     * Define the verifyer function.
+     * Define the verifier function.
      */
-    if     ($mode == 'insert') $verifyer = 'inserted_id';
-    elseif ($mode == 'update') $verifyer = 'affected_rows';
+    if     ($mode == 'insert') $verifier = 'inserted_id';
+    elseif ($mode == 'update') $verifier = 'affected_rows';
     else                       $error    = true;
 
     // Verify If there's an error
@@ -2377,14 +2391,15 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
 
         $args = [
             'title'           => $valid_data['title'] ?? '',
+            'description'     => $valid_data['description'] ?? '',
             'slug'            => !empty($valid_data['slug']) ? sanitize_string($valid_data['slug']) : '',
             'page_settings'   => $valid_data['page_settings'] ?? [],
             'seo'             => $valid_data['seo'] ?? [],
             'page_type'       => $valid_data['page_type'] ?? '',
             'is_public'       => $valid_data['is_public'] ?? 0,
-            'parent_page_id'       => $valid_data['parent_page_id'] ?? 0,
+            'parent_page_id'  => $valid_data['parent_page_id'] ?? null,
             'page_area'       => $valid_data['page_area'] ?? '',
-            'custom_urls'      => $valid_data['custom_urls'] ?? '',
+            'custom_urls'     => $valid_data['custom_urls'] ?? '',
             'page_template'   => $valid_data['page_template'] ?? 'common.php',
             'access_count'    => $valid_data['access_count'] ?? 0,
             'status_id'       => $valid_data['status_page_id'] ?? 3,
@@ -2410,7 +2425,7 @@ function manage_page_system(array $data, string $mode, bool $debug = false)
          * Verify if inserted/updated correctaly.
          *
          */
-        if ($verifyer()) :
+        if ($verifier()) :
 
             $page_id = ($mode == 'insert') ? inserted_id() : $id;
             unset($_SESSION['FormData']);

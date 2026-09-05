@@ -5,11 +5,11 @@
  * Color Branding
  *
  */
-$st: #D4AF37;
+$st: #f6bb1b;
 $st-text: #121212;
 $st-is-dark: false;
 
-$nd: #E6B3B3;
+$nd: #C77A00;
 $nd-text: #121212;
 $nd-is-dark: false;
 
@@ -40,8 +40,8 @@ $primary: $st;
 $secondary: $nd;
 
 // Text
-$font-family-base: 'raleway', sans-serif;
-$nd-font-family-base: 'raleway', sans-serif;
+$font-family-base: 'montserrat', sans-serif;
+$nd-font-family-base: 'montserrat', sans-serif;
 $font-weight-base: 500;
 
 // Generic
@@ -86,8 +86,8 @@ $modal-header-border-radius: $border-radius-400;
 $modal-footer-border-radius: $border-radius-400;
 
 // Toasts
-$toast-border-radius: $border-radius-100;
-$toast-header-border-radius: $border-radius-100;
+$toast-border-radius: $border-radius-300;
+$toast-header-border-radius: $border-radius-300;
 
 // Tabs / Navs
 $nav-tabs-border-radius: $border-radius-400;
@@ -111,10 +111,14 @@ $dropdown-item-border-radius: $border-radius-400;
 @import '../../../../assets/styles/blocks/cmps/**/*.scss';
 @import '../../../../assets/styles/blocks/modules/**/*.scss';
 
-
+/**
+ *
+ * Area styles
+ *
+ */
 @import './sidebar.scss';
-@import './pages.scss';
 @import './page-crud-management-system.scss';
 @import './menu-management.scss';
 @import './roles-management.scss';
 @import './fields-card.scss';
+@import './pages.scss';

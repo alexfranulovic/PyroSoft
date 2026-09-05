@@ -60,6 +60,8 @@ module.exports =
         filesPreviewer: './this-system/assets/scripts/inc/files-previewer.js',
         passwordInput: './this-system/assets/scripts/inc/password-input.js',
         rangeInput: './this-system/assets/scripts/inc/range-input.js',
+        searchableFields: './this-system/assets/scripts/inc/searchable-fields.js',
+        tables: './this-system/assets/scripts/inc/tables.js',
         // charts: './this-system/assets/scripts/charts.js',
     },
 

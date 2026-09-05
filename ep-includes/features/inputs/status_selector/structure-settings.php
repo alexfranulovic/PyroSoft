@@ -23,10 +23,10 @@ function inputs_for_status_selector(string $type_form, $counter, array $data = [
         [
             'size' => 'col-md-6 col-lg-4',
             'label' => 'Tipo de status',
-            'name' => "Fields[$counter][function_proccess]",
-            'input_id' => "function_proccess-$counter",
+            'name' => "Fields[$counter][function_process]",
+            'input_id' => "function_process-$counter",
             'Options' => type_status(true),
-            'Value' => $data['function_proccess'] ?? '',
+            'Value' => $data['function_process'] ?? '',
             'Required' => true
         ]
     );

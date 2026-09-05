@@ -18,6 +18,8 @@
 
     &.navbar-transparent-absolute {
         background-image: linear-gradient(90deg, #ffffff00 0%, #00000000 100%) !important;
+        box-shadow: unset;
+        margin-bottom: 2rem;
     }
 
     &.navbar-fixed {

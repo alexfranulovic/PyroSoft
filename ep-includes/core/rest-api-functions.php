@@ -38,6 +38,21 @@ function register_rest_route($route, $args = [], $override = false)
     return $rest_api_routes += [ $route => array_merge($defaults, $args) ];
 }
 
+/**
+ * Small helper shared by the three inline-edit routes below -- all three
+ * take the same {id, ...} JSON body shape and gate on the same
+ */
+function read_json_payload(): array
+{
+    $payload = $_POST;
+    if (empty($_POST))
+    {
+        $raw = trim((string) file_get_contents('php://input'));
+        $payload = $raw !== '' ? (json_decode($raw, true) ?: []) : [];
+    }
+
+    return (array) $payload;
+}
 
 function login_required_response()
 {
@@ -128,6 +143,8 @@ function rest_api_json_page()
     header('Content-Type: application/json; charset=UTF-8');
 
     $error = false;
+
+    $_POST = read_json_payload();
 
     $res = [
         'code'   => 'rest_no_route',

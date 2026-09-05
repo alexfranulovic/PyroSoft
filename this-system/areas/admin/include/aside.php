@@ -3,8 +3,8 @@
 
   <div class="offcanvas-header">
     <a class="navbar-brand" href="<?= pg ?>/admin/administration" aria-label="<?= $info['name'] ?>" title="<?= $info['name'] ?>">
-      <img class="logotype-light" src="<?= file_url('images/brand', false, 'imagotype-black-st.png') ?>" loading="lazy">
-      <img class="logotype-dark" src="<?= file_url('images/brand', false, 'imagotype-white-st.png') ?>" loading="lazy">
+      <img class="logotype-light" src="<?= file_url('images/brand', false, 'x-imagotype-black-st.webp') ?>" loading="lazy">
+      <img class="logotype-dark" src="<?= file_url('images/brand', false, 'x-imagotype-black-nd.webp') ?>" loading="lazy">
     </a>
     <!--<h5><?= $info['name'] ?></h5>-->
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebar" aria-label="Close"></button>

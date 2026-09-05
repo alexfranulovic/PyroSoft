@@ -1,7 +1,6 @@
 <?php
 if(!isset($seg)) exit;
 
-global $alerts;
 
 /**
  * Manage error and success messages based on input values.
@@ -13,8 +12,7 @@ global $alerts;
  *
  * @return array - An array containing the alert message details, including color, close button flag, and the message itself.
  */
-
-$alerts = [
+$GLOBALS['alerts'] = [
     'ER_TO_SCHEDULE' => [
         'color' => 'danger', 'close_button' => true,
         'title' => 'Erro!',
@@ -375,7 +373,7 @@ $alerts = [
 
 function alert_message($alert, $view_mode = 'none')
 {
-    global $alerts;
+    $alerts = $GLOBALS['alerts'];
 
     if (
         $view_mode != 'alert' &&
@@ -384,11 +382,31 @@ function alert_message($alert, $view_mode = 'none')
         $view_mode != 'none'
     ) { return 'View mode was not selected correctly.'; }
 
+
     if (is_array($alert))
     {
+        if ($view_mode == 'toast')
+        {
+            $alert['attributes'] = 'data-toast:();';
+            if (!empty($alert['title']))
+            {
+                $alert['body'] = "{$alert['title']} {$alert['body']}";
+                unset($alert['title']);
+            }
+        }
         return ($view_mode != 'none')
             ? block($view_mode, $alert)
             : $alert;
+    }
+
+    if ($view_mode == 'toast')
+    {
+        $alerts[$alert]['attributes'] = 'data-toast:();';
+        if (!empty($alerts[$alert]['title']))
+        {
+            $alerts[$alert]['body'] = "{$alerts[$alert]['title']} {$alerts[$alert]['body']}";
+            unset($alerts[$alert]['title']);
+        }
     }
 
     return ($view_mode != 'none')

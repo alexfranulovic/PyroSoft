@@ -443,14 +443,19 @@ function input(string $type_input, string $type_form, $Attr = [])
 
 
     // Extra HTML attributes
-    $Attr['attributes'] = !empty($Attr['attributes'])
-        ? parse_html_tag_attributes($Attr['attributes'])
-        : '';
+    if (empty($Attr['bypass_parse_attributes']))
+    {
+        $Attr['attributes'] = !empty($Attr['attributes'])
+            ? parse_html_tag_attributes($Attr['attributes'])
+            : '';
+    }
 
-
-    $Attr['div_attributes'] = !empty($Attr['div_attributes'])
-        ? parse_html_tag_attributes($Attr['div_attributes'])
-        : '';
+    if (empty($Attr['bypass_parse_div_attributes']))
+    {
+        $Attr['div_attributes'] = !empty($Attr['div_attributes'])
+            ? parse_html_tag_attributes($Attr['div_attributes'])
+            : '';
+    }
 
 
     // Normalize attachment (JSON | array | scalar)

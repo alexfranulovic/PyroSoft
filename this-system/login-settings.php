@@ -20,32 +20,65 @@ if(!isset($seg)) exit;
  * - Text values are assumed to be trusted and localized upstream if needed.
  * - Missing optional keys (like `description`) are handled gracefully by renderers.
  */
-$login_forms['register']['aside'] = [
-    'svg' => 'login-rafiki',
-    'title' => 'Crie sua conta e veja o melhor do conquiste.me',
+$login_forms['register'] = [
+    'main' => [
+    ],
+    'aside' => [
+        'svg' => 'login-rafiki',
+        'title' => 'Create your account and enjoy the best of ' . $info['name'],
+    ]
 ];
 
-$login_forms['login']['aside'] = [
-    'svg' => 'login-rafiki',
-    'title' => 'Entrar no PyroSoft',
-    'description' => 'Use sua conta para entrar',
+$login_forms['login'] = [
+    'main' => [
+        'title' => 'Log in to ' . $info['name'],
+        'description' => 'Use an account or enter your details to access the platform.',
+    ],
+    'aside' => [
+        'svg' => 'login-rafiki',
+        'title' => 'Easier way to build a Product',
+        'description' => 'Security, data, performance, and much more — you’ll find it all right here.',
+    ]
 ];
 
-$login_forms['block_system']['aside'] = [
-    'svg' => 'maintenance-amico',
-    'title' => 'Xii... Brocotó...',
-    'description' => 'O site está em manutenção, volte mais tarde!',
+$login_forms['block_system'] = [
+    'main' => [
+    ],
+    'aside' => [
+        'svg' => 'maintenance-amico',
+        'title' => 'Oops... Something went wrong...',
+        'description' => 'The site is under maintenance. Please come back later!',
+    ]
 ];
 
-$login_forms['find_account']['aside'] = [
-    'svg' => 'forgot-password-bro',
-    'title' => 'Encontre sua conta',
+$login_forms['find_account'] = [
+    'main' => [
+    ],
+    'aside' => [
+        'svg' => 'forgot-password-bro',
+        'title' => 'Find your account',
+    ]
 ];
 
-$login_forms['new_password']['aside'] = [
-    'svg' => 'webinar-pana',
-    'title' => 'Digite a nova senha',
-    'description' => 'Anote essa senha em um local seguro. Não vai esquecer ela de novo, hein?',
+$login_forms['new_password'] = [
+    'main' => [
+        'title' => 'Enter your new password',
+        'description' => 'Write down this password somewhere safe. Don’t forget it again, okay?',
+    ],
+    'aside' => [
+        'svg' => 'webinar-pana',
+    ]
+];
+
+$login_forms['email_sso'] = [
+    'main' => [
+        'title' => 'Log in with email',
+        'description' => 'We’ll send a login link to your email. No password required.',
+    ],
+    'aside' => [
+        'svg' => 'login-rafiki',
+        'title' => 'Quick access, no password needed',
+    ]
 ];
 
 
@@ -86,19 +119,44 @@ $login_forms['new_password']['aside'] = [
  */
 function login_form_management($key = 'login')
 {
-    global $info, $login_settings, $login_forms, $login_social;
+    global $info, $login_settings, $login_forms, $login_social, $config;
 
     $login_fields = $login_footer = '';
 
+    /**
+     * Quando o plugin advanced-login esta ativo, o form de login aponta para
+     * o wrapper 'advlogin-login' (adiciona "manter conectado" + gate facial).
+     * Caso contrario, usa a rota nativa 'user-login'.
+     */
+    $login_action = rest_api_route_url(
+        in_array('advanced-login', $config['activated_plugins'] ?? [], true)
+            ? 'advlogin-login'
+            : 'user-login'
+    );
+
+    $alt_logins = '';
+
     if (!empty($login_settings['login_social']))
     {
-        $login_fields.= "<div class='social-logins'>";
         foreach ($login_settings['login_social'] as $from)
         {
             $function_caller = "{$from}_inject_button_once";
-            $login_fields.= $function_caller('df');
+            if (function_exists($function_caller)) {
+                $alt_logins.= $function_caller('df');
+            }
         }
-        $login_fields.= "</div>".block('division', [ 'title' => 'OU' ]);
+    }
+
+    // Entrar com e-mail (magic link) - mesma logica de exibicao do login social,
+    // ligado/desligado por login_settings[email_sso] no painel.
+    if (!empty($login_settings['email_sso']) && function_exists('advlogin_email_sso_button'))
+    {
+        $alt_logins.= advlogin_email_sso_button();
+    }
+
+    if ($alt_logins !== '')
+    {
+        $login_fields.= "<div class='social-logins'>{$alt_logins}</div>" . block('division', [ 'title' => 'OU' ]);
     }
 
     /**
@@ -129,13 +187,13 @@ function login_form_management($key = 'login')
       ]
     );
 
-    if ($login_settings['who_changes_password'] != 'only_admin')
-    {
-        $login_fields.= "
-        <div class='col-12 forgot-password'>
-          <a href='". pg . "/login?forgot-password'>Esqueceu a senha?</a>
-        </div>";
-    }
+    // if ($login_settings['who_changes_password'] != 'only_admin')
+    // {
+    //     $login_fields.= "
+    //     <div class='col-12 forgot-password'>
+    //       <a href='". pg . "/login?forgot-password'>Esqueceu a senha?</a>
+    //     </div>";
+    // }
 
 
     /**
@@ -159,11 +217,19 @@ function login_form_management($key = 'login')
       'insert',
       [
         'type' => 'switch',
-        'size' => 'col-12',
+        'size' => 'col-6',
         'name' => "save_login",
         'Options' => [[ 'value' => 'true', 'display' => 'Manter conectado' ]]
       ]
     );
+
+    if ($login_settings['who_changes_password'] != 'only_admin')
+    {
+        $login_fields.= "
+        <div class='col-6 forgot-password'>
+          <a href='". pg . "/login?forgot-password'>Esqueci minha senha</a>
+        </div>";
+    }
 
     if (!empty($login_settings['recaptcha_login']) && $login_settings['recaptcha_login'])
     $login_fields.= input('g-recaptcha', 'insert', [ 'size' => 'col-12' ]);
@@ -186,19 +252,19 @@ function login_form_management($key = 'login')
      * Form login footer.
      *
      */
-    if ($login_settings['register_page']['active'] && !empty($login_settings['register_page']['slug']))
+    if ($login_settings['signup_page']['active'] && !empty($login_settings['signup_page']['slug']))
     {
         $login_footer.= "
         <div class='col-12 register'>
-          <a href='". pg ."/{$login_settings['register_page']['slug']}'>Crie sua conta hoje</a>
+          <a href='". pg ."/{$login_settings['signup_page']['slug']}'> Crie sua conta hoje</a>
         </div>";
     }
 
 
     // Create login page.
-    $login_forms['login']['main'] = [
+    $login_forms['login']['main']+= [
         'form' => [
-            'action' => rest_api_route_url('user-login'),
+            'action' => $login_action,
             'fields' => $login_fields,
         ],
         'footer' => $login_footer ?? '',
@@ -210,9 +276,9 @@ function login_form_management($key = 'login')
      * Create login page (Only Dev's can login).
      *
      */
-    $login_forms['block_system']['main'] = [
+    $login_forms['block_system']['main']+= [
         'form' => [
-            'action' => rest_api_route_url('user-login'),
+            'action' => $login_action,
             'fields' => $login_fields,
         ],
         'footer' => '<div class="col-12 main-footer-login"><i>Apenas desenvolvedores podem fazer login.</i></div>',
@@ -289,7 +355,7 @@ function login_form()
 
 
     // Create login page (Only Dev's can login).
-    $login_forms['find_account']['main'] = [
+    $login_forms['find_account']['main']+= [
         'form' => [
             'action' => rest_api_route_url('forgot-password?find-account'),
             'fields' => $find_account_fields,
@@ -298,10 +364,102 @@ function login_form()
     ];
 
     // Create login page (Only Dev's can login).
-    $login_forms['new_password']['main'] = [
+    $login_forms['new_password']['main']+= [
         'form' => [
             'action' => rest_api_route_url('forgot-password?new-password'),
             'fields' => $new_password_fields,
+        ],
+        'footer' => $footer,
+    ];
+
+    // SSO por e-mail (magic link) - plugin advanced-login.
+    // Cooldown: mesmo tempo (ADVLOGIN_EMAIL_SSO_COOLDOWN_SECONDS) e mesmo
+    // estado (sessao) usados pelo backend em advlogin_email_sso_request().
+    $sso_cooldown_seconds = defined('ADVLOGIN_EMAIL_SSO_COOLDOWN_SECONDS') ? ADVLOGIN_EMAIL_SSO_COOLDOWN_SECONDS : 30;
+    $sso_cooldown_left    = function_exists('advlogin_email_sso_cooldown_remaining') ? advlogin_email_sso_cooldown_remaining() : 0;
+
+    $email_sso_fields =
+    input(
+      'basic',
+      'insert',
+      [
+        'size' => 'col-12',
+        'type' => 'email',
+        'label' => 'E-mail',
+        'Placeholder' => 'voce@exemplo.com',
+        'attributes' => 'autocomplete:(email);',
+        'name' => 'email',
+        'Required' => true,
+      ]
+    )
+    . (!empty($_GET['redirect_to'])
+        ? input('hidden', 'insert', ['name' => 'redirect_to', 'Value' => $_GET['redirect_to']])
+        : '')
+    . input(
+        'submit_button',
+        'insert',
+        [
+            'size' => 'col-12',
+            'class' => "btn btn-st",
+            'Value' => 'Enviar link de acesso',
+            'disabled' => $sso_cooldown_left > 0,
+        ]
+    )
+    . "
+    <div class='col-12 advlogin-sso-cooldown'" . ($sso_cooldown_left > 0 ? '' : ' hidden') . ">
+      <small>Aguarde <span class='advlogin-sso-cooldown-count'>{$sso_cooldown_left}</span>s para reenviar</small>
+    </div>
+    <script>
+    (function () {
+      var form = document.currentScript.closest('form');
+      if (!form) return;
+
+      var btn  = form.querySelector('[type=\"submit\"]');
+      var wrap = form.querySelector('.advlogin-sso-cooldown');
+      var out  = wrap ? wrap.querySelector('.advlogin-sso-cooldown-count') : null;
+      if (!btn || !wrap || !out) return;
+
+      var DEFAULT_SECONDS = {$sso_cooldown_seconds};
+      var timer = null;
+
+      function start(seconds) {
+        clearInterval(timer);
+        var remaining = seconds;
+
+        function tick() {
+          if (remaining <= 0) {
+            clearInterval(timer);
+            btn.disabled = false;
+            wrap.hidden = true;
+            return;
+          }
+          out.textContent = remaining;
+          wrap.hidden = false;
+          btn.disabled = true;
+          remaining--;
+        }
+
+        tick();
+        timer = setInterval(tick, 1000);
+      }
+
+      if ({$sso_cooldown_left} > 0) start({$sso_cooldown_left});
+
+      form.addEventListener('submit', function () {
+        start(DEFAULT_SECONDS);
+      });
+    })();
+    </script>";
+
+    $footer = "
+    <div class='col-12 main-footer-login'>
+        <a href='". pg ."/login' title='Login'>Tentar outra forma de login</a></i>
+    </div>";
+
+    $login_forms['email_sso']['main']+= [
+        'form' => [
+            'action' => rest_api_route_url('advlogin-email-sso?step=request'),
+            'fields' => $email_sso_fields,
         ],
         'footer' => $footer,
     ];
@@ -351,7 +509,7 @@ function login_modal()
     $footer = $login_fields['main']['footer'] ?? '';
 
     $modal_body = "
-    <section class='content'>
+    <section class='header'>
         {$title}
         {$description}
     </section>

@@ -35,12 +35,12 @@ if (!isset($seg)) exit;
  */
 $sql = "
 CREATE TABLE tb_orders (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  user_id BIGINT UNSIGNED NULL,
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NULL,
   status_id INT NOT NULL,
   -- Order classification
-  order_type ENUM('product','plan','one_off','mixed')
-    NOT NULL DEFAULT 'product',
+  order_type ENUM('product','plan','one_off','mixed') NOT NULL DEFAULT 'product',
+  order_purpose VARCHAR(50) NOT NULL DEFAULT 'charge',
   -- Customer Snapshot
   customer_first_name VARCHAR(255) NOT NULL,
   customer_last_name VARCHAR(255) NOT NULL,
@@ -61,23 +61,38 @@ CREATE TABLE tb_orders (
   currency CHAR(3) NOT NULL DEFAULT 'BRL',
   subtotal_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   discount_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  fee_amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   shipping_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  fee_amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   tax_amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   total_amount    DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  gateway_fee     DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  net_amount      DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  refunded_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   -- Marketplace / affiliate commission snapshot
   commission_amount DECIMAL(10,2) NULL,
-  vendor_id BIGINT UNSIGNED NULL,
+  commission_activation_function VARCHAR(255) NULL,
+  commission_status_id INT DEFAULT NULL,
+  vendor_id INT NULL,
   notes TEXT NULL,
+  subscription_id INT NULL,
   -- Audit
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   -- Indexes
   INDEX idx_orders_user (user_id),
   INDEX idx_orders_vendor (vendor_id),
+  INDEX idx_orders_commission_status (commission_status_id),
   INDEX idx_orders_status (status_id),
   INDEX idx_orders_email (customer_email),
-  INDEX idx_orders_created (created_at)
+  INDEX idx_orders_created (created_at),
+
+  -- vendor_id is the invite_code owner (tb_users) attributed as this
+  -- order's seller -- see create_order() (index.php). ON DELETE SET NULL:
+  -- losing the vendor's user account shouldn't take the order down with it.
+  CONSTRAINT fk_orders_vendor_user
+    FOREIGN KEY (vendor_id) REFERENCES tb_users(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ";
@@ -86,21 +101,23 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE tb_order_items (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id BIGINT UNSIGNED NOT NULL,
-  product_id BIGINT UNSIGNED NULL,
-  plan_id BIGINT UNSIGNED NULL,
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT NOT NULL,
+  product_id BIGINT NULL,
+  plan_id BIGINT NULL,
   item_type ENUM('product','plan','one_off') NOT NULL,
   item_name VARCHAR(255) NOT NULL,
+  slug varchar(120) DEFAULT NULL,
   quantity INT NOT NULL DEFAULT 1,
-  unit_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   regular_unit_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  unit_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   line_discount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   -- Snapshot totals per line (safe if you freeze them)
   line_subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   line_total    DECIMAL(10,2) NOT NULL DEFAULT 0.00,
   meta_json JSON NULL,
   activation_function VARCHAR(255) DEFAULT NULL,
+  deactivation_function VARCHAR(255) DEFAULT NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
 
@@ -109,6 +126,7 @@ CREATE TABLE tb_order_items (
     ON DELETE CASCADE,
 
   INDEX idx_items_order (order_id),
+  INDEX idx_items_slug (slug),
   INDEX idx_items_product (product_id),
   INDEX idx_items_plan (plan_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -119,8 +137,9 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE tb_order_payments (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id BIGINT UNSIGNED NOT NULL,
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  payment_hash varchar(64) DEFAULT NULL,
+  order_id BIGINT NOT NULL,
   status_id VARCHAR(30) DEFAULT NULL,
   method VARCHAR(32) NOT NULL,
   provider VARCHAR(32) NOT NULL,
@@ -128,19 +147,26 @@ CREATE TABLE tb_order_payments (
   amount DECIMAL(10,2) NOT NULL,        -- gross charged
   gateway_fee DECIMAL(10,2) NULL,
   net_amount DECIMAL(10,2) NULL,
-  installments TINYINT UNSIGNED NULL,
+  refunded_amount DECIMAL(10,2) DEFAULT NULL,
+  installment_fee_amount decimal(10,2) DEFAULT NULL,
+  installment_rate_amount decimal(10,2) DEFAULT NULL,
+  installments TINYINT NULL,
   installment_amount DECIMAL(10,2) NULL,
   payment_link VARCHAR(500) NULL,
+  code varchar(200) DEFAULT NULL,
   raw_response_json JSON NULL,
-  idempotency_key VARCHAR(100) NULL,
   provider_reference VARCHAR(150) NULL,
+  provider_order_id VARCHAR(220) NULL,
   provider_payment_id VARCHAR(220) NULL,
   provider_type_code INT NULL,
   provider_status VARCHAR(50) NULL,
-  paid_at DATETIME NULL,
+  statement_descriptor VARCHAR(20) NULL,
+  user_payment_method_id bigint(20) DEFAULT NULL,
   expires_at DATETIME NULL,
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
+
+  KEY `idx_tb_order_payments_user_payment_method_id` (`user_payment_method_id`),
 
   CONSTRAINT fk_payments_order
     FOREIGN KEY (order_id) REFERENCES tb_orders(id)
@@ -157,8 +183,8 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE tb_order_coupons (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id BIGINT UNSIGNED NOT NULL,
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT NOT NULL,
   code VARCHAR(64) NOT NULL,
   -- Snapshot of coupon configuration at the time it was applied
   discount_type ENUM('percent','fixed_cart','fixed_item') NOT NULL DEFAULT 'fixed_cart',
@@ -182,8 +208,8 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE tb_order_fees (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id BIGINT UNSIGNED NOT NULL,
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT NOT NULL,
   name VARCHAR(255) NOT NULL,
   -- Can be negative (manual discount) or positive (extra charge)
   amount DECIMAL(10,2) NOT NULL,
@@ -197,6 +223,107 @@ CREATE TABLE tb_order_fees (
 
   INDEX idx_fee_order (order_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+";
+query_it($sql);
+
+
+$sql = "
+CREATE TABLE `tb_user_payment_methods` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT(20) NOT NULL,
+  `provider` VARCHAR(32) NOT NULL,
+  `method` VARCHAR(32) NOT NULL DEFAULT 'card',
+  `provider_customer_id` VARCHAR(64) DEFAULT NULL,
+  `provider_card_id` VARCHAR(64) DEFAULT NULL,
+  `brand` VARCHAR(32) DEFAULT NULL,
+  `brand_name` VARCHAR(50) DEFAULT NULL,
+  `issuer_name` VARCHAR(50) DEFAULT NULL,
+  `first6` VARCHAR(6) DEFAULT NULL,
+  `last4` VARCHAR(4) DEFAULT NULL,
+  `exp_month` VARCHAR(3) DEFAULT NULL,
+  `exp_year` VARCHAR(5) DEFAULT NULL,
+  `holder_name` VARCHAR(120) DEFAULT NULL,
+  `is_default` TINYINT(1) NOT NULL DEFAULT 0,
+  `status_id` TINYINT(1) NOT NULL DEFAULT 2,
+  `meta_json` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (JSON_VALID(`meta_json`)),
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_provider_card` (`provider`, `provider_card_id`, `user_id`),
+  KEY `idx_user` (`user_id`),
+  KEY `idx_customer` (`provider`, `provider_customer_id`)
+)
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+";
+query_it($sql);
+
+
+$sql = "
+CREATE TABLE tb_order_notes (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT NOT NULL,
+  visibility ENUM('private', 'customer') NOT NULL DEFAULT 'private',
+  note_type VARCHAR(50) NOT NULL DEFAULT 'manual',
+  title VARCHAR(255) DEFAULT NULL,
+  content TEXT NOT NULL,
+  body_type VARCHAR(255) DEFAULT 'default',
+  created_by BIGINT DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+
+  INDEX idx_order_notes_order_id (order_id),
+  INDEX idx_order_notes_note_type (note_type),
+  INDEX idx_order_notes_visibility (visibility),
+  INDEX idx_order_notes_created_at (created_at),
+
+  CONSTRAINT fk_order_notes
+    FOREIGN KEY (order_id)
+    REFERENCES tb_orders(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+";
+query_it($sql);
+
+
+$sql = "
+CREATE TABLE tb_order_utm_data (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  order_id BIGINT NOT NULL,
+  utm_source VARCHAR(190) NULL,
+  utm_medium VARCHAR(190) NULL,
+  utm_campaign VARCHAR(190) NULL,
+  utm_content VARCHAR(190) NULL,
+  utm_term VARCHAR(190) NULL,
+  utm_resource VARCHAR(190) NULL,
+  invite_code VARCHAR(50) NULL,
+  created_at DATETIME NOT NULL,
+
+  INDEX idx_order_utm_data_order (order_id),
+
+  CONSTRAINT fk_order_utm_data_order
+    FOREIGN KEY (order_id)
+    REFERENCES tb_orders(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+";
+query_it($sql);
+
+
+/**
+ * Vendor attribution: whoever owns an `invite_code` gets attributed as
+ * vendor_id (tb_orders, above) when a buyer checks out carrying that code
+ * in $_SESSION/$_COOKIE (capture_utm_params(), core) -- see create_order()'s
+ * vendor resolution (index.php).
+ */
+$sql = "
+ALTER TABLE tb_users
+    ADD COLUMN invite_code VARCHAR(50) DEFAULT NULL,
+    ADD UNIQUE KEY uq_tb_users_invite_code (invite_code);
 ";
 query_it($sql);
 
@@ -218,10 +345,18 @@ update_option('default_currency', 'BRL', 1);
 update_option('pyrosales_api_status', '0');
 update_option('pyrosales_is_sandbox', '1', 1);
 update_option('active_payment_methods', [], 1);
+update_option('default_payment_method', [], 1);
 update_option('fee_mode', 'merchant');
 update_option('max_interest_free_installments', '1');
 update_option('surcharge_percent', 0.05);
 update_option('surcharge_fixed', 1);
+update_option('checkout_page_id', '');
+update_option('receipt_page_id', '');
+update_option('pyrosales_create_user_after_checkout', '1');
+update_option('pyrosales_login_user_after_checkout', '1');
+update_option('pyrosales_one_off_allow_installments', '0');
+update_option('pyrosales_commission_activation_function', '');
+update_option('pyrosales_payment_expiriation', []);
 
 /**
  * PERMISSIONS
@@ -313,17 +448,72 @@ $crud = [
       'name' => 'active_payment_methods[]',
       'type' => 'switch',
       'variation' => 'inline',
-      'Required' => 1,
+      // 'Required' => 1,
       'status_id' => 1,
       'options_resolver' => 'format_payment_gateways()'
     ],
     [
       'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Default payment methods',
+      'name' => 'default_payment_method',
+      'type' => 'radio',
+      'variation' => 'inline',
+      'Required' => 1,
+      'status_id' => 1,
+      'options_resolver' => 'format_payment_gateways("is_settings_form_free", "default_payment_method")',
+    ],
+    [
+      'depth' => 1,
+      'size' => 'col-12',
       'type_field' => 'basic',
       'name' => "default_currency",
       'label' => 'Default currency',
       'Required' => true,
     ],
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'name' => "pyrosales_payment_expiriation[unit]",
+      'label' => 'Payment expiriation (unit)',
+      'type' => 'radio',
+      'variation' => 'inline',
+      'Options' => [
+        [ 'value' => 'minute', 'display' => 'Minutes' ],
+        [ 'value' => 'day', 'display' => 'Days'],
+      ]
+    ],
+    [
+      'depth' => 1,
+      'type_field' => 'basic',
+      'type' => 'number',
+      'name' => "pyrosales_payment_expiriation[count]",
+      'label' => 'Payment expiriation (count)',
+    ],
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Checkout Page URL',
+      'name' => 'checkout_page_id',
+      'type' => 'search',
+      'variation' => 'original',
+      'Required' => 1,
+      'status_id' => 1,
+      'options_resolver' => 'get_pages_for_select("id")',
+    ],
+
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Receipt Page URL',
+      'name' => 'receipt_page_id',
+      'type' => 'search',
+      'variation' => 'original',
+      'Required' => 1,
+      'status_id' => 1,
+      'options_resolver' => 'get_pages_for_select("id")',
+    ],
+
     [
       'depth' => 0,
       'type_field' => 'divider',
@@ -374,6 +564,76 @@ $crud = [
       ],
       'Required' => true,
     ],
+
+    [
+      'depth' => 0,
+      'type_field' => 'divider',
+      'title' => 'User',
+    ],
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Create user after successful checkout',
+      'name' => 'pyrosales_create_user_after_checkout',
+      'type' => 'radio',
+      'variation' => 'inline',
+      'Required' => 1,
+      'status_id' => 1,
+      'Options' => [
+        [ 'value' => 1, 'display' => 'Yes' ],
+        [ 'value' => 0, 'display' => 'No'  ],
+      ]
+    ],
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Create user after successful checkout',
+      'name' => 'pyrosales_login_user_after_checkout',
+      'type' => 'radio',
+      'variation' => 'inline',
+      'Required' => 1,
+      'status_id' => 1,
+      'Options' => [
+        [ 'value' => 1, 'display' => 'Yes' ],
+        [ 'value' => 0, 'display' => 'No'  ],
+      ]
+    ],
+
+    [
+      'depth' => 0,
+      'type_field' => 'divider',
+      'title' => 'One-off',
+    ],
+    [
+      'depth' => 1,
+      'type_field' => 'selection_type',
+      'label' => 'Allow installments for one-off orders',
+      'name' => 'pyrosales_one_off_allow_installments',
+      'type' => 'radio',
+      'variation' => 'inline',
+      'Required' => 1,
+      'status_id' => 1,
+      'Options' => [
+        [ 'value' => 1, 'display' => 'Yes' ],
+        [ 'value' => 0, 'display' => 'No'  ],
+      ]
+    ],
+
+    [
+      'depth' => 0,
+      'type_field' => 'divider',
+      'title' => 'Vendor',
+    ],
+    [
+      'depth' => 1,
+      'size' => 'col-12',
+      'type_field' => 'textarea',
+      'attributes' => 'rows:(1);',
+      'size' => 'col-6 col-md-3',
+      'name' => "pyrosales_commission_activation_function",
+      'label' => 'Commission activation function',
+    ],
+
     [
       'depth' => 0,
       'type_field' => 'submit_button',
@@ -436,6 +696,53 @@ $page = [
   'permission_type' => 'only_these',
   'allowed' => [1],
   'page_template' => PLUGINS_PATH . '/pyrosales/custom-pages/order-manager.php',
+];
+manage_page_system($page, 'insert');
+
+/**
+ * APP PAGES
+ *
+ * Registers two admin pages (restricted to allowed users):
+ * - checkout : list view of orders
+ * - recibo   : create/edit/manage a specific order
+ */
+$page = [
+  'title' => 'Checkout',
+  'slug' => 'checkout',
+  'page_type' => 'not_essential',
+  'status_page_id' => 1,
+  'page_area' => 'app',
+  'permission_type' => 'except_these',
+  'allowed' => [],
+  'page_template' => PLUGINS_PATH . '/pyrosales/custom-pages/checkout-template.php',
+  'is_public' => 1,
+  'page_settings' => [
+    "navbar" => [
+      "format" => "medium",
+      "style" => "transparent-absolute"
+    ],
+    "footer" => ["format" => "none"]
+  ],
+];
+manage_page_system($page, 'insert');
+
+$page = [
+  'title' => 'Pagamento confirmado',
+  'slug' => 'recibo',
+  'page_type' => 'not_essential',
+  'status_page_id' => 1,
+  'page_area' => 'app',
+  'permission_type' => 'except_these',
+  'allowed' => [],
+  'page_template' => PLUGINS_PATH . '/pyrosales/custom-pages/receipt-template.php',
+  'is_public' => 1,
+  'page_settings' => [
+    "navbar" => [
+      "format" => "medium",
+      "style" => "transparent-absolute"
+    ],
+    "footer" => ["format" => "none"]
+  ],
 ];
 manage_page_system($page, 'insert');
 

@@ -95,18 +95,23 @@ function type_status(bool $for_selects = false)
  * @param string $type (optional) The type of status to search in (default: 'general_status').
  * @return string The name of the status if found; otherwise, "Not defined.".
  */
-function general_stats($status, string $type = 'general_status')
+function general_stats($status, string $function = 'general_status', string $type = 'button')
 {
-    // var_dump($type());
-    if (function_exists($type))
+    // var_dump($function());
+    if (function_exists($function))
     {
-        foreach ($type(false) as $k => $i)
+        foreach ($function(false) as $k => $i)
         {
-            if ($i['id'] == $status || $i['slug'] == $status) return "<span class='badge rounded-pill text-bg-{$i['color']}'>{$i['name']}</span>";
+            if ($i['id'] == $status || $i['slug'] == $status)
+            {
+                return ($type == 'button')
+                    ? "<span class='badge rounded-pill text-bg-{$i['color']}'>{$i['name']}</span>"
+                    : (!empty($i[$type]) ? $i[$type] : $i['name']);
+            }
         }
     }
 
-    return "The function '$type' with status '$status' does not exist.";
+    return "The function '$function' with status '$status' does not exist.";
 }
 
 
@@ -146,6 +151,11 @@ function status_buttons($id, $status, string $mode, string $status_type = 'gener
 function e($value)
 {
     global $config;
+
+    if (is_array($value) || is_object($value)) {
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    }
+
     return htmlspecialchars((string) $value, ENT_QUOTES, $config['charset']);
 }
 

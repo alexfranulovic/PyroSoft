@@ -185,7 +185,7 @@ function common_inputs_for_menu(string $type_form, string $selector, $data = nul
         $type_form,
         [
             'size' => 'col-md-6',
-            'function_proccess' => 'general_status',
+            'function_process' => 'general_status',
             'name' => "menu-item[$counter][status_id]",
             'Value' => $data,
             'Required' => true
@@ -566,7 +566,7 @@ function manage_menu_form(string $type_form = 'insert', int $counter = 1)
                 $type_form,
                 [
                     'size' => 'col-md-6',
-                    'function_proccess' => 'general_status',
+                    'function_process' => 'general_status',
                     'name' => "status_id",
                     'Value' => ($type_form=='update') ? $menu['status_id'] : '',
                     'Required' => true
@@ -643,7 +643,7 @@ function manage_menu_items(array $params, bool $debug = false): array
             array_pop($stack);
         }
 
-        $parent_id = empty($stack) ? 0 : end($stack)['id'];
+        $parent_id = empty($stack) ? null : end($stack)['id'];
 
         $menu_mode = !empty($menu['id']) ? 'update' : 'insert';
 
@@ -706,14 +706,13 @@ function manage_menu_system(array $data, string $mode, bool $debug = false)
 {
     $error        = false;
     $valid_data   = $data;
-
-    $msg_type = 'toast';
+    $msg_type     = 'toast';
 
     /*
-     * Define the verifyer function.
+     * Define the verifier function.
      */
-    if     ($mode == 'insert') $verifyer = 'inserted_id';
-    elseif ($mode == 'update') $verifyer = 'affected_rows';
+    if     ($mode == 'insert') $verifier = 'inserted_id';
+    elseif ($mode == 'update') $verifier = 'affected_rows';
     else                       $error    = true;
 
 
@@ -749,7 +748,7 @@ function manage_menu_system(array $data, string $mode, bool $debug = false)
         /*
          * Verify if inserted/updated correctaly.
          */
-        if ($verifyer()) :
+        if ($verifier()) :
 
             $menu_id = ($mode == 'insert') ? inserted_id() : $valid_data['id'];
 

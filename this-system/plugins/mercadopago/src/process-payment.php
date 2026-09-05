@@ -4,7 +4,7 @@ if (!isset($seg)) exit;
 require __DIR__ .'/customer.php';
 require __BASE_DIR__ . '/vendor/autoload.php';
 
-function mercadopago_credit_card_process_payment(array $data, bool $debug = true): array
+function mercadopago_credit_card_process_payment(array $data, bool $debug = false): array
 {
     global $info, $seg;
 

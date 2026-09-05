@@ -32,10 +32,10 @@ function inputs_for_address_form(string $type_form, $counter, array $data = [])
             'type' => 'switch',
             'size' => 'col-12',
             'label' => 'Autocomplete',
-            'name' => "Fields[$counter][function_proccess]",
-            'input_id' => "function_proccess-$counter",
+            'name' => "Fields[$counter][function_process]",
+            'input_id' => "function_process-$counter",
             'Options' => "4|| 1|| Sim;",
-            'Value' => $data['function_proccess'] ?? '1',
+            'Value' => $data['function_process'] ?? '1',
         ]
     );
     $advanced_options.= common_inputs_for_crud($type_form, 'subscribers_only', $data['subscribers_only'] ?? '', $counter);

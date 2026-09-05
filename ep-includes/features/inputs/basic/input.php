@@ -6,7 +6,7 @@ function input_basic(string $type_form, array $Attr = [])
     $res = '';
 
     $type = $type ?? 'text';
-    $Value = format_text( ($_SESSION['FormData'][$name] ?? $Value), 'decode');
+    $Value = format_text( $Value, 'decode');
 
     /**
      * Type "price" is custom, then we have to turn into "text"
@@ -20,6 +20,7 @@ function input_basic(string $type_form, array $Attr = [])
     if ($type == 'password') {
         $Value = '';
     }
+
 
     $input = "<input class='$class' type='$type' $attributes placeholder='$Placeholder' name='$name' id='$input_id' value=\"{$Value}\" $Required $disabled $readonly>";
 
@@ -47,7 +48,7 @@ function input_basic(string $type_form, array $Attr = [])
 
         // Prepend
         if (!empty($attachment['prepend'])) {
-            $res.= "<span class='input-group-text'>{$attachment['prepend']}</span>";
+            $res.= "<span class='input-group-text prepend'>{$attachment['prepend']}</span>";
         }
 
         $res.= $input;
@@ -62,7 +63,7 @@ function input_basic(string $type_form, array $Attr = [])
 
         // Append
         elseif (!empty($attachment['append'])) {
-            $res.= "<span class='input-group-text'>{$attachment['append']}</span>";
+            $res.= "<span class='input-group-text append'>{$attachment['append']}</span>";
         }
 
         $res.= "</div>";

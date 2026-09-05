@@ -28,11 +28,21 @@ if (!isset($seg)) exit;
  * Uses `IF EXISTS` to avoid fatal errors if tables were already removed.
  */
 
-query_it("DROP TABLE IF EXISTS tb_orders");
+query_it("DROP TABLE IF EXISTS tb_order_utm_data");
+query_it("DROP TABLE IF EXISTS tb_order_notes");
 query_it("DROP TABLE IF EXISTS tb_order_items");
 query_it("DROP TABLE IF EXISTS tb_order_payments");
 query_it("DROP TABLE IF EXISTS tb_order_coupons");
 query_it("DROP TABLE IF EXISTS tb_order_fees");
+query_it("DROP TABLE IF EXISTS tb_user_payment_methods");
+query_it("DROP TABLE IF EXISTS tb_orders");
+
+/**
+ * Reverts the tb_users.invite_code column added by install.php (vendor
+ * attribution -- see create_order(), index.php). Dropping the column also
+ * drops its unique key.
+ */
+query_it("ALTER TABLE tb_users DROP COLUMN IF EXISTS invite_code");
 
 /**
  * OPTIONS CLEANUP
@@ -45,10 +55,18 @@ delete_option('default_currency');
 delete_option('pyrosales_api_status');
 delete_option('pyrosales_is_sandbox');
 delete_option('active_payment_methods');
+delete_option('default_payment_method');
 delete_option('fee_mode');
 delete_option('max_interest_free_installments');
 delete_option('surcharge_percent');
 delete_option('surcharge_fixed');
+delete_option('checkout_page_id');
+delete_option('receipt_page_id');
+delete_option('pyrosales_one_off_allow_installments');
+delete_option('pyrosales_create_user_after_checkout');
+delete_option('pyrosales_login_user_after_checkout');
+delete_option('pyrosales_commission_activation_function');
+delete_option('pyrosales_payment_expiriation');
 
 /**
  * PERMISSIONS CLEANUP
@@ -88,6 +106,24 @@ delete_record([
     'foreign_key'     => 'page_id',
     'where_field'     => 'slug',
     'where_value'     => 'order-manager',
+    'tables_to_action'=> '-f',
+]);
+
+// Remove "Checkout" page
+delete_record([
+    'table'           => 'tb_pages',
+    'foreign_key'     => 'page_id',
+    'where_field'     => 'slug',
+    'where_value'     => 'checkout',
+    'tables_to_action'=> '-f',
+]);
+
+// Remove "Order Manager" page
+delete_record([
+    'table'           => 'tb_pages',
+    'foreign_key'     => 'page_id',
+    'where_field'     => 'slug',
+    'where_value'     => 'recibo',
     'tables_to_action'=> '-f',
 ]);
 

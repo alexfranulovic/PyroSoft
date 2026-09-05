@@ -13,7 +13,6 @@ if(!isset($seg)) exit;
  * @param bool $debug If true, outputs debug information about the plugin files being loaded. Defaults to false.
  * @return bool Returns true if plugin files were processed successfully, or false if an error occurred.
  */
-load_plugins();
 function load_plugins(string $action = 'index', string $which_plugin = 'all', bool $force = false, bool $debug = false)
 {
     global $seg, $config, $info;
@@ -39,7 +38,7 @@ function load_plugins(string $action = 'index', string $which_plugin = 'all', bo
         $plugin_name = basename($dir);
         if ($which_plugin == 'all' OR $which_plugin == $plugin_name)
         {
-            if ($force || in_array($plugin_name, $config['activated_plugins']))
+            if ($force || in_array($plugin_name, $config['activated_plugins'] ?? []))
             {
                 $plugin_file = "{$dir}/{$action}.php";
 

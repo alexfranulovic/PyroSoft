@@ -9,3 +9,6 @@
 <?= footer() ?>
 
 <?php feature('security-js'); ?>
+
+</body>
+</html>

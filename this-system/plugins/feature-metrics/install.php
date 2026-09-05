@@ -7,10 +7,10 @@ if (!isset($seg)) exit;
  */
 $sql = "
 CREATE TABLE IF NOT EXISTS tb_feature_metrics (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     feature_name VARCHAR(191) NOT NULL,
-    user_id INT UNSIGNED NULL,
-    type TINYINT UNSIGNED NOT NULL,
+    user_id INT NULL,
+    type TINYINT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_feature (feature_name),
     KEY idx_user (user_id),

@@ -55,7 +55,6 @@ function put_name_as_key_in_fields(array $cruds_fields = [], string $main_table 
 function form_processor(array $payload = [])
 {
     global
-        $alerts,
         $config,
         $current_user;
 
@@ -345,7 +344,7 @@ function form_processor(array $payload = [])
 
     /**
      *
-     * Start proccessing the tables data.
+     * Start processing the tables data.
      *
      */
     $query_counter = 0;
@@ -424,7 +423,7 @@ function form_processor(array $payload = [])
 
         /**
          *
-         * It proccess table data.
+         * It process table data.
          *
          */
         foreach ($data_in_table as $k => $data)
@@ -491,7 +490,7 @@ function form_processor(array $payload = [])
                 }
 
 
-                $verifyer = ($mode == 'insert')
+                $verifier = ($mode == 'insert')
                     ? 'inserted_id'
                     : 'affected_rows';
 
@@ -508,9 +507,9 @@ function form_processor(array $payload = [])
                 // print_r($fields[$table_name]);
                 foreach ($fields[$table_name] as $key => $field)
                 {
-                    if (!empty($field['run_before_action']) && !empty($field['function_proccess']))
+                    if (!empty($field['run_before_action']) && !empty($field['function_process']))
                     {
-                        $result = function_proccess($field['function_proccess'], $key, $data);
+                        $result = function_process($field['function_process'], $key, $data);
 
                         /**
                          * Pre-set function result as value.
@@ -582,7 +581,7 @@ function form_processor(array $payload = [])
                         $field      = $fields[$table_name][$key];
                         $type       = $field['type'] ?? null;
                         $type_field  = $field['type_field'] ?? null;
-                        $function   = $field['function_proccess'] ?? null;
+                        $function   = $field['function_process'] ?? null;
 
                         $must_continue = false;
                         $detail = null;
@@ -601,7 +600,7 @@ function form_processor(array $payload = [])
                             $value = $data[$key] ?? null;
                         }
                         elseif ($type_field !== 'status_selector' && $type_field !== 'address_form') {
-                            $value = function_proccess($function, $key, $data);
+                            $value = function_process($function, $key, $data);
                         }
 
 
@@ -822,7 +821,7 @@ function form_processor(array $payload = [])
                 if ($related_to != 'system_info' && (!$error && !empty($args_bd)))
                 {
                     $query = $mode($table_name, $args_bd, false, false);
-                    $id_new_register = $verifyer();
+                    $id_new_register = $verifier();
 
                     $current_id = ($mode === 'insert')
                         ? $id_new_register
@@ -859,7 +858,8 @@ function form_processor(array $payload = [])
                  * This case serves when the form is related to system_info.
                  *
                  */
-                else
+                // else
+                elseif ($related_to == 'system_info' && (!$error && !empty($args_bd)))
                 {
                     foreach ($args as $key => $value) {
                         $query = update_option($key, $value);
@@ -895,7 +895,8 @@ function form_processor(array $payload = [])
                 }
 
 
-                if (!empty($pending_moves))
+                // if (!empty($pending_moves))
+                if (!empty($pending_moves) && !empty($finalId))
                 {
                     foreach ($pending_moves as $mv)
                     {
@@ -978,7 +979,7 @@ function form_processor(array $payload = [])
 
     else
     {
-        $id_new_register = $verifyer() ?? null;
+        $id_new_register = $verifier() ?? null;
         if ($query->code == 'success')
         {
             $code = 'SC';
@@ -998,6 +999,7 @@ function form_processor(array $payload = [])
      * Return the message.
      *
      */
+    $alerts             = $GLOBALS['alerts'];
     $message_code       = "{$code}_TO_". strtoupper($original_mode);
     $new_body           = $alerts[$message_code];
     $new_body['body']   = $alerts[$message_code]['body'] . $alert;
@@ -1111,7 +1113,7 @@ function form_processor(array $payload = [])
     if (($code == 'SC') AND ($type_crud === 'insert') AND ($related_to == "logged_in_user"))
     {
         $login_settings = $config['login_settings'];
-        $login_after_register = $login_settings['register_page']['login_after_register'] ?? false;
+        $login_after_register = $login_settings['signup_page']['login_after_register'] ?? false;
 
         /**
          *
@@ -1178,7 +1180,7 @@ function run_after_action_hooks(array $tables = [])
                 $data['parent_id'] = $parent_id;
             }
 
-            function_proccess(
+            function_process(
                 $deferred['function'] ?? '',
                 $deferred['key'] ?? '',
                 $data

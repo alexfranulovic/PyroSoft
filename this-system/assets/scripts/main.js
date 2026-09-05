@@ -137,6 +137,134 @@ window.onunhandledrejection = function (event) {
 })();
 
 
+/**
+ * Marks a field as invalid and attaches/updates a Bootstrap .invalid-feedback element.
+ *
+ * Regras:
+ * - Se tiver .input-group: aplica .is-invalid no input + .input-group
+ *   e cria/usa .invalid-feedback associado ao grupo (irmão do .input-group).
+ * - Se não tiver .input-group, mas tiver .form-floating:
+ *   cria/usa .invalid-feedback dentro do .form-floating.
+ * - Fallback: cria .invalid-feedback logo após o input.
+ *
+ * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} input
+ * @param {string} message
+ */
+(function ()
+{
+  if (window.applyInvalidFeedback) return;
+
+  /**
+   * Marks a field as invalid and attaches/updates a Bootstrap .invalid-feedback element.
+   *
+   * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} input
+   * @param {string} message
+   */
+  window.applyInvalidFeedback = function (input, message)
+  {
+    if (!input) return;
+
+    input.classList.add('is-invalid');
+
+    const inputGroup   = input.closest('.input-group');
+    const formFloating = input.closest('.form-floating');
+
+    let feedback = null;
+
+    // --- input-group ---
+    if (inputGroup)
+    {
+      inputGroup.classList.add('is-invalid');
+
+      feedback = inputGroup.querySelector('.invalid-feedback');
+
+      const parent = inputGroup.parentElement;
+
+      if (!feedback && parent)
+      {
+        for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling)
+        {
+          if (sib.classList?.contains('invalid-feedback')) {
+            feedback = sib;
+            break;
+          }
+        }
+      }
+
+      if (!feedback && parent)
+      {
+        feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+
+        let insertBefore = null;
+
+        for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling)
+        {
+          if (sib.tagName?.toLowerCase() === 'small') {
+            insertBefore = sib;
+            break;
+          }
+        }
+
+        if (insertBefore) {
+          parent.insertBefore(feedback, insertBefore);
+        } else if (inputGroup.nextSibling) {
+          parent.insertBefore(feedback, inputGroup.nextSibling);
+        } else {
+          parent.appendChild(feedback);
+        }
+      }
+    }
+
+    // --- form-floating ---
+    else if (formFloating)
+    {
+      feedback = formFloating.querySelector('.invalid-feedback');
+
+      if (!feedback)
+      {
+        feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        formFloating.appendChild(feedback);
+      }
+    }
+
+    // --- fallback ---
+    else
+    {
+      const parent = input.parentElement;
+      if (!parent) return;
+
+      feedback = Array.from(parent.children).find(el =>
+        el.classList?.contains('invalid-feedback')
+      ) || null;
+
+      if (!feedback)
+      {
+        feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+
+        if (input.nextSibling) {
+          parent.insertBefore(feedback, input.nextSibling);
+        } else {
+          parent.appendChild(feedback);
+        }
+      }
+    }
+
+    if (feedback)
+    {
+      const msg = String(message ?? '');
+
+      if (/<[a-z][\s\S]*>/i.test(msg)) {
+        feedback.innerHTML = msg;
+      } else {
+        feedback.textContent = msg;
+      }
+    }
+  };
+
+})();
 
 
 document.addEventListener('DOMContentLoaded', function()

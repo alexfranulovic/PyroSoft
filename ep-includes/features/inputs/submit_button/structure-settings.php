@@ -47,7 +47,7 @@ function inputs_for_submit_button(string $type_form, $counter, array $data = [])
         [
             'type' => 'checkbox',
             'size' => 'col-12',
-            'label' => 'Tipo de upload',
+            // 'label' => 'Tipo de upload',
             'name' => "Fields[$counter][type]",
             'variation' => 'inline',
             'input_id' => "type-$counter",
@@ -66,7 +66,7 @@ function inputs_for_submit_button(string $type_form, $counter, array $data = [])
                 ],
             ],
             // 'Value' => $data['type'] ?? '',
-            'Required' => true
+            // 'Required' => true
         ]
     );
     $res.= sizes_selector($type_form, 'Fields', $data['size'] ?? '', $counter);

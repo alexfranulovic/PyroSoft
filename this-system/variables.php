@@ -9,8 +9,8 @@ ini_set('display_errors', 1);
 /**
  * Inputs
  */
-if (!defined('MIN_TIME_AUDIO'))        define('MIN_TIME_AUDIO', 1);       // seconds
-if (!defined('MAX_TIME_AUDIO'))        define('MAX_TIME_AUDIO', 10);      // seconds
+if (!defined('MIN_TIME_AUDIO'))        define('MIN_TIME_AUDIO', 5);       // seconds
+if (!defined('MAX_TIME_AUDIO'))        define('MAX_TIME_AUDIO', 20);      // seconds
 if (!defined('EVENT_DEFAULT_HOUR'))    define('EVENT_DEFAULT_HOUR', "10:00");
 
 
@@ -28,3 +28,11 @@ if (!defined('TIME_TO_DELETE_TEMP_FILES'))  define('TIME_TO_DELETE_TEMP_FILES', 
  * User
  */
 if (!defined('USER_PASSWORD_RECOVERY_TIME'))    define('USER_PASSWORD_RECOVERY_TIME', 3600);
+
+
+/**
+ * Queue messages
+ */
+if (!defined('TIME_TO_DELETE_QUEUE_MESSAGES'))      define('TIME_TO_DELETE_QUEUE_MESSAGES', 30); // days
+if (!defined('MAX_ATTEMPTS_TO_SEND_MESSAGES'))      define('MAX_ATTEMPTS_TO_SEND_MESSAGES', 3);
+if (!defined('MESSAGE_SENDING_LIMIT_IN_THE_QUEUE')) define('MESSAGE_SENDING_LIMIT_IN_THE_QUEUE', 10);

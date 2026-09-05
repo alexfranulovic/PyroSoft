@@ -1,19 +1,23 @@
+// Ícones de ordenação do Grid.js (evita repetir a mesma data-URI por tema)
+@function gridjs-sort-icon($path, $fill) {
+  @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$fill}'%3E%3Cpath d='#{$path}'/%3E%3C/svg%3E");
+}
+
+$gridjs-icon-neutral: 'M8 1l4 4H4l4-4zm0 14l-4-4h8l-4 4z';
+$gridjs-icon-asc: 'M8 4l6 6H2z';
+$gridjs-icon-desc: 'M8 12l-6-6h12z';
+
 /* Header */
 .crud-panel
 {
   padding: .5rem 1rem;
-  background-color: rgba(var(--bs-body-color-rgb), 0.03);
-  // border: none;
+  background-color: rgba(var(--bs-body-color-rgb), .03);
   border: 1px solid var(--bs-border-color);
   border-radius: $card-border-radius;
   margin-bottom: 1rem;
-
-  // @include media-breakpoint-up(md)
-  // {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  // }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   @include media-breakpoint-down(md) {
     padding: .8rem 1rem;
@@ -45,7 +49,7 @@
       line-height: 0;
 
       &::after {
-        display: none ;
+        display: none;
       }
     }
   }
@@ -125,10 +129,7 @@
           margin: .1rem;
         }
       }
-    }
 
-    table
-    {
       thead {
         border-bottom: 1px solid var(--bs-border-color);
       }
@@ -146,7 +147,6 @@
 
         [target="_blank"] {
           color: inherit !important;
-          // text-decoration: underline;
 
           .icon {
             font-size: .75rem;
@@ -163,46 +163,6 @@
         }
       }
     }
-
-    .dt-container
-    {
-      .row {
-        margin: 0 !important;
-        margin-bottom: 1rem !important;
-      }
-      .dt-layout-table
-      {
-        margin-bottom: 0 !important;
-        .dt-layout-full
-        {
-          @extend .table-responsive;
-          padding: 0;
-        }
-      }
-    }
-
-    .dt-layout-start,
-    .dt-layout-end
-    {
-      padding: 0;
-      * {
-        font-weight: 600;
-        font-size: .875rem;
-      }
-    }
-  }
-
-  /* Forms */
-  &.crud-form
-  {
-    .row
-    {
-      /*[type="submit"] {
-        width: 100%;
-      }*/
-    }
-
-
   }
 
   /* View unique item */
@@ -212,15 +172,9 @@
     {
       @extend .table-responsive;
 
-      // Reset margin-top para todos os filhos
-      > * {
-        margin-top: 5rem;
-      }
-
-      // Remove margin-top do primeiro filho
-      > *:first-child {
-        margin-top: 0;
-      }
+      // Reset margin-top para todos os filhos, exceto o primeiro
+      > * { margin-top: 5rem; }
+      > *:first-child { margin-top: 0; }
 
       table
       {
@@ -229,7 +183,6 @@
         @extend .table-striped;
 
         thead {
-          // border-top: 1px solid var(--bs-border-color);
           border-top-radius: $card-border-radius;
 
           th {
@@ -247,8 +200,7 @@
               font-weight: 600;
             }
 
-            &.content
-            {
+            &.content {
               width: 85%;
             }
           }
@@ -262,7 +214,6 @@
   {
     tr
     {
-
       .audio-player {
         margin-bottom: .5rem;
       }
@@ -280,22 +231,16 @@
         height: 200px;
         max-height: 200px;
       }
-
     }
   }
-
 }
 
 .steps-form
 {
-  // @extend .card;
-
   color: var(--bs-body-color) !important;
 
   .container
   {
-    // max-width: max-content !important;
-
     @include media-breakpoint-down(lg) {
       margin: 0;
       padding: 0;
@@ -317,28 +262,19 @@
   }
 
   .progress-content {
-    // padding: 0 .313rem;
     margin-left: .313rem;
-    margin-right: 313rem;
-  }
-
-  .step-content {
-
+    // margin-right: 313rem; -> valor sem o ponto (313rem ≈ 5000px); mantido
+    // comentado até confirmar se era pra ser .313rem, como o margin-left.
   }
 
   .carousel-caption {
     bottom: auto;
     left: auto;
-    // margin: 0 auto;
-    // max-width: 60rem;
+    right: auto;
     width: 100%;
     position: relative;
-    right: auto;
     text-align: left;
     padding: 0;
-  }
-
-  .carousel-caption {
     color: var(--bs-body-color) !important;
   }
 
@@ -352,7 +288,6 @@
   .step-description p {
     color: $gray-500;
     font-size: .8rem;
-    // line-height: 1;
     margin-top: 1.2rem;
     margin-bottom: 1.2rem;
   }
@@ -401,14 +336,6 @@
         border: none;
       }
     }
-
-    .next {
-
-    }
-  }
-
-  form {
-    // margin-top: 1.5rem;
   }
 }
 
@@ -430,16 +357,169 @@
         padding: 0;
       }
 
-      .schedule-event
-      {
-        ul {
-          width: auto;
-        }
+      .schedule-event ul {
+        width: auto;
       }
     }
   }
 
   .crud-panel {
     border-radius: $card-border-radius;
+  }
+}
+
+[data-table-loader]
+{
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    margin: 0 .5rem;
+  }
+}
+
+.gridjs-header {
+  margin-bottom: 1rem;
+}
+
+@include media-breakpoint-down(md)
+{
+  .gridjs-length-selector
+  {
+    display: flex;
+    justify-content: center;
+    margin-right: auto !important;
+    align-items: center;
+    width: 100%;
+  }
+  .gridjs-search {
+    display: flex;
+    justify-content: center;
+    margin-left: auto !important;
+    align-items: center;
+    width: 100%;
+  }
+  .gridjs-search-input {
+    width: 75%;
+  }
+}
+
+.gridjs-header,
+.gridjs-footer
+{
+  @include media-breakpoint-up(md) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.gridjs-table-wrapper {
+  overflow-x: auto;
+}
+
+@include media-breakpoint-down(md)
+{
+  .gridjs-pagination {
+    display: flex;
+    justify-content: center;
+  }
+  .gridjs-summary {
+    width: 100% !important;
+    text-align: center;
+    margin-bottom: .313rem;
+  }
+  .gridjs-pages {
+    width: 100% !important;
+  }
+}
+
+.gridjs-footer
+{
+  width: 100%;
+
+  .gridjs-summary,
+  .gridjs-pages {
+    width: fit-content;
+  }
+}
+
+.gridjs-th-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+}
+th.gridjs-th-sort {
+  cursor: pointer;
+}
+th.gridjs-th-sort .gridjs-th-content {
+  margin-right: .315rem;
+}
+th.gridjs-th-sort:hover,
+th.gridjs-th-sort:focus {
+  background-color: var(--bs-tertiary-bg, var(--bs-light));
+}
+
+button.gridjs-sort {
+  float: right;
+  width: 13px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position-x: center;
+  background-size: 16px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.gridjs-search-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  background-color: rgba(var(--bs-body-color-rgb), .5);
+  color: #000;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+// Padrão claro (não muda entre temas)
+button.gridjs-sort-neutral {
+  opacity: .6;
+  background-position-y: center;
+  background-image: gridjs-sort-icon($gridjs-icon-neutral, '%236c757d');
+}
+button.gridjs-sort-asc {
+  background-position-y: 35%;
+  background-image: gridjs-sort-icon($gridjs-icon-asc, '%23212529');
+}
+button.gridjs-sort-desc {
+  background-position-y: 65%;
+  background-image: gridjs-sort-icon($gridjs-icon-desc, '%23212529');
+}
+
+[data-bs-theme="dark"]
+{
+  .gridjs-search-loading-overlay {
+    color: #fff;
+  }
+
+  button.gridjs-sort-asc {
+    background-image: gridjs-sort-icon($gridjs-icon-asc, '%23FFF');
+  }
+  button.gridjs-sort-desc {
+    background-image: gridjs-sort-icon($gridjs-icon-desc, '%23FFF');
   }
 }

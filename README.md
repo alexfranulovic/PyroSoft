@@ -21,7 +21,7 @@ It follows a layered architecture inspired by platforms like WordPress, where **
 index.php
  └── load.php
      ├── config.php
-     ├── ep-includes/      (core system – DO NOT EDIT)
+     ├── ep-includes/      (core system – SAFE TO EDIT)
      └── this-system/      (your project – SAFE TO EDIT)
 ```
 
@@ -148,4 +148,4 @@ Prefer plugins or project-level extensions when deeper customization is required
 ## License / ownership
 
 PyroSoft is a proprietary system developed by **EUPHORIA SYSTEMS**.
-# PyroSoft
+# conquiste.me

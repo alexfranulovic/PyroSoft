@@ -5,10 +5,6 @@ const bootstrap = window.bootstrap;
 /*ScrollReveal*/
 import ScrollReveal from 'scrollreveal';
 
-/*DataTables*/
-import DataTable from 'datatables.net-bs5';
-import pt_BR from './inc/datatables-pt-br.js';
-
 /*TomSelect*/
 import TomSelect from 'tom-select';
 import 'tom-select/dist/css/tom-select.bootstrap5.min.css';
@@ -121,85 +117,6 @@ document.addEventListener('DOMContentLoaded', function()
 
   });
 
-
-  /**
-   *
-   * Datatables
-   *
-   **/
-  // ----- Client-side tables -----
-  document.querySelectorAll('.data-table, [data-table]').forEach(function (el)
-  {
-    // eslint-disable-next-line no-new
-    new DataTable(el, {
-      language: pt_BR
-    });
-  });
-
-  // Helper: serialize DataTables request object (nested) into FormData (bracket notation)
-  function appendFormData(fd, data, parentKey)
-  {
-    if (Array.isArray(data)) {
-      for (var i = 0; i < data.length; i++) {
-        appendFormData(fd, data[i], parentKey ? parentKey + '[' + i + ']' : String(i));
-      }
-    } else if (data !== null && typeof data === 'object') {
-      for (var k in data) {
-        if (!Object.prototype.hasOwnProperty.call(data, k)) continue;
-        var v = data[k];
-        var key = parentKey ? parentKey + '[' + k + ']' : k;
-        appendFormData(fd, v, key);
-      }
-    } else if (parentKey) {
-      fd.append(parentKey, data == null ? '' : data);
-    }
-  }
-
-  // ----- Server-side tables -----
-  document.querySelectorAll('.data-table-async, [data-table-async]').forEach(function (el)
-  {
-    var crudId = el.getAttribute('data-crud-id') || '';
-    var loader = el.closest('[data-table-loader]');
-
-    // eslint-disable-next-line no-new
-    new DataTable(el,
-    {
-      language: pt_BR,
-      processing: true,
-      serverSide: true,
-      ajax: function (dtRequest, callback /*, settings */)
-      {
-        // show loader
-        if (loader) loader.style.removeProperty('display');
-
-        var body = new FormData();
-        appendFormData(body, dtRequest, '');     // draw, start, length, search, order, columns...
-        if (crudId) body.append('crud_id', crudId);
-
-        fetch(BASE_URL + '/' + REST_API_BASE_ROUTE + '/get-crud-list', {
-          method: 'POST',
-          body: body
-        })
-
-          .then(function (res) { return res.json(); })
-          .then(function (json) {
-            // Expected: { draw, recordsTotal, recordsFiltered, data, ... }
-            callback(json);
-          })
-
-          .catch(function (err) {
-            console.error('DataTable ajax error:', err);
-            callback({ draw: dtRequest.draw, recordsTotal: 0, recordsFiltered: 0, data: [] });
-          })
-
-          .finally(function () {
-            // hide loader
-            if (loader) loader.style.display = 'none';
-          });
-      }
-    });
-  });
-
 });
 
 
@@ -292,66 +209,190 @@ document.addEventListener('DOMContentLoaded', function()
 
   // ─────────────────────────────────────────────────────────────
   // Money mask (custom)
+  // Locked caret at the end
   // ─────────────────────────────────────────────────────────────
-  function formatMoney(raw) {
-    raw = (raw == null ? '' : String(raw)).trim();
-    // keep only digits; last 2 digits are cents
-    var digits = raw.replace(/\D/g, '');
-    var cents = digits.slice(-2).padStart(2, '0');
-    var ints  = digits.slice(0, -2) || '0';
 
-    // add thousand separators
-    ints = ints.replace(/^0+(?=\d)/, '');
-    ints = ints.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-    return ints + ',' + cents;
+  function isMoneyField(el) {
+    return !!(el && el.matches && el.matches('.mask-money, [mask-money]'));
   }
 
-  function formatMoneyInput(el) {
-    if (!maskable(el)) return;
+  function getMoneyDigits(value) {
+    return String(value == null ? '' : value).replace(/\D/g, '');
+  }
 
-    var before = el.value || '';
-    var start = el.selectionStart || 0;
-    var digitsBefore = before.slice(0, start).replace(/\D/g, '').length;
+  function formatMoney(value) {
+    var digits = getMoneyDigits(value);
 
-    var after = formatMoney(before);
-    if (before === after) return;
+    if (!digits) return '0,00';
 
-    el.value = after;
+    var cents = digits.slice(-2).padStart(2, '0');
+    var ints  = digits.slice(0, -2).replace(/^0+(?=\d)/, '') || '0';
 
-    // restore cursor roughly based on digit count before cursor
-    try {
-      var pos = 0, seen = 0;
-      while (pos < after.length) {
-        if (/\d/.test(after.charAt(pos))) seen++;
-        if (seen >= digitsBefore) break;
-        pos++;
-      }
-      el.setSelectionRange(pos + 1, pos + 1);
-    } catch (e) {}
+    return ints.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + cents;
+  }
+
+  function isMoneyZero(value) {
+    return Number(getMoneyDigits(value) || 0) === 0;
+  }
+
+  function moveCaretToEnd(el) {
+    if (!el || typeof el.setSelectionRange !== 'function') return;
+
+    var end = (el.value || '').length;
+
+    requestAnimationFrame(function () {
+      try {
+        el.setSelectionRange(end, end);
+      } catch (e) {}
+    });
+  }
+
+  function formatMoneyInput(el, clearZero) {
+    if (!el || !maskable(el)) return;
+
+    var raw = String(el.value || '').trim();
+
+    if (!raw) {
+      if (clearZero) el.value = '';
+      return;
+    }
+
+    var formatted = formatMoney(raw);
+
+    if (clearZero && isMoneyZero(formatted)) {
+      el.value = '';
+      return;
+    }
+
+    if (el.value !== formatted) {
+      el.value = formatted;
+    }
+  }
+
+  function ensureMoneyFocusValue(el) {
+    if (!el || !maskable(el)) return;
+
+    if (!String(el.value || '').trim()) {
+      el.value = '0,00';
+    } else {
+      formatMoneyInput(el, false);
+    }
+
+    moveCaretToEnd(el);
+  }
+
+  function preventCaretChange(el, e) {
+    if (!el) return;
+
+    if (e) e.preventDefault();
+
+    if (document.activeElement !== el) {
+      el.focus();
+    }
+
+    ensureMoneyFocusValue(el);
   }
 
   function scanMoney(root) {
     var list = collect(root, '.mask-money').concat(collect(root, '[mask-money]'));
+
     for (var i = 0; i < list.length; i++) {
-      if (list[i].dataset.moneyInit !== '1') {
-        formatMoneyInput(list[i]);
-        list[i].dataset.moneyInit = '1';
+      if (!maskable(list[i])) continue;
+
+      if (String(list[i].value || '').trim()) {
+        formatMoneyInput(list[i], true);
       }
     }
   }
 
+  document.addEventListener('focus', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    ensureMoneyFocusValue(el);
+  }, true);
+
   document.addEventListener('input', function (e) {
     var el = e.target;
-    if (!el || !el.matches) return;
-    if (el.matches('.mask-money, [mask-money]')) formatMoneyInput(el);
+    if (!isMoneyField(el)) return;
+
+    formatMoneyInput(el, false);
+    moveCaretToEnd(el);
   });
 
   document.addEventListener('blur', function (e) {
     var el = e.target;
-    if (!el || !el.matches) return;
-    if (el.matches('.mask-money, [mask-money]')) formatMoneyInput(el);
+    if (!isMoneyField(el)) return;
+
+    formatMoneyInput(el, true);
   }, true);
+
+  document.addEventListener('keydown', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    var blockedKeys = {
+      ArrowLeft: true,
+      ArrowRight: true,
+      ArrowUp: true,
+      ArrowDown: true,
+      Home: true,
+      End: true,
+      PageUp: true,
+      PageDown: true
+    };
+
+    if (blockedKeys[e.key]) {
+      e.preventDefault();
+    }
+
+    if (e.key !== 'Tab') {
+      moveCaretToEnd(el);
+    }
+  });
+
+  document.addEventListener('mousedown', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    preventCaretChange(el, e);
+  });
+
+  document.addEventListener('mouseup', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    e.preventDefault();
+    moveCaretToEnd(el);
+  });
+
+  document.addEventListener('click', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    moveCaretToEnd(el);
+  });
+
+  document.addEventListener('select', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    moveCaretToEnd(el);
+  });
+
+  document.addEventListener('touchstart', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    ensureMoneyFocusValue(el);
+  }, { passive: true });
+
+  document.addEventListener('touchend', function (e) {
+    var el = e.target;
+    if (!isMoneyField(el)) return;
+
+    moveCaretToEnd(el);
+  }, { passive: true });
 
   // ─────────────────────────────────────────────────────────────
   // MutationObserver (dynamic nodes)
@@ -536,24 +577,25 @@ if (zipcodeEl) zipcodeEl.addEventListener('blur', search_zipcode);
  * Data controller confirmation with modals
  *
  **/
-document.addEventListener('click', async (e) =>
-{
+let lastActionGridWrapper = null;
+
+document.addEventListener('click', async (e) => {
   const a = e.target.closest('a[data-controller]');
   if (!a) return;
-
   e.preventDefault();
   const href = a.getAttribute('href') || '';
   const controller = a.dataset.controller;
   const params = new URLSearchParams(href.split('?')[1] || '');
   const foreign_key = params.get('foreign_key');
-
   const body = new FormData();
   body.append('action', href);
   body.append('controller', controller);
   if (foreign_key) body.append('foreign_key', foreign_key);
-
   const res = await fetch(`${BASE_URL}/${REST_API_BASE_ROUTE}/crud-data-controller`, { method: 'POST', body });
   const json = await res.json().catch(() => ({}));
+
+  lastActionGridWrapper = a.closest('.gridjs-refreshable');
+
   if (json?.detail?.msg) open_message(json.detail.type, json.detail.msg);
 });
 
@@ -632,90 +674,94 @@ document.addEventListener('submit', function (e)
 {
   var form = e.target.closest('[data-controller-form]');
   if (!form) return;
-
   e.preventDefault();
+
+  var gridWrapper = lastActionGridWrapper;
+  lastActionGridWrapper = null; // consume once — don't leak into an unrelated later submit
 
   var form_action = form.getAttribute('action') || window.location.href;
   var form_method = (form.getAttribute('method') || 'POST').toUpperCase();
   var formData = new FormData(form);
 
-  fetch(form_action, {
-    method: form_method,
-    body: formData
-  })
-  .then(function (res) { return res.text(); })
-  .then(function (text) {
-    var response;
-    try {
-      response = JSON.parse(text);
-    } catch (err) {
-      console.error('Resposta não-JSON do servidor:', text);
-      alert('Erro inesperado no servidor. Tente novamente mais tarde.');
-      return;
-    }
+  fetch(form_action, { method: form_method, body: formData })
+    .then(function (res) { return res.text(); })
+    .then(function (text) {
+      var response;
+      try {
+        response = JSON.parse(text);
+      } catch (err) {
+        console.error('Resposta não-JSON do servidor:', text);
+        alert('Erro inesperado no servidor. Tente novamente mais tarde.');
+        return;
+      }
 
-    var redirect_delay = 0;
+      var redirect_delay = 0;
+      if (response && response.detail && response.detail.msg !== undefined) {
+        open_message(response.detail.type, response.detail.msg);
+        redirect_delay = 2500;
+      }
 
-    if (response && response.detail && response.detail.msg !== undefined) {
-      open_message(response.detail.type, response.detail.msg);
-      redirect_delay = 2500;
-    }
-
-    if (response && response.redirect !== undefined) {
-      setTimeout(function () {
-        window.location.href = response.redirect;
-      }, redirect_delay);
-    }
-  })
-  .catch(function (err) {
-    console.error('Falha na requisição:', err);
-  });
+      if (gridWrapper && typeof gridWrapper.refreshGridTable === 'function') {
+        // This confirm came from a Grid.js table row — ignore any redirect
+        // and refresh the table in place instead of navigating away.
+        setTimeout(function () {
+          gridWrapper.refreshGridTable();
+        }, redirect_delay);
+      } else if (response && response.redirect !== undefined) {
+        setTimeout(function () {
+          window.location.href = response.redirect;
+        }, redirect_delay);
+      }
+    })
+    .catch(function (err) {
+      console.error('Falha na requisição:', err);
+    });
 }, true);
 
 
-document.addEventListener('DOMContentLoaded', () =>
-{
-  //1) Busca normal
-  document.querySelectorAll('select[data-search]').forEach((el) =>
-  {
-    if (el.tomselect) return;
+// document.addEventListener('DOMContentLoaded', () =>
+// {
+//   //1) Busca normal
+//   document.querySelectorAll('select[data-search]').forEach((el) =>
+//   {
+//     if (el.tomselect) return;
 
-    const allowCreate = el.hasAttribute('data-allow-create');
+//     const allowCreate = el.hasAttribute('data-allow-create');
 
-    new TomSelect(el, {
-      create: allowCreate,
-      plugins: ['dropdown_input'],
-    });
-  });
+//     new TomSelect(el, {
+//       create: allowCreate,
+//       plugins: ['dropdown_input'],
+//     });
+//   });
 
-  // 2) Múltiplos
-  document.querySelectorAll('select[data-search-multiple]').forEach((el) =>
-  {
-    if (el.tomselect) return;
+//   // 2) Múltiplos
+//   document.querySelectorAll('select[data-search-multiple]').forEach((el) =>
+//   {
+//     if (el.tomselect) return;
 
-    const min = parseInt(el.dataset.min || 0, 10);
-    const max = parseInt(el.dataset.max || 0, 10);
-    const allowCreate = el.hasAttribute('data-allow-create');
+//     const min = parseInt(el.dataset.min || 0, 10);
+//     const max = parseInt(el.dataset.max || 0, 10);
+//     const allowCreate = el.hasAttribute('data-allow-create');
 
-    const ts = new TomSelect(el, {
-      create: allowCreate,
-      maxItems: max || null,
-      plugins: ['remove_button', 'dropdown_input'],
-    });
+//     const ts = new TomSelect(el, {
+//       create: allowCreate,
+//       maxItems: max || null,
+//       plugins: ['remove_button', 'dropdown_input'],
+//     });
 
-    const form = el.closest('form');
-    if (form && min > 0)
-    {
-      form.addEventListener('submit', (e) =>
-      {
-        if (ts.items.length < min) {
-          e.preventDefault();
-          alert(`Selecione no mínimo ${min} item(ns).`);
-        }
-      });
-    }
-  });
-});
+//     const form = el.closest('form');
+//     if (form && min > 0)
+//     {
+//       form.addEventListener('submit', (e) =>
+//       {
+//         if (ts.items.length < min) {
+//           e.preventDefault();
+//           alert(`Selecione no mínimo ${min} item(ns).`);
+//         }
+//       });
+//     }
+//   });
+// });
 
 
 
@@ -898,16 +944,6 @@ function revealContainersFor(el)
 
 
 /**
- * Validates required fields inside a form.
- *
- * @param {HTMLFormElement|HTMLElement} form - The root form.
- * @param {Object} [options]
- * @param {HTMLElement|null} [options.scope=null] - If provided, only validates fields inside this container.
- * @param {boolean} [options.scrollToFirstInvalid=true] - Scrolls to the first invalid field if any.
- * @param {boolean} [options.revealContainers=true] - Calls revealContainersFor on the first invalid field, if available.
- * @returns {{ allFieldsValid: boolean, firstInvalid: HTMLElement|null }}
- */
-/**
  * Validates fields inside a form using native constraint validation first,
  * while keeping special rules for:
  * - hidden upload JSON inputs ([input-files])
@@ -1052,35 +1088,86 @@ function validateRequiredFields(form, options)
   // We validate only controls that the browser considers validatable.
   const controls = root.querySelectorAll('input, select, textarea');
 
+  // controls.forEach((el) =>
+  // {
+  //   // Skip disabled + non-validatable
+  //   if (!el || el.disabled) return;
+
+  //   // Skip file inputs that are “mirrored” by your custom [input-files] in the same .files wrapper
+  //   if (
+  //     el.type === 'file' &&
+  //     el.closest('.files') &&
+  //     el.closest('.files').querySelector('input[input-files]')
+  //   ) {
+  //     return;
+  //   }
+
+  //   // Skip radio/checkbox here (handled above when required)
+  //   if (el.type === 'radio' || el.type === 'checkbox') return;
+
+  //   // Skip custom upload hidden (handled above)
+  //   if (el.hasAttribute('input-files')) return;
+
+  //   // If browser can validate it, use it
+  //   if (el.willValidate) {
+  //     const ok = el.checkValidity();
+
+  //     if (!ok) {
+  //       allFieldsValid = false;
+  //       markInvalid(el, el.validationMessage || '');
+  //       if (!firstInvalid) firstInvalid = el;
+  //     } else {
+  //       clearInvalid(el);
+  //     }
+  //   }
+  // });
+
   controls.forEach((el) =>
   {
-    // Skip disabled + non-validatable
     if (!el || el.disabled) return;
 
-    // Skip file inputs that are “mirrored” by your custom [input-files] in the same .files wrapper
     if (
-      el.type === 'file' &&
-      el.closest('.files') &&
-      el.closest('.files').querySelector('input[input-files]')
+        el.type === 'file' &&
+        el.closest('.files') &&
+        el.closest('.files').querySelector('input[input-files]')
     ) {
+        return;
+    }
+
+    if (el.type === 'radio' || el.type === 'checkbox') return;
+
+    if (el.hasAttribute('input-files')) return;
+
+    const hasForcedInvalid = el.classList.contains('is-invalid');
+
+    if (hasForcedInvalid)
+    {
+      allFieldsValid = false;
+
+        const feedback = el.closest('.input-group')?.parentElement?.querySelector('.invalid-feedback')
+            || el.closest('.form-floating')?.querySelector('.invalid-feedback')
+            || el.parentElement?.querySelector('.invalid-feedback');
+
+      markInvalid(el, feedback?.textContent || '');
+
+      if (!firstInvalid) firstInvalid = el;
+
       return;
     }
 
-    // Skip radio/checkbox here (handled above when required)
-    if (el.type === 'radio' || el.type === 'checkbox') return;
-
-    // Skip custom upload hidden (handled above)
-    if (el.hasAttribute('input-files')) return;
-
-    // If browser can validate it, use it
-    if (el.willValidate) {
+    if (el.willValidate)
+    {
       const ok = el.checkValidity();
 
-      if (!ok) {
+      if (!ok)
+      {
         allFieldsValid = false;
         markInvalid(el, el.validationMessage || '');
+
         if (!firstInvalid) firstInvalid = el;
-      } else {
+      }
+      else
+      {
         clearInvalid(el);
       }
     }
@@ -1259,115 +1346,115 @@ document.addEventListener('input', function(e)
 }, true);
 
 
-/**
- * Marks a field as invalid and attaches/updates a Bootstrap .invalid-feedback element.
- *
- * Regras:
- * - Se tiver .input-group: aplica .is-invalid no input + .input-group
- *   e cria/usa .invalid-feedback associado ao grupo (irmão do .input-group).
- * - Se não tiver .input-group, mas tiver .form-floating:
- *   cria/usa .invalid-feedback dentro do .form-floating.
- * - Fallback: cria .invalid-feedback logo após o input.
- *
- * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} input
- * @param {string} message
- */
-function applyInvalidFeedback(input, message)
-{
-  if (!input) return;
+// /**
+//  * Marks a field as invalid and attaches/updates a Bootstrap .invalid-feedback element.
+//  *
+//  * Regras:
+//  * - Se tiver .input-group: aplica .is-invalid no input + .input-group
+//  *   e cria/usa .invalid-feedback associado ao grupo (irmão do .input-group).
+//  * - Se não tiver .input-group, mas tiver .form-floating:
+//  *   cria/usa .invalid-feedback dentro do .form-floating.
+//  * - Fallback: cria .invalid-feedback logo após o input.
+//  *
+//  * @param {HTMLInputElement|HTMLSelectElement|HTMLTextAreaElement} input
+//  * @param {string} message
+//  */
+// function applyInvalidFeedback(input, message)
+// {
+//   if (!input) return;
 
-  // Sempre marca o próprio campo
-  input.classList.add('is-invalid');
+//   // Sempre marca o próprio campo
+//   input.classList.add('is-invalid');
 
-  const inputGroup  = input.closest('.input-group');
-  const formFloating = input.closest('.form-floating');
-  let feedback = null;
+//   const inputGroup  = input.closest('.input-group');
+//   const formFloating = input.closest('.form-floating');
+//   let feedback = null;
 
-  // --- CASO 1: existe .input-group ---
-  if (inputGroup)
-  {
-    // Marca o grupo como inválido também
-    inputGroup.classList.add('is-invalid');
+//   // --- CASO 1: existe .input-group ---
+//   if (inputGroup)
+//   {
+//     // Marca o grupo como inválido também
+//     inputGroup.classList.add('is-invalid');
 
-    // 1) tenta encontrar feedback dentro do input-group
-    feedback = inputGroup.querySelector('.invalid-feedback');
+//     // 1) tenta encontrar feedback dentro do input-group
+//     feedback = inputGroup.querySelector('.invalid-feedback');
 
-    const parent = inputGroup.parentElement;
+//     const parent = inputGroup.parentElement;
 
-    // 2) se não tiver dentro, tenta achar como irmão logo depois do input-group
-    if (!feedback && parent) {
-      for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling) {
-        if (sib.classList && sib.classList.contains('invalid-feedback')) {
-          feedback = sib;
-          break;
-        }
-      }
-    }
+//     // 2) se não tiver dentro, tenta achar como irmão logo depois do input-group
+//     if (!feedback && parent) {
+//       for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling) {
+//         if (sib.classList && sib.classList.contains('invalid-feedback')) {
+//           feedback = sib;
+//           break;
+//         }
+//       }
+//     }
 
-    // 3) se ainda não existir, cria como irmão do input-group
-    if (!feedback && parent) {
-      feedback = document.createElement('div');
-      feedback.className = 'invalid-feedback';
+//     // 3) se ainda não existir, cria como irmão do input-group
+//     if (!feedback && parent) {
+//       feedback = document.createElement('div');
+//       feedback.className = 'invalid-feedback';
 
-      // insere antes de <small>, se existir
-      let insertBefore = null;
-      for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling) {
-        if (sib.tagName && sib.tagName.toLowerCase() === 'small') {
-          insertBefore = sib;
-          break;
-        }
-      }
+//       // insere antes de <small>, se existir
+//       let insertBefore = null;
+//       for (let sib = inputGroup.nextElementSibling; sib; sib = sib.nextElementSibling) {
+//         if (sib.tagName && sib.tagName.toLowerCase() === 'small') {
+//           insertBefore = sib;
+//           break;
+//         }
+//       }
 
-      if (insertBefore) {
-        parent.insertBefore(feedback, insertBefore);
-      } else if (inputGroup.nextSibling) {
-        parent.insertBefore(feedback, inputGroup.nextSibling);
-      } else {
-        parent.appendChild(feedback);
-      }
-    }
+//       if (insertBefore) {
+//         parent.insertBefore(feedback, insertBefore);
+//       } else if (inputGroup.nextSibling) {
+//         parent.insertBefore(feedback, inputGroup.nextSibling);
+//       } else {
+//         parent.appendChild(feedback);
+//       }
+//     }
 
-  // --- CASO 2: não tem .input-group, mas tem .form-floating ---
-  } else if (formFloating) {
+//   // --- CASO 2: não tem .input-group, mas tem .form-floating ---
+//   } else if (formFloating) {
 
-    // feedback fica DENTRO do .form-floating
-    feedback = formFloating.querySelector('.invalid-feedback');
+//     // feedback fica DENTRO do .form-floating
+//     feedback = formFloating.querySelector('.invalid-feedback');
 
-    if (!feedback) {
-      feedback = document.createElement('div');
-      feedback.className = 'invalid-feedback';
-      formFloating.appendChild(feedback);
-    }
+//     if (!feedback) {
+//       feedback = document.createElement('div');
+//       feedback.className = 'invalid-feedback';
+//       formFloating.appendChild(feedback);
+//     }
 
-  // --- Fallback: sem input-group e sem form-floating ---
-  } else {
-    const parent = input.parentElement;
-    if (!parent) return;
+//   // --- Fallback: sem input-group e sem form-floating ---
+//   } else {
+//     const parent = input.parentElement;
+//     if (!parent) return;
 
-    // tenta achar algum .invalid-feedback como irmão
-    feedback = Array.from(parent.children).find(function (el) {
-      return el.classList && el.classList.contains('invalid-feedback');
-    }) || null;
+//     // tenta achar algum .invalid-feedback como irmão
+//     feedback = Array.from(parent.children).find(function (el) {
+//       return el.classList && el.classList.contains('invalid-feedback');
+//     }) || null;
 
-    if (!feedback) {
-      feedback = document.createElement('div');
-      feedback.className = 'invalid-feedback';
-      if (input.nextSibling) {
-        parent.insertBefore(feedback, input.nextSibling);
-      } else {
-        parent.appendChild(feedback);
-      }
-    }
-  }
+//     if (!feedback) {
+//       feedback = document.createElement('div');
+//       feedback.className = 'invalid-feedback';
+//       if (input.nextSibling) {
+//         parent.insertBefore(feedback, input.nextSibling);
+//       } else {
+//         parent.appendChild(feedback);
+//       }
+//     }
+//   }
 
-  if (feedback) {
-    const msg = String(message ?? '');
+//   if (feedback) {
+//     const msg = String(message ?? '');
 
-    // Se vier com tag, renderiza HTML; senão, texto normal
-    if (/<[a-z][\s\S]*>/i.test(msg)) feedback.innerHTML = msg;
-    else feedback.textContent = msg;
-  }
-}
+//     // Se vier com tag, renderiza HTML; senão, texto normal
+//     if (/<[a-z][\s\S]*>/i.test(msg)) feedback.innerHTML = msg;
+//     else feedback.textContent = msg;
+//   }
+// }
 
 
 
@@ -1416,7 +1503,14 @@ async function send_form(form)
       willRedirect = true;
       form.classList.add('is-redirecting');
 
-      setTimeout(() => { window.location.href = json.redirect; }, 2500);
+      setTimeout(() =>
+      {
+        if (json.redirect == '{force_reload}') {
+          location.reload();
+        } else {
+          window.location.href = json.redirect;
+        }
+      }, 2500);
       return json ?? [];
     }
 
@@ -1958,6 +2052,64 @@ document.addEventListener('click', function (e)
     console.error('It was not possible to copy', err);
   });
 });
+
+
+/**
+ * Validate CPF fields using event delegation.
+ *
+ * Supports dynamically loaded `.mask-cpf` fields.
+ */
+function validate_cpf(event)
+{
+  const input = event.target;
+
+  if (!input.matches('.mask-cpf')) {
+    return;
+  }
+
+  const cpf      = input.value.replace(/\D/g, '');
+  const fieldset = input.closest('fieldset');
+  const floating = input.closest('.form-floating');
+
+  const calculate_digit = (length) => {
+    let total  = 0;
+    let factor = length + 1;
+
+    for (let index = 0; index < length; index++) {
+      total += parseInt(cpf[index], 10) * factor--;
+    }
+
+    const remainder = (total * 10) % 11;
+
+    return remainder === 10 ? 0 : remainder;
+  };
+
+  const valid = (
+    cpf.length === 11 &&
+    !/^(\d)\1{10}$/.test(cpf) &&
+    calculate_digit(9) === parseInt(cpf[9], 10) &&
+    calculate_digit(10) === parseInt(cpf[10], 10)
+  );
+
+  input.classList.toggle('is-invalid', !valid);
+
+  const container = floating || fieldset;
+  const feedback  = container.querySelector('.invalid-feedback');
+
+  if (!valid && !feedback) {
+    container.insertAdjacentHTML(
+      'beforeend',
+      '<div class="invalid-feedback">CPF inválido. Informe o dado corretamente.</div>'
+    );
+  }
+
+  if (valid && feedback) {
+    feedback.remove();
+  }
+
+  return valid;
+}
+document.addEventListener('blur', validate_cpf, true);
 
 
 /**

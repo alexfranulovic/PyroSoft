@@ -557,7 +557,6 @@ function steps_form(array $Attr = [])
             ? "<p>{$description}</p>"
             : '';
 
-
         /**
          * Execptions
          */
@@ -673,7 +672,7 @@ function steps_form(array $Attr = [])
     <section class='module steps-form $size'>";
     if($container) $html.= "<div class='container-lg'>";
 
-        $html.= "<form $delay step-form class='carousel-fade step-form' {$without_reload} method='{$form_method}' {$form_action} {$attr_form}>";
+        $html.= "<form $delay step-form class='carousel-fade step-form' {$without_reload} method='{$form_method}' {$form_action} {$attr_form} data-bs-touch='false'>";
 
         $html.= input('hidden', $type_form, [
             'name' => 'actual_step',
@@ -914,6 +913,13 @@ function table(array $Attr = [])
         $data_table     = $Attr['data_table'] ?? false;
         $settings       = $Attr['settings'] ?? [];
 
+        $loader = "
+        <div data-table-loader>
+            <div class='spinner-border' role='status'>
+                <span class='visually-hidden'>Loading...</span>
+            </div>
+            <p>Carregando...</p>
+        </div>";
 
         /**
          * Put the CRUD panel panel
@@ -922,10 +928,22 @@ function table(array $Attr = [])
             ? parse_html_tag_attributes($Attr['div_attributes'])
             : 'class="col-12 crud crud-table"';
 
+        /**
+         * Put the CRUD panel panel
+         */
+        $table_attributes = !empty($Attr['table_attributes'])
+            ? parse_html_tag_attributes($Attr['table_attributes'])
+            : '';
+
 
         $data_table_settings = '';
-        if (in_array('data_table_async', $settings) && $data_table) {
-            $data_table_settings = "data-table-async data-crud-id='{$crud_id}'";
+        if (in_array('data_table_async', $settings) && $data_table)
+        {
+            $data_table_settings = "
+            data-table-async
+            data-crud-id='{$crud_id}'
+            style='display: none;'
+            ";
         }
 
         elseif ($data_table) {
@@ -938,7 +956,7 @@ function table(array $Attr = [])
          * Start the table.
          *
          */
-        $table = "<table $data_table_settings >";
+        $table = "<table $table_attributes $data_table_settings >";
 
         /**
          * Define the columns
@@ -966,7 +984,9 @@ function table(array $Attr = [])
         {
             foreach ($Attr['body'] as $body)
             {
-                $table.= "<tr>";
+                $row_id = !empty($body['id']) ? " record-id='{$body['id']}'" : "";
+
+                $table.= "<tr{$row_id}>";
                 foreach ($body as $content) $table.= "<td>". (!empty($content) && !is_array($content) ? $content : '-') ."</td>";
                 $table.= "</tr>";
             }
@@ -991,7 +1011,8 @@ function table(array $Attr = [])
 
         // Show a loader if table is async
         if (in_array('data_table_async', $settings)) {
-            $res.= '<div data-table-loader style="display: none;"><p>Carregando...</p></div>';
+            // $res.= "<div data-table-loader style='display: none;'><p>Carregando...</p></div>";
+            $res.= $loader;
         }
 
         $res.= $table;
@@ -999,6 +1020,10 @@ function table(array $Attr = [])
         $res.= '</div>';
         $res.= '</div>';          // End div
         $res.= '</section>';      // End section
+
+        if ($data_table) {
+            add_asset('footer', "<script src='".base_url."/dist/scripts/tables.js' defer></script>");
+        }
 
         add_asset('footer', "<script src='".base_url."/dist/scripts/filesPreviewer.js' defer></script>");
 

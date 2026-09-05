@@ -24,13 +24,43 @@ function USD($value)
  * @param mixed $value The input value, usually a string with localized formatting (e.g., "1.234,56").
  * @return string A string representation of the number in decimal format with two digits after the decimal point (e.g., "1234.56").
  */
-function DECIMAL($value)
+function DECIMAL($value, bool $force_decimals = true)
 {
-    $value = str_replace(['.', ' '], '', $value);
-    $value = str_replace(',', '.', $value);
+    $value = trim((string) $value);
+    $value = str_replace(' ', '', $value);
 
-    return number_format((float) $value, 2, '.', '');
+    $lastComma = strrpos($value, ',');
+    $lastDot   = strrpos($value, '.');
+
+    if ($lastComma !== false && $lastDot !== false) {
+        if ($lastComma > $lastDot) {
+            // BR: "1.000,90" -> dot is thousands, comma is the decimal point.
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        } else {
+            // US: "1,000.90" -> comma is thousands, dot is the decimal point.
+            $value = str_replace(',', '', $value);
+        }
+    } elseif ($lastComma !== false) {
+        // Only a comma -> BR decimal separator: "130,90" -> "130.90"
+        $value = str_replace(',', '.', $value);
+    }
+    // else: only a dot, or neither -> already dot-decimal or a plain
+    // integer, left as-is.
+
+    if ($force_decimals) {
+        return number_format((float) $value, 2, '.', '');
+    }
+
+
+    $value = (string) (float) $value;
+    if ($value == 0) {
+        return (string)'';
+    }
+
+    return $value;
 }
+
 
 
 /**
@@ -213,6 +243,54 @@ function format_datetime($value)
     return date('d/m/Y - H:i', strtotime($value));
 }
 
+/**
+ * Formats a date.
+ *
+ * @param string $value The date value to format.
+ * @return string The formatted date.
+ */
+function format_date($value)
+{
+    return date('d/m/Y', strtotime($value));
+}
+
+
+/**
+ * Format a date/datetime as "{dia} de {mês} de {ano}" (pt-BR), e.g.
+ * "25 de agosto de 2026" -- used by custom-listings/payment-history.php.
+ * No locale/intl dependency (setlocale() is process-wide and unreliable
+ * across servers), just a static month map.
+ *
+ * @param string $datetime Any strtotime()-parsable date/datetime.
+ * @return string
+ */
+function format_date_long_ptbr(string $datetime, bool $full = true): string
+{
+    $timestamp = strtotime($datetime);
+    if (!$timestamp) return '';
+
+    $months = [
+        1 => 'jan.', 2 => 'fev.', 3 => 'mar.', 4 => 'abr.',
+        5 => 'mai.', 6 => 'jun.', 7 => 'jul.', 8 => 'ago.',
+        9 => 'set.', 10 => 'out.', 11 => 'nov.', 12 => 'dez.',
+    ];
+
+    if ($full)
+    {
+        $months = [
+            1 => 'janeiro', 2 => 'fevereiro', 3 => 'março', 4 => 'abril',
+            5 => 'maio', 6 => 'junho', 7 => 'julho', 8 => 'agosto',
+            9 => 'setembro', 10 => 'outubro', 11 => 'novembro', 12 => 'dezembro',
+        ];
+    }
+
+    $day   = (int) date('j', $timestamp);
+    $month = $months[(int) date('n', $timestamp)];
+    $year  = date('Y', $timestamp);
+
+    return "{$day} de {$month} de {$year}";
+}
+
 
 /**
  * Formats a price for freight.
@@ -330,4 +408,45 @@ function states_address(bool $for_selects = false)
     }
 
     return $res;
+}
+
+
+/**
+ * Converts a BR-formatted date or date+time search term into the
+ * year-first order MySQL stores DATETIME columns as, so it can be used as
+ * a LIKE '%prefix%' match — deliberately a PREFIX, not a full value, since
+ * a typed term like "05/08/2026 - 17:14" has no seconds and there's no way
+ * to guess the exact one stored in the DB. LIKE against the prefix matches
+ * any row within that minute (or day, or whatever precision was typed)
+ * regardless of seconds.
+ *
+ * Accepts, with the time part fully optional:
+ *   dd/mm/yyyy
+ *   dd/mm/yyyy - hh:mm
+ *   dd/mm/yyyy - hh:mm:ss
+ *
+ *   br_datetime_to_mysql('05/08/2026 - 17:14')       -> '2026-08-05 17:14'
+ *   br_datetime_to_mysql('05/08/2026 - 17:14:04')     -> '2026-08-05 17:14:04'
+ *   br_datetime_to_mysql('05/08/2026')                -> '2026-08-05'
+ */
+function br_datetime_to_mysql(string $term): string
+{
+    $term = trim($term);
+    $term = str_replace('/', '-', $term);
+
+    // Date part must be complete (dd-mm-yyyy); the time part after it, if
+    // any, is captured as-is — however much of it has been typed so far.
+    if (!preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})(?:\s*-\s*(.*))?$/', $term, $m)) {
+        return $term;
+    }
+
+    [, $day, $month, $year] = $m;
+    $result = sprintf('%04d-%02d-%02d', $year, $month, $day);
+
+    $timePart = trim($m[4] ?? '');
+    if ($timePart !== '') {
+        $result .= ' ' . $timePart;
+    }
+
+    return $result;
 }

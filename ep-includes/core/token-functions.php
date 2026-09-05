@@ -23,6 +23,29 @@ function token_generate(array $payload = []): string
         return (string) random_int($min, $max);
     }
 
+    if ($mode === 'hex')
+    {
+        $length = max(32, min($length, 128));
+        return substr(
+            bin2hex(random_bytes((int) ceil($length / 2))),
+            0,
+            $length
+        );
+    }
+
+    if ($mode === 'nanoid')
+    {
+        $length = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-';
+        $max = strlen($length) - 1;
+
+        $id = '';
+        for ($i = 0; $i < $length; $i++) {
+            $id .= $length[random_int(0, $max)];
+        }
+
+        return $id;
+    }
+
     // Default: md5
     if (function_exists('random_bytes')) {
         return md5(bin2hex(random_bytes(16)) . microtime(true));

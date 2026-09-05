@@ -104,7 +104,7 @@ else
                 {
                     if ((!is_user_logged_in()) AND ($page['is_public'] == 0 OR $page['is_public'] == 2))
                     {
-                        $_SESSION['msg'] = alert_message('ER_RESTRICTED_AREA', 'alert');
+                        $_SESSION['msg'] = alert_message('ER_RESTRICTED_AREA', 'toast');
 
                         $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
                         header("Location: $redirect");
@@ -121,7 +121,7 @@ else
                 {
                     if ((!is_user_logged_in()) OR (!is_dev()))
                     {
-                        $_SESSION['msg'] = alert_message('ER_MAINTENANCE_PAGE', 'alert');
+                        $_SESSION['msg'] = alert_message('ER_MAINTENANCE_PAGE', 'toast');
 
                         $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
                         header("Location: $redirect");
@@ -152,7 +152,7 @@ else
          *
          */
         else {
-            $_SESSION['msg'] = alert_message('ER_INVALID_PERMISSION', 'alert');
+            $_SESSION['msg'] = alert_message('ER_INVALID_PERMISSION', 'toast');
             $redirect = pg .'/login?redirect_to='. urlencode(actual_pg);
             header("Location: $redirect");
         }
@@ -172,8 +172,10 @@ else
      * Include the template.
      */
     if (isset($file)) {
-        page($file);
+        // page($file);
+        require_once $file;
     }
+
 }
 
 mysqli_close($conn);

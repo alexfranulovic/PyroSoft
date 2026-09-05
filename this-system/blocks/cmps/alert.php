@@ -16,20 +16,19 @@ function alert(array $Attr = [])
   {
     $class      = $Attr['class'] ?? '';
     $title      = $Attr['title'] ?? '';
-    $color      = $Attr['color'] ?? '';
-    $background = $Attr['color']['background'] ?? 'info';
+    $color = $Attr['color'] ?? 'info';
     $variation  = $Attr['variation'] ?? 'alert-default';
 
     $attributes = !empty($Attr['attributes'])
       ? parse_html_tag_attributes($Attr['attributes'])
       : '';
 
-    $res = "<div class='alert $variation fade show alert-$color' $attributes>";
+    $res = "<article class='alert $variation fade show alert-$color $class' $attributes>";
     $res.= (isset($Attr['close_button']) && $Attr['close_button'] == true)
       ? "<button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>"
       : '';
     $res.= "<span class='body'>". format_text($title) ." ". format_text($Attr['body']) ."</span>";
-    $res.= "</div>";
+    $res.= "</article>";
 
     return $res;
   }

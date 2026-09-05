@@ -13,6 +13,70 @@ feature('all', 'api');
 
 
 /**
+ * Rota REST do modo ASYNC dos campos de busca (TomSelect / searchablefields.js).
+ * A lógica de fato mora em selection_type/process.php, carregada sob
+ * demanda via load_input() dentro do callback.
+ *
+ * GET  {base_url}/{REST_API_BASE_ROUTE}/searchable-fields
+ *   ?search={texto}
+ *   &field-id={id}       (formato 1 — tb_cruds_fields.Query)
+ *   &field-search={key}  (formato 2 — $GLOBALS['searchable-fields'][key])
+ *
+ * POST {base_url}/{REST_API_BASE_ROUTE}/searchable-fields
+ *   body JSON: { "field-search": "{key}", "value": "{texto digitado}" }
+ *   Cria um novo registro via $GLOBALS['searchable-fields'][key]['insert']['query']
+ *   quando o campo permite criação (data-allow-create) e o grupo tiver
+ *   essa query configurada. Só o formato 2 (field-search) suporta
+ *   criação — tb_cruds_fields não tem uma query de inserção própria.
+ */
+register_rest_route('searchable-fields', [
+  'methods'    => ['GET', 'POST'],
+  'need_login' => true, // TODO: mude para false se algum desses campos for usado fora da área logada.
+  'callback'   => function ()
+  {
+    global $seg;
+    load_input('selection_type', 'process');
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST')
+    {
+      $body        = json_decode(file_get_contents('php://input'), true) ?: [];
+      $fieldSearch = $body['field-search'] ?? null;
+      $newValue    = trim($body['value'] ?? '');
+
+      try
+      {
+        return create_searchable_field_option($fieldSearch, $newValue);
+      }
+      catch (Throwable $e)
+      {
+        if (function_exists('app_log')) {
+            app_log('error', 'Fail to process endpoint "searchable-fields" (insert)', ['exception' => $e]);
+        }
+        return ['code' => 'error', 'msg' => $e->getMessage()];
+      }
+    }
+
+    $fieldId     = $_GET['field-id']     ?? null;
+    $fieldSearch = $_GET['field-search'] ?? null;
+    $searchValue = trim($_GET['search']  ?? '');
+    try
+    {
+      if (!empty($fieldId))     return searchable_fields_by_field_id($fieldId, $searchValue);
+      if (!empty($fieldSearch)) return searchable_fields_by_group($fieldSearch, $searchValue);
+      return [];
+    }
+    catch (Throwable $e)
+    {
+      if (function_exists('app_log')) {
+          app_log('error', 'Fail to process endpoint "searchable-fields"', ['exception' => $e]);
+      }
+      return ['code' => 'error', 'msg' => $e->getMessage()];
+    }
+  },
+  'permission_callback' => '__return_true',
+]);
+
+/**
  * Register a REST API route for user login.
  *
  * This code registers a REST API route named 'user-login' for handling user login requests.
@@ -34,8 +98,9 @@ register_rest_route('log-it', [
         $data['level'] ?? 'info',
         "[JS] " . ($data['message'] ?? 'No message'),
         [
-          'context_js' => $data['context'] ?? [],
           'js_url'     => $data['url'] ?? null,
+          'file_name' => 'js.log',
+          'context_js' => $data['context'] ?? [],
           'user_agent' => $data['userAgent'] ?? null,
           'client_time'=> $data['time'] ?? null,
           'origin'     => 'javascript'
@@ -46,7 +111,7 @@ register_rest_route('log-it', [
     }
 
     catch (Throwable $e) {
-      app_log('error', 'Fail to proccess endpoint "log-it"', [
+      app_log('error', 'Fail to process endpoint "log-it"', [
         'exception' => $e
       ]);
       return json_encode(['code' => 'error', 'msg' => $e->getMessage()]);
@@ -378,82 +443,6 @@ register_rest_route('duplicate-record', [
 ]);
 
 
-
-/**
- * Register a REST API route for truncate table.
- *
- * This code registers a REST API route named 'truncate-table'.
- */
-register_rest_route('truncate-record', [
-  'methods' => 'POST',
-  'callback' => function()
-  {
-    $id               = $_GET['id'] ?? null;
-    $permission_id    = $_GET['permission_id'] ?? null;
-    $tables_to_action = $_POST['tables_to_action'] ?? null;
-
-    $debug = (is_dev() && isset($_GET['debug'])) ? true : false;
-
-    if (isset($_GET['crud']))
-    {
-      $crud_id = (int) $_GET['crud'];
-
-      // If permission is denied, short-circuit with system-standard JSON
-      if (!load_permission($crud_id, 'truncate')) {
-        return invalid_permission_response();
-      }
-
-      // With permission granted, resolve CRUD data
-      $crud           = get_result("SELECT table_crud, foreign_key, pages_list FROM tb_cruds WHERE id = {$crud_id}");
-      $pages_list     = $crud['pages_list'];
-      $table          = $crud['table_crud'];
-      $foreign_key    = $crud['foreign_key'] ?? null;
-      $referer        = $_SERVER['HTTP_REFERER'] ?? null;
-
-      $redirect = !empty($pages_list->list_pg)
-        ? get_url_page($pages_list->list_pg, 'full')
-        : $referer;
-    }
-
-    // Optional path: explicit permission id (when not using CRUD id)
-    elseif (!empty($permission_id))
-    {
-      if (!load_permission($permission_id, 'custom')) {
-        return invalid_permission_response();
-      }
-
-      // Then resolve table/foreign key from query
-      $table       = $_GET['table']        ?? null;
-      $foreign_key = $_GET['foreign_key']  ?? null;
-      $redirect    = $_SERVER['HTTP_REFERER'] ?? null;
-    }
-
-    // No CRUD nor explicit permission id: treat as forbidden
-    else {
-      return invalid_permission_response();;
-    }
-
-    // $return = truncate_table($table);
-    $return = false;
-
-    $msgKey = ($return ? 'SC' : 'ER') . '_TO_TRUNCATE';
-
-    $res = [
-      'code'   => $return ? 'success' : 'error',
-      'detail' => [
-        'type' => 'toast',
-        'msg'  => alert_message($msgKey, 'toast'),
-      ],
-    ];
-
-    if (!empty($_GET['redirect']) && $_GET['redirect'] == true && isset($redirect)) {
-      $res['redirect'] = $redirect;
-    }
-
-    return $res;
-  },
-]);
-
 /**
  * Register a REST API route for delete record.
  *
@@ -617,7 +606,7 @@ register_rest_route('get-crud-list', [
 
       extract($hooks['buttons']);
 
-      // Get filters from DataTables request
+      // Get filters from table request
       $filters = [
           'start'  => $_POST['start'] ?? 0,
           'length' => $_POST['length'] ?? 10,

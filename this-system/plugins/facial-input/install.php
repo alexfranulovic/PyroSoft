@@ -4,7 +4,7 @@ if(!isset($seg)) exit;
 $sql = "
 CREATE TABLE IF NOT EXISTS `tb_user_biometrics`
 (
-    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
     `descriptor_json` JSON NOT NULL,
     `photo_path` VARCHAR(255) DEFAULT NULL,

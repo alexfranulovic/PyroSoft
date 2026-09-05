@@ -53,4 +53,238 @@
 .payment-details pre {
     padding: 1rem;
     background: #f0f0f0;
+    max-height: 600px;
+}
+
+.payment-details form {
+    /*width: max-content;*/
+    margin: auto;
+    max-width: 400px;
+}
+
+
+
+#notes {
+    /*display: grid;*/
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    width: 550px !important;
+}
+
+#notes .empty-state {
+    display: flex;
+    align-items: center;
+}
+
+#notes .empty-state svg {
+    max-width: 300px;
+    margin: auto;
+    display: block;
+}
+
+#notes .empty-state h3 {
+    font-weight: 800;
+    color: var(--bs-primary);
+    text-align: center;
+}
+
+#notes .empty-state p {
+    text-align: center;
+    font-size: .875rem;
+}
+
+#notes .list-notes {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+#notes .list-notes .dialog {
+    overflow: auto;
+    display: grid;
+    gap: .313rem;
+}
+
+#notes .list-notes .dialog .date {
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 600;
+    background-color: var(--bs-gray-300);
+    color: var(--bs-gray-800);
+    margin-top: 1.2rem;
+    font-size: .75rem !important;
+}
+
+#notes .list-notes .dialog article {
+    padding: .313rem .5rem;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.5;
+    border-radius: .25rem;
+    width: fit-content !important;
+}
+#notes .list-notes .dialog article .content {
+    margin-top: .313rem;
+}
+
+#notes .list-notes .dialog article.to-customer {
+    background-color: var(--st-300) !important;
+    color: var(--st-black) !important;
+    margin-left: auto;
+}
+#notes .list-notes .dialog article.private {
+    background-color: var(--st-300) !important;
+    color: var(--st-black) !important;
+    margin-left: auto;
+    border: 4px dashed var(--st-900);
+}
+#notes .list-notes .dialog article.system {
+    background-color: var(--gray-300) !important;
+    color: var(--gray-black) !important;
+    width: 100% !important;
+}
+#notes .list-notes .dialog article.from-customer {
+    background-color: var(--bs-gray-300);
+    color: var(--bs-gray-800);
+    margin-right: 30px;
+}
+
+#notes .list-notes .dialog article .created-by {
+    font-size: .75rem;
+    font-weight: 500;
+}
+#notes .list-notes .dialog article .time {
+    font-size: .75rem;
+    margin-left: auto;
+    font-weight: 500;
+    margin-top: 0;
+    text-align: end;
+}
+
+#notes .list-notes .dialog article.alert {
+    width: 100% !important;
+    margin-bottom: 0;
+}
+
+#notes .list-notes .dialog article.alert .accordion {
+    margin-top: .313rem;
+}
+#notes .list-notes .dialog article.alert .accordion-item {
+    /*border: none !important;*/
+}
+#notes .list-notes .dialog article.alert .accordion .accordion-button {
+    box-shadow: none !important;
+    padding: .313rem;
+}
+
+/*#notes .list-notes .dialog article.alert .accordion .accordion-button:after {
+    margin-left: .313rem;
+}
+*/
+#notes .list-notes .dialog article.alert .accordion-body {
+    background-color: var(--bs-gray-300);
+    color: var(--bs-gray-800);
+}
+
+#notes .list-notes .dialog article.alert .accordion-collapse.collapsing,
+#notes .list-notes .dialog article.alert .accordion-collapse.show {
+    display: grid;
+    width: stretch;
+}
+
+#notes .list-notes .dialog article.alert pre {
+    padding: 1rem;
+    max-height: 600px;
+    margin-bottom: 0;
+    overflow: auto;
+}
+
+#notes .list-notes .dialog article.alert code {
+    max-width: calc(600px - 10rem);
+    width: auto;
+    display: block;
+}
+
+#notes .add-note {
+    max-height: fit-content;
+    flex-shrink: 0;
+}
+
+#notes .add-note form {
+    display: flex;
+    border-radius: 1rem;
+    background-color: var(--bs-gray-300);
+    max-height: fit-content;
+    padding: .75rem;
+    flex-shrink: 0;
+    margin: 0;
+}
+#notes .add-note fieldset {
+    padding: 0;
+    margin: 0;
+}
+#notes .add-note form textarea {
+    background-color: transparent;
+    resize: none;
+    max-height: 250px;
+    border-radius: 0;
+    border: 0;
+    padding: 0;
+    box-shadow: none !important;
+    field-sizing: content;
+}
+#notes .add-note form select {
+    padding: 0;
+    border: 0;
+    background-color: transparent;
+    box-shadow: none !important;
+}
+#notes .add-note .submit-btn {
+    width: fit-content;
+    box-shadow: none !important;
+}
+#notes .add-note button {
+    height: 35px;
+    width: 35px;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 50rem;
+    display: block;
+    margin-left: auto;
+}
+
+#notes .add-note form small {
+    /*display: none;*/
+}
+
+
+[data-bs-theme="dark"] #notes .add-note form,
+[data-bs-theme="dark"] #notes .list-notes .dialog .date,
+#notes .list-notes .dialog article.alert .accordion-body {
+    background-color: var(--bs-gray-800);
+    color: var(--bs-gray-400);
+}
+
+[data-bs-theme="dark"] #notes .list-notes .dialog article.to-customer,
+[data-bs-theme="dark"] #notes .list-notes .dialog article.private {
+    background-color: var(--st-500) !important;
+}
+
+[data-bs-theme="dark"] #notes .list-notes .dialog article.from-customer {
+    background-color: var(--bs-gray-700);
+    color: var(--bs-gray-400);
+    margin-right: 30px;
+}
+
+#order-headers-utm h6 {
+    font-weight: 600;
+}
+
+#order-headers-utm tr {
+    font-size: .75rem;
+}
+
+#order-headers-utm hr {
+    margin: 3rem 0;
 }

@@ -801,7 +801,10 @@ function seo_structred_data($data, bool $mix = true, string $type = 'organizatio
 
         $function = "{$type}_structured_data";
 
-        if (!function_exists($function)) return var_dump('This model of structured data does not exist.');
+        if (!function_exists($function)) {
+            echo '<!-- This model of structured data does not exist. -->';
+            return '';
+        }
 
         $data = $function($data);
     }
@@ -1054,3 +1057,51 @@ function generate_SEO_meta()
     <meta name='twitter:image' content='". ($thumbnail ?? ($config_thumbnail ?? $info['favicon'])) ."'>
     <meta name='twitter:creator' content='". ($page['seo']['author'] ?? ($config['seo']['author'] ?? '')) ."'>\n";
 }
+
+
+
+/**
+ * Capture UTM parameters from URL and persist them in cookie/session.
+ *
+ * @param array $allowed_params Allowed UTM keys.
+ * @param int   $cookie_days    Cookie lifetime in days.
+ *
+ * @return void
+ */
+function capture_utm_params(array $allowed_params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_resource', 'invite_code'], int $cookie_days = 30): void
+{
+    foreach ($allowed_params as $key)
+    {
+        if (!isset($_GET[$key])) {
+            continue;
+        }
+
+        $value = trim((string) $_GET[$key]);
+
+        if ($value === '') {
+            continue;
+        }
+
+        $_SESSION[$key] = $value;
+
+        setcookie(
+            $key,
+            $value,
+            [
+                'expires'  => time() + ($cookie_days * 86400),
+                'path'     => '/',
+                'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                'httponly' => false,
+                'samesite' => 'Lax',
+            ]
+        );
+    }
+
+    foreach ($allowed_params as $key)
+    {
+        if (empty($_SESSION[$key]) && !empty($_COOKIE[$key])) {
+            $_SESSION[$key] = (string) $_COOKIE[$key];
+        }
+    }
+}
+capture_utm_params();

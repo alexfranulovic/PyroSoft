@@ -54,7 +54,7 @@ function brevo_send_email($data = [])
     curl_close($ch);
 
     return [
-        'success' => ($http_code == 201) ? true : false,
+        'code' => ($http_code == 201) ? 'success' : 'error',
         'msg'     => json_decode($msg, true)
     ];
 }

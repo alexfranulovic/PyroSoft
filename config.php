@@ -17,11 +17,11 @@
  */
 
 // ** Setting the DataBase connection ** //
+define( 'DB_ENGINE',   env('database.engine') );    //DataBase's engine
 define( 'DB_HOST',     env('database.host') );      //DataBase's server
 define( 'DB_USER',     env('database.user') );      //DataBase's user
 define( 'DB_PASSWORD', env('database.password') );  //DataBase's password
 define( 'DB_NAME',     env('database.name') );      //DataBase's name
-
 
 /** Tables prefix is used to create a pattern **/
 $table_prefix = 'ep_tb_';

@@ -38,6 +38,7 @@ require_once 'ep-includes/core/variables.php';
 require_once 'this-system/variables.php';
 require_once 'ep-includes/core/functions.php';
 require_once 'this-system/functions.php';
+load_plugins();
 
 
 /**
@@ -59,7 +60,7 @@ $url = strip_tags($url);
 $cleaned_url = clean_url($url);
 
 // split into segments
-$params_url  = explode('/', $cleaned_url);
+$params_url = array_filter(explode('/', $cleaned_url));
 
 // canonical URL definition
 define('canonical', pg . '/' . $cleaned_url);
@@ -69,7 +70,7 @@ define('canonical', pg . '/' . $cleaned_url);
  * Determine the area (module) of the application from the first URL segment.
  * Default area is "app".
  */
-$page_path = $params_url[0];
+$page_path = $params_url[0] ?? null;
 
 
 /**

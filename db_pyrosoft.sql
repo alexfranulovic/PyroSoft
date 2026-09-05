@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Tempo de geração: 13/02/2026 às 04:29
+-- Tempo de geração: 26/03/2026 às 15:38
 -- Versão do servidor: 10.9.1-MariaDB
 -- Versão do PHP: 8.1.9
 
@@ -29,12 +29,12 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `tb_cron_events`;
 CREATE TABLE `tb_cron_events` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` int(10)  NOT NULL,
   `slug` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `hook` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `args` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `timestamp` int(10) UNSIGNED NOT NULL,
-  `recurrence` int(10) UNSIGNED DEFAULT NULL,
+  `timestamp` int(10)  NOT NULL,
+  `recurrence` int(10)  DEFAULT NULL,
   `mode` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -72,7 +72,7 @@ CREATE TABLE `tb_cruds` (
   `list_settings` varchar(500) DEFAULT NULL,
   `limit_results` varchar(11) DEFAULT NULL,
   `related_to` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '''table''',
-  `crud_id` varchar(11) DEFAULT NULL,
+  `crud_id` int(11) DEFAULT NULL,
   `crud_panel` text DEFAULT NULL,
   `pages_list` text DEFAULT NULL,
   `custom_urls` text DEFAULT NULL,
@@ -89,16 +89,16 @@ CREATE TABLE `tb_cruds` (
 --
 
 INSERT INTO `tb_cruds` (`id`, `piece_name`, `slug`, `type_crud`, `attributes`, `div_attributes`, `form_method`, `form_action`, `views_count`, `submits_count`, `table_crud`, `foreign_key`, `form_settings`, `list_settings`, `limit_results`, `related_to`, `crud_id`, `crud_panel`, `pages_list`, `custom_urls`, `result_page`, `permission_type`, `login_required`, `status_id`, `created_at`, `updated_at`) VALUES
-(176, 'Edit User', 'main-edit-user', 'update', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"default\",\"container\":\"1\",\"steps_form\":{\"save_between_steps\":\"1\",\"one_step_at_a_time\":\"1\",\"show_progess\":\"1\",\"show_steps\":\"1\",\"progess_style\":\"progress_steps_detailed\",\"progress_color\":\"secondary\",\"button_name_send\":\"Enviar\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:16', '2026-02-09 16:48:14'),
-(177, 'List Users', 'main-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"data_table\",\"2\":\"data_table_async\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:17', '2026-02-13 01:28:56'),
+(176, 'Edit User', 'main-edit-user', 'update', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"default\",\"container\":\"1\",\"steps_form\":{\"save_between_steps\":\"1\",\"one_step_at_a_time\":\"1\",\"show_progess\":\"1\",\"show_steps\":\"1\",\"progess_style\":\"progress_steps_detailed\",\"progress_color\":\"secondary\",\"button_name_send\":\"Send\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:16', '2026-02-09 16:48:14'),
+(177, 'List Users', 'main-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"data_table\",\"2\":\"data_table_async\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 1, 1, '2025-01-21 01:42:17', '2026-03-09 00:52:05'),
 (179, 'Create User', 'main-create-user', 'insert', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 0, 1, '2025-02-12 01:36:22', '2026-02-09 16:41:27'),
-(182, 'User Master', 'main-user-master', 'master', '', '', '', '[]', 0, 0, 'tb_users', 'user_id', '[]', '[]', '', 'table', '', '[]', '{\"list_pg\":\"63\",\"insert\":{\"mode\":\"page\",\"page\":\"310\",\"piece\":\"179\"},\"update\":{\"mode\":\"page\",\"page\":\"77\",\"piece\":\"176\"},\"view\":{\"mode\":\"modal\",\"page\":\"84\",\"piece\":\"231\"}}', '[]', '', 'only_these', 0, 1, '2025-03-29 06:37:49', '2026-02-09 16:42:18'),
+(182, 'User Master', 'main-user-master', 'master', '', '', '', '[]', 0, 0, 'tb_users', 'user_id', '[]', '[]', '', 'table', NULL, '[]', '{\"list_pg\":\"63\",\"insert\":{\"mode\":\"page\",\"page\":\"310\",\"piece\":\"179\"},\"update\":{\"mode\":\"page\",\"page\":\"77\",\"piece\":\"176\"},\"view\":{\"mode\":\"modal\",\"page\":\"84\",\"piece\":\"231\"}}', '[]', '', 'only_these', 0, 1, '2025-03-29 06:37:49', '2026-02-09 16:42:18'),
 (231, 'View User', 'main-view-user', 'view', '', '', 'POST', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"0\":\"show_id\",\"1\":\"show_list_pg\",\"2\":\"data_table\",\"limit_results\":\"\"}', '', 'table', '182', '{\"show_panel\":\"1\"}', '[]', '[]', '', '', 0, 1, '2025-07-22 01:30:15', '2026-02-01 21:55:25'),
 (239, 'General Settings', 'general-settings', 'master', '', '', '', '[]', 0, 0, 'tb_info', '', '[]', '[]', NULL, 'table', NULL, '[]', '{\"list_pg\":\"\",\"insert\":{\"mode\":\"page\",\"page\":\"\",\"piece\":\"\"},\"update\":{\"mode\":\"modal\",\"page\":\"\",\"piece\":\"\"},\"view\":{\"mode\":\"page\",\"page\":\"\",\"piece\":\"\"}}', '[]', '', 'only_these', 0, 1, '2025-09-21 05:38:35', '2026-02-09 16:42:29'),
 (240, 'Branding Settings', 'branding-settings', 'update', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', NULL, 'system_info', '239', '[]', '[]', '[]', '', '', 1, 1, '2025-09-30 01:50:13', '2026-02-09 16:48:14'),
 (242, 'Business Settings', 'business-settings', 'update', NULL, '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', '', 'system_info', '239', '[]', '[]', '[]', '', '', 1, 1, '2025-10-05 04:59:54', '2026-02-09 16:48:14'),
-(251, 'Maintenance Settings', 'maintenance-settings', 'update', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', NULL, 'system_info', '239', '[]', '[]', '[]', '', '', 0, 4, '2025-10-07 00:33:56', '2026-02-09 16:48:14'),
-(254, '[Summary] List Users', 'main-summary-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"5\"}', '', 'table', '182', '{\"show_panel\":\"1\",\"0\":\"show_name\",\"1\":\"minimize_actions\"}', '[]', '[]', '', '', 1, 1, '2026-02-01 02:52:41', '2026-02-13 01:28:56');
+(251, 'Maintenance Settings', 'maintenance-settings', 'update', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"without_reload\":\"1\",\"view_mode\":\"tabs_form\",\"steps_form\":{\"progess_style\":\"\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"\"}', NULL, 'system_info', '239', '[]', '[]', '[]', '', '', 0, 4, '2025-10-07 00:33:56', '2026-02-18 04:59:56'),
+(254, '[Summary] List Users', 'main-summary-list-users', 'list', '', '', '', '{\"type\":\"api\",\"action\":\"form-processor\"}', 0, 0, '', '', '{\"view_mode\":\"default\",\"steps_form\":{\"progess_style\":\"progress_bar\",\"progress_color\":\"\",\"button_name_send\":\"\"},\"delay\":\"\"}', '{\"limit_results\":\"5\"}', '', 'table', '182', '{\"show_panel\":\"1\",\"0\":\"show_name\",\"1\":\"minimize_actions\"}', '[]', '[]', '', '', 1, 1, '2026-02-01 02:52:41', '2026-03-09 00:52:05');
 
 -- --------------------------------------------------------
 
@@ -129,28 +129,28 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 (229, 'basic', 'login', '{\"label\":\"Nickname\",\"type\":\"text\",\"input_id\":\"login\",\"attachment\":\"{\\\"prepend\\\":\\\"@\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 3, NULL, 176, '1'),
 (232, 'basic', 'first_name', '{\"label\":\"Nome\",\"type\":\"text\",\"input_id\":\"nome\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '1', 1, NULL, 177, '1'),
 (233, 'basic', 'login', '{\"label\":\"Nickname\",\"type\":\"text\",\"input_id\":\"login\",\"attachment\":\"{\\\"prepend\\\":\\\"@\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 2, NULL, 177, '1'),
-(242, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-primary\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 9, NULL, 176, '1'),
+(242, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-primary\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 9, NULL, 176, '1'),
 (252, 'basic', 'last_name', '{\"label\":\"Sobrenome\",\"type\":\"text\",\"input_id\":\"nome[singular]\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 2, NULL, 176, '1'),
-(258, 'status_selector', 'status_id', '{\"function_proccess\":\"user_status\",\"Value\":\"1\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 8, NULL, 176, '1'),
+(258, 'status_selector', 'status_id', '{\"function_process\":\"user_status\",\"Value\":\"1\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 8, NULL, 176, '1'),
 (264, 'hr', '', '{\"Query\":\"\"}', '', '', 6, NULL, 176, '1'),
 (268, 'basic', 'first_name', '{\"label\":\"Nome\",\"type\":\"text\",\"input_id\":\"nome\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '', 1, 0, 179, '1'),
 (269, 'basic', 'login', '{\"label\":\"Nickname\",\"type\":\"text\",\"input_id\":\"login\",\"attachment\":\"{\\\"prepend\\\":\\\"@\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 3, 0, 179, '1'),
-(270, 'basic', 'password', '{\"label\":\"Senha\",\"type\":\"password\",\"input_id\":\"senha\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 4, 0, 179, '1'),
-(272, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-primary\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 6, 0, 179, '1'),
+(270, 'basic', 'password', '{\"label\":\"Password\",\"type\":\"password\",\"input_id\":\"Password\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 4, 0, 179, '1'),
+(272, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-primary\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 6, 0, 179, '1'),
 (273, 'basic', 'last_name', '{\"label\":\"Sobrenome\",\"type\":\"text\",\"input_id\":\"nome[singular]\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 2, 0, 179, '1'),
-(275, 'status_selector', 'status_id', '{\"function_proccess\":\"general_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 5, 0, 179, '1'),
+(275, 'status_selector', 'status_id', '{\"function_process\":\"general_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 5, 0, 179, '1'),
 (283, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 3, NULL, 177, '1'),
-(285, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_proccess\":\"auto_fill_name_by_cpf({email})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"unique_key\":\"1\",\"Query\":\"\"}', '', '', 4, NULL, 176, '1'),
-(319, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"balloons\",\"run_after_action\":\"1\",\"function_proccess\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '1', 7, NULL, 176, '1'),
-(341, 'status_selector', 'status_id', '{\"function_proccess\":\"user_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '1', 4, NULL, 177, '1'),
+(285, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_process\":\"auto_fill_name_by_cpf({email})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"unique_key\":\"1\",\"Query\":\"\"}', '', '', 4, NULL, 176, '1'),
+(319, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"balloons\",\"run_after_action\":\"1\",\"function_process\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '1', 7, NULL, 176, '1'),
+(341, 'status_selector', 'status_id', '{\"function_process\":\"user_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '1', 4, NULL, 177, '1'),
 (342, 'basic', 'first_name', '{\"label\":\"Nome\",\"type\":\"text\",\"input_id\":\"nome\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '1', 1, NULL, 231, '1'),
 (343, 'basic', 'login', '{\"label\":\"Nickname\",\"type\":\"text\",\"input_id\":\"login\",\"attachment\":\"{\\\"prepend\\\":\\\"@\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 4, NULL, 231, '1'),
-(346, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-primary\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 7, NULL, 231, '1'),
+(346, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-primary\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 7, NULL, 231, '1'),
 (347, 'basic', 'last_name', '{\"label\":\"Sobrenome\",\"type\":\"text\",\"input_id\":\"nome[singular]\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 2, NULL, 231, '1'),
-(349, 'status_selector', 'status_id', '{\"function_proccess\":\"user_status\",\"Value\":\"1\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 6, NULL, 231, '1'),
-(354, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_proccess\":\"auto_fill_name_by_cpf({email}, {register_id})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"Query\":\"\"}', '', '', 3, NULL, 231, '1'),
-(361, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"inline\",\"run_after_action\":\"1\",\"function_proccess\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string({register_id})\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '1', 5, NULL, 231, '1'),
-(442, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"inline\",\"run_after_action\":\"1\",\"function_proccess\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string({register_id})\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '', 5, NULL, 177, '1'),
+(349, 'status_selector', 'status_id', '{\"function_process\":\"user_status\",\"Value\":\"1\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '', 6, NULL, 231, '1'),
+(354, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_process\":\"auto_fill_name_by_cpf({email}, {register_id})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"Query\":\"\"}', '', '', 3, NULL, 231, '1'),
+(361, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"inline\",\"run_after_action\":\"1\",\"function_process\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string({register_id})\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '1', 5, NULL, 231, '1'),
+(442, 'selection_type', 'role_id[]', '{\"label\":\"Roles\",\"type\":\"checkbox\",\"variation\":\"inline\",\"run_after_action\":\"1\",\"function_process\":\"edit_user_role_assignments({register_id}, {role_id})\",\"function_view\":\"user_roles_to_string({register_id})\",\"options_resolver\":\"get_roles_by_user_id()\",\"Query\":\"\"}', '', '', 5, NULL, 177, '1'),
 (451, 'divider', '', '{\"title\":\"Branding\",\"Query\":\"\"}', '', '', 1, NULL, 240, '1'),
 (452, 'basic', 'name', '{\"depth\":\"1\",\"label\":\"Name\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '', 2, NULL, 240, '1'),
 (453, 'basic', 'short_name', '{\"depth\":\"1\",\"label\":\"Short Name\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '', 3, NULL, 240, '1'),
@@ -169,8 +169,8 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 (476, 'seo_form', 'seo', '{\"depth\":\"1\",\"mode\":\"common\",\"Query\":\"\"}', '', '', 27, NULL, 240, '1'),
 (477, 'field_repeater', 'contact', '{\"depth\":\"1\",\"label\":\"Concatcts\",\"storage_mode\":\"json\",\"Query\":\"\"}', '', '', 15, NULL, 240, '1'),
 (478, 'basic', 'contact_type', '{\"depth\":\"2\",\"label\":\"Contact type\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 16, NULL, 240, '1'),
-(479, 'basic', 'phone', '{\"depth\":\"2\",\"label\":\"Phone\",\"type\":\"text\",\"class\":\"mask-phone\",\"input_id\":\"telephone\",\"function_proccess\":\"clean_number\",\"function_view\":\"format_phone\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 17, NULL, 240, '1'),
-(480, 'basic', 'email', '{\"depth\":\"2\",\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_proccess\":\"auto_fill_name_by_cpf({email})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"Query\":\"\"}', '', '', 18, NULL, 240, '1'),
+(479, 'basic', 'phone', '{\"depth\":\"2\",\"label\":\"Phone\",\"type\":\"text\",\"class\":\"mask-phone\",\"input_id\":\"telephone\",\"function_process\":\"clean_number\",\"function_view\":\"format_phone\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 17, NULL, 240, '1'),
+(480, 'basic', 'email', '{\"depth\":\"2\",\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"function_process\":\"auto_fill_name_by_cpf({email})\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"@email.com\\\"}\",\"Required\":\"1\",\"run_before_action\":\"1\",\"Query\":\"\"}', '', '', 18, NULL, 240, '1'),
 (481, 'basic', 'country', '{\"depth\":\"2\",\"label\":\"Country\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-sm-6 col-md-3\",\"Query\":\"\"}', '', '', 19, NULL, 240, '1'),
 (482, 'basic', 'language', '{\"depth\":\"2\",\"label\":\"Language\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-sm-6 col-md-3 col-xl-3\",\"Query\":\"\"}', '', '', 20, NULL, 240, '1'),
 (483, 'field_repeater', 'social_media', '{\"depth\":\"1\",\"label\":\"Social medias\",\"storage_mode\":\"json\",\"Query\":\"\"}', '', '', 22, NULL, 240, '1'),
@@ -179,13 +179,13 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 (486, 'basic', 'url', '{\"depth\":\"2\",\"label\":\"URL\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-xl-12\",\"Query\":\"\"}', '', '', 25, NULL, 240, '1'),
 (488, 'hr', '', '{\"depth\":\"1\",\"Query\":\"\"}', '', '', 21, NULL, 240, '1'),
 (503, 'divider', '', '{\"title\":\"Business\",\"Query\":\"\"}', '', '', 1, 0, 242, '1'),
-(504, 'basic', 'taxID', '{\"depth\":\"1\",\"label\":\"Tax  ID\",\"type\":\"text\",\"class\":\"mask-cnpj\",\"function_proccess\":\"clean_number\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-md-6 col-xl-3\",\"Query\":\"\"}', '', '', 2, 0, 242, '1'),
+(504, 'basic', 'taxID', '{\"depth\":\"1\",\"label\":\"Tax  ID\",\"type\":\"text\",\"class\":\"mask-cnpj\",\"function_process\":\"clean_number\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-md-6 col-xl-3\",\"Query\":\"\"}', '', '', 2, 0, 242, '1'),
 (505, 'basic', 'price_range', '{\"depth\":\"1\",\"label\":\"Price range\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 3, 0, 242, '1'),
 (506, 'field_repeater', 'about_business[services]', '{\"depth\":\"1\",\"label\":\"List your services\",\"storage_mode\":\"json\",\"table\":\"tb_info\",\"add_btn_title\":\"Adicionar servi\\u00e7o\",\"Query\":\"\"}', '', '', 5, 0, 242, '1'),
 (507, 'basic', 'name', '{\"depth\":\"2\",\"label\":\"Name\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 6, 0, 242, '1'),
 (508, 'basic', 'description', '{\"depth\":\"2\",\"label\":\"Description\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 7, 0, 242, '1'),
 (509, 'selection_type', 'about_business[type]', '{\"depth\":\"1\",\"label\":\"Type\",\"type\":\"select\",\"variation\":\"original\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"local_business\\\",\\\"display\\\":\\\"Local business\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"Organization\\\",\\\"display\\\":\\\"Organization\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 4, 0, 242, '1'),
-(511, 'address_form', 'address', '{\"depth\":\"1\",\"label\":\"Endere\\u00e7o\",\"function_proccess\":\"1\",\"Query\":\"\"}', '', '', 13, 0, 242, '1'),
+(511, 'address_form', 'address', '{\"depth\":\"1\",\"label\":\"Endere\\u00e7o\",\"function_process\":\"1\",\"Query\":\"\"}', '', '', 13, 0, 242, '1'),
 (526, 'shortcode', '', '{\"depth\":\"1\",\"content\":\"<h4>Address<\\/h4>\",\"size\":\"col-xl-12\",\"Query\":\"\"}', '', '', 12, 0, 242, '1'),
 (527, 'divider', '', '{\"title\":\"Local\",\"Query\":\"\"}', '', '', 8, NULL, 242, '1'),
 (528, 'shortcode', '', '{\"depth\":\"1\",\"content\":\"<h4>Geo<\\/h4>\",\"size\":\"col-xl-12\",\"Query\":\"\"}', '', '', 9, NULL, 242, '1'),
@@ -235,10 +235,10 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 (576, 'selection_type', 'login_settings[recaptcha_login]', '{\"depth\":\"1\",\"label\":\"Enable reCaptcha in login page\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 18, NULL, 251, '1'),
 (577, 'selection_type', 'login_settings[login_social][]', '{\"depth\":\"1\",\"label\":\"Login social\",\"type\":\"checkbox\",\"variation\":\"inline\",\"size\":\"col-md-12 col-xl-12\",\"Alert\":\"It requires plugins\",\"options_resolver\":\"$login_social\",\"Query\":\"\"}', '', '', 27, NULL, 251, '1'),
 (579, 'shortcode', '', '{\"depth\":\"1\",\"content\":\"<h4>Register page<\\/h4>\",\"size\":\"col-xl-12\",\"Query\":\"\"}', '', '', 25, NULL, 251, '1'),
-(580, 'selection_type', 'login_settings[register_page][active]', '{\"depth\":\"1\",\"label\":\"Active\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl-3\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 29, NULL, 251, '1'),
-(581, 'selection_type', 'login_settings[register_page][slug]', '{\"depth\":\"1\",\"label\":\"Register page\",\"type\":\"search\",\"variation\":\"original\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl\",\"function_proccess\":\"get_pages_for_select\",\"options_resolver\":\"get_pages_for_select(\\\"slug\\\")\",\"Query\":\"\"}', '', '', 28, NULL, 251, '1'),
-(582, 'selection_type', 'login_settings[register_page][login_after_register]', '{\"depth\":\"1\",\"label\":\"Login after register\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl-3\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 30, NULL, 251, '1'),
-(583, 'selection_type', 'lowest_role[]', '{\"depth\":\"1\",\"label\":\"Lowest role(s)\",\"type\":\"checkbox\",\"variation\":\"balloons\",\"size\":\"col-xl-12\",\"Query\":\"SELECT id as value, name as display FROM tb_user_roles\"}', '', '', 26, NULL, 251, '1'),
+(580, 'selection_type', 'login_settings[signup_page][active]', '{\"depth\":\"1\",\"label\":\"Active\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl-3\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 29, NULL, 251, '1'),
+(581, 'selection_type', 'login_settings[signup_page][slug]', '{\"depth\":\"1\",\"label\":\"Register page\",\"type\":\"search\",\"variation\":\"original\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl\",\"function_process\":\"get_pages_for_select\",\"options_resolver\":\"get_pages_for_select(\\\"slug\\\")\",\"Query\":\"\"}', '', '', 28, NULL, 251, '1'),
+(582, 'selection_type', 'login_settings[signup_page][login_after_register]', '{\"depth\":\"1\",\"label\":\"Login after register\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"size\":\"col-md-6 col-xl-3\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 30, NULL, 251, '1'),
+(583, 'selection_type', 'lowest_role[]', '{\"depth\":\"1\",\"label\":\"Lowest role(s)\",\"type\":\"checkbox\",\"variation\":\"balloons\",\"size\":\"col-xl-12\",\"options_resolver\":\"get_roles(\\\"list\\\")\",\"Query\":\"\"}', '', '', 26, NULL, 251, '1'),
 (584, 'divider', '', '{\"title\":\"Maintence\",\"Query\":\"\"}', '', '', 7, NULL, 251, '1'),
 (585, 'selection_type', 'block_system', '{\"depth\":\"1\",\"label\":\"Block system\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"Alert\":\"Only developers can login.\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 8, NULL, 251, '1'),
 (586, 'selection_type', 'is_localhost', '{\"depth\":\"1\",\"label\":\"Is localhost\",\"type\":\"radio\",\"variation\":\"inline\",\"Required\":\"1\",\"Options\":\"{\\\"1\\\":{\\\"value\\\":\\\"1\\\",\\\"display\\\":\\\"Yes\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"},\\\"2\\\":{\\\"value\\\":\\\"0\\\",\\\"display\\\":\\\"No\\\",\\\"name\\\":\\\"\\\",\\\"description\\\":\\\"\\\",\\\"highlight\\\":\\\"\\\",\\\"small\\\":\\\"\\\",\\\"attributes\\\":\\\"\\\"}}\",\"Query\":\"\"}', '', '', 9, NULL, 251, '1'),
@@ -251,14 +251,14 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 (593, 'basic', 'viewport', '{\"depth\":\"1\",\"label\":\"Viewport\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 6, NULL, 251, '1'),
 (594, 'hr', '', '{\"depth\":\"1\",\"Query\":\"\"}', '', '', 12, NULL, 251, '1'),
 (595, 'basic', 'developer[author]', '{\"depth\":\"1\",\"label\":\"Developer\",\"type\":\"text\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"size\":\"col-md-6\",\"Query\":\"\"}', '', '', 13, NULL, 251, '1'),
-(597, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-st\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 28, NULL, 240, '1'),
-(598, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-st\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 45, NULL, 242, '1'),
-(599, 'submit_button', 'process-form', '{\"Value\":\"Enviar\",\"class\":\"btn btn-st\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 31, NULL, 251, '1'),
+(597, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-st\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 28, NULL, 240, '1'),
+(598, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-st\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 45, NULL, 242, '1'),
+(599, 'submit_button', 'process-form', '{\"Value\":\"Send\",\"class\":\"btn btn-st\",\"allow_schedule\":\"1\",\"input_id\":\"process-form\",\"Query\":\"\"}', '', '', 31, NULL, 251, '1'),
 (600, 'copy', 'system-password', '{\"depth\":\"1\",\"label\":\"System password\",\"type\":\"password\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '', 11, NULL, 251, '1'),
-(655, 'password', 'password', '{\"label\":\"Senha\",\"type\":\"default\",\"Query\":\"\"}', '', '', 5, NULL, 176, '1'),
+(655, 'password', 'password', '{\"label\":\"Password\",\"type\":\"default\",\"Query\":\"\"}', '', '', 5, NULL, 176, '1'),
 (657, 'basic', 'first_name', '{\"label\":\"Nome\",\"type\":\"text\",\"input_id\":\"nome\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Required\":\"1\",\"Query\":\"\"}', '', '1', 1, NULL, 254, '1'),
 (659, 'basic', 'email', '{\"label\":\"E-mail\",\"type\":\"email\",\"input_id\":\"email\",\"attachment\":\"{\\\"prepend\\\":\\\"\\\",\\\"append\\\":\\\"\\\"}\",\"Query\":\"\"}', '', '1', 2, NULL, 254, '1'),
-(660, 'status_selector', 'status_id', '{\"function_proccess\":\"user_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '1', 3, NULL, 254, '1');
+(660, 'status_selector', 'status_id', '{\"function_process\":\"user_status\",\"input_id\":\"status_id\",\"Query\":\"\"}', '', '1', 3, NULL, 254, '1');
 
 -- --------------------------------------------------------
 
@@ -268,7 +268,7 @@ INSERT INTO `tb_cruds_fields` (`id`, `type_field`, `name`, `settings`, `subscrib
 
 DROP TABLE IF EXISTS `tb_info`;
 CREATE TABLE `tb_info` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` bigint(20)  NOT NULL,
   `option_name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `option_value` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `autoload` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT '1',
@@ -292,6 +292,7 @@ INSERT INTO `tb_info` (`id`, `option_name`, `option_value`, `autoload`, `type`) 
 (10, 'founding', '', '1', 'info'),
 (11, 'price_range', '', '1', 'info'),
 (12, 'taxID', '', '1', 'info'),
+(13, 'slogan', '', '1', 'info'),
 (14, 'email', 'example@email.com', '1', 'info'),
 (19, 'favicon', 'favicon.png', '1', 'info'),
 (29, 'brand_colors', '{\"primary\":\"#f6bb1b\",\"secondary\":\"#c77a00\",\"tertiary\":\"#f8f8f8\",\"quaternary\":\"#121212\"}', '1', 'info'),
@@ -310,7 +311,7 @@ INSERT INTO `tb_info` (`id`, `option_name`, `option_value`, `autoload`, `type`) 
 (43, 'ep-public-key', 'ep-pk-', '1', 'config'),
 (44, 'is_localhost', '1', '1', 'config'),
 (45, 'email_config', '{\"enable_sending\":\"1\",\"plugin\":\"\"}', '1', 'config'),
-(46, 'login_settings', '{\"recaptcha_login\":\"0\",\"password_must\":{\"has_number\":\"1\",\"has_upper\":\"1\",\"has_special_characters\":\"1\",\"length\":{\"min\":\"8\",\"max\":\"16\"}},\"who_changes_password\":\"only_admin\",\"register_page\":{\"slug\":\"home\",\"active\":\"0\",\"login_after_register\":\"1\"}}', '1', 'config'),
+(46, 'login_settings', '{\"recaptcha_login\":\"0\",\"password_must\":{\"has_number\":\"1\",\"has_upper\":\"1\",\"has_special_characters\":\"1\",\"length\":{\"min\":\"8\",\"max\":\"16\"}},\"who_changes_password\":\"only_admin\",\"signup_page\":{\"slug\":\"home\",\"active\":\"0\",\"login_after_register\":\"1\"}}', '1', 'config'),
 (47, 'lowest_role', '[\"3\"]', '1', 'config'),
 (48, 'base_url', 'https://localhost/PyroSoft/development', '1', 'config');
 
@@ -327,6 +328,7 @@ CREATE TABLE `tb_menus` (
   `attributes` varchar(200) DEFAULT NULL,
   `icon` varchar(25) DEFAULT NULL,
   `url` varchar(200) DEFAULT NULL,
+  `slug` varchar(200) DEFAULT NULL,
   `order_reg` int(11) DEFAULT NULL,
   `depth` int(2) DEFAULT 0,
   `parent_id` int(11) DEFAULT NULL,
@@ -336,6 +338,7 @@ CREATE TABLE `tb_menus` (
   `which_users` varchar(15) DEFAULT NULL,
   `status_id` varchar(11) DEFAULT NULL,
   `menu_id` int(11) DEFAULT NULL,
+  `page_id` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -344,24 +347,24 @@ CREATE TABLE `tb_menus` (
 -- Despejando dados para a tabela `tb_menus`
 --
 
-INSERT INTO `tb_menus` (`id`, `title`, `attributes`, `icon`, `url`, `order_reg`, `depth`, `parent_id`, `function_view`, `type`, `style`, `which_users`, `status_id`, `menu_id`, `created_at`, `updated_at`) VALUES
-(153, '[app] Main Menu', NULL, NULL, 'app-main-menu', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, '2025-03-13 03:38:42', '2026-01-28 03:05:48'),
-(270, '[admin] Main Menu', NULL, NULL, 'admin-main-menu', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, '2025-03-18 05:49:24', '2026-01-28 03:06:26'),
-(272, 'Dashboard', NULL, 'fas fa-home', '47', 2, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(274, 'List Users', NULL, ' ', '63', 4, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(275, 'Permissions', NULL, ' ', '61', 6, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(277, 'Site', NULL, 'fas fa-home', '1', 7, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(279, 'Manage CRUDs', NULL, ' ', '179', 9, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(280, 'List Pages', NULL, ' ', '49', 10, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(281, 'Manage Menus', NULL, ' ', '311', 11, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-18 06:17:54', '2026-01-28 03:06:26'),
-(293, 'Basic', NULL, '', '', 1, 0, 0, '', 'groups', 'generic', 'everyone', NULL, 270, '2025-03-19 02:25:51', '2026-01-28 03:06:26'),
-(294, 'Roles', NULL, '', '60', 5, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, '2025-03-19 05:12:09', '2026-01-28 03:06:26'),
-(315, '[app] Footer', NULL, NULL, 'app-footer', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, '2025-03-20 03:22:32', '2026-01-28 03:05:10'),
-(321, 'Settings', NULL, 'fas fa-cogs', '', 8, 1, 293, '', 'groups', 'generic', 'everyone', NULL, 270, '2025-04-15 05:52:05', '2026-01-28 03:06:26'),
-(322, 'Users', NULL, 'fas fa-users', '', 3, 1, 293, '', 'groups', 'generic', 'everyone', NULL, 270, '2025-04-15 05:57:55', '2026-01-28 03:06:26'),
-(324, 'Scheduled Events', NULL, 'fas fa-clock', '314', 14, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, '2025-07-31 07:14:08', '2026-01-28 03:06:26'),
-(336, 'System Settings', NULL, '', '316', 12, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, '2025-10-02 19:19:48', '2026-01-28 03:06:26'),
-(337, 'Plugins', NULL, '', '318', 13, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, '2025-12-04 01:30:52', '2026-01-28 03:06:26');
+INSERT INTO `tb_menus` (`id`, `title`, `attributes`, `icon`, `url`, `slug`, `order_reg`, `depth`, `parent_id`, `function_view`, `type`, `style`, `which_users`, `status_id`, `menu_id`, `page_id`, `created_at`, `updated_at`) VALUES
+(153, '[app] Main Menu', NULL, NULL, '', 'app-main-menu', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, NULL, '2025-03-13 03:38:42', '2026-02-18 03:17:46'),
+(270, '[admin] Main Menu', NULL, NULL, '', 'admin-main-menu', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, NULL, '2025-03-18 05:49:24', '2026-02-18 04:54:40'),
+(272, 'Dashboard', NULL, 'fas fa-home', '', '', 2, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, 47, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(274, 'List Users', NULL, ' ', '', '', 4, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, 63, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(275, 'Permissions', NULL, ' ', '', '', 6, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, 61, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(277, 'Site', NULL, 'fas fa-home', '', '', 7, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, 1, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(279, 'Manage CRUDs', NULL, ' ', '', '', 9, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, 179, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(280, 'List Pages', NULL, ' ', '', '', 10, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, 49, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(281, 'Manage Menus', NULL, ' ', '', '', 11, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, 311, '2025-03-18 06:17:54', '2026-02-27 04:33:07'),
+(293, 'Basic', NULL, '', '', '', 1, 0, NULL, '', 'groups', 'generic', 'everyone', NULL, 270, NULL, '2025-03-19 02:25:51', '2026-02-27 04:33:07'),
+(294, 'Roles', NULL, '', '', '', 5, 2, 322, '', 'page', 'generic', 'everyone', NULL, 270, 60, '2025-03-19 05:12:09', '2026-02-27 04:33:07'),
+(315, '[app] Footer', NULL, NULL, '', 'app-footer', NULL, 0, NULL, NULL, 'list', NULL, NULL, '1', NULL, NULL, '2025-03-20 03:22:32', '2026-02-18 03:18:00'),
+(321, 'Settings', NULL, 'fas fa-cogs', '', '', 8, 1, 293, '', 'groups', 'generic', 'everyone', NULL, 270, NULL, '2025-04-15 05:52:05', '2026-02-27 04:33:07'),
+(322, 'Users', NULL, 'fas fa-users', '', '', 3, 1, 293, '', 'groups', 'generic', 'everyone', NULL, 270, NULL, '2025-04-15 05:57:55', '2026-02-27 04:33:07'),
+(324, 'Scheduled Events', NULL, 'fas fa-clock', '', '', 14, 1, 293, '', 'page', 'generic', 'everyone', NULL, 270, 314, '2025-07-31 07:14:08', '2026-02-27 04:33:07'),
+(336, 'System Settings', NULL, '', '', '', 12, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, 316, '2025-10-02 19:19:48', '2026-02-27 04:33:07'),
+(337, 'Plugins', NULL, '', '', '', 13, 2, 321, '', 'page', 'generic', 'everyone', NULL, 270, 318, '2025-12-04 01:30:52', '2026-02-27 04:33:07');
 
 -- --------------------------------------------------------
 
@@ -375,6 +378,7 @@ CREATE TABLE `tb_pages` (
   `slug` varchar(220) DEFAULT NULL,
   `seo` longtext DEFAULT NULL,
   `title` varchar(220) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
   `access_count` int(11) DEFAULT 0,
   `page_settings` longtext DEFAULT NULL,
   `page_type` varchar(15) DEFAULT NULL,
@@ -394,22 +398,22 @@ CREATE TABLE `tb_pages` (
 --
 
 INSERT INTO `tb_pages` (`id`, `slug`, `seo`, `title`, `access_count`, `page_settings`, `page_type`, `is_public`, `page_template`, `parent_page_id`, `page_area`, `custom_urls`, `permission_type`, `status_id`, `created_at`, `updated_at`) VALUES
-(1, 'home', NULL, 'Welcome to PyroSoft', 0, '{\"navbar\":{\"format\":\"none\",\"style\":\"transparent-scroll\"},\"footer\":{\"format\":\"full\"}}', 'essential', 1, 'this-system/areas/app/home.php', 0, 'app', '', 'except_these', 1, '2018-02-23 00:00:00', '2026-02-13 01:28:56'),
-(12, 'login', NULL, 'Login', 0, '{\"navbar\":{\"format\":\"medium\",\"style\":\"transparent-absolute\"},\"footer\":{\"format\":\"none\"}}', 'essential', 1, 'this-system/areas/app/login.php', 0, 'app', '', 'except_these', 1, '2021-01-14 14:28:03', '2026-01-28 05:10:13'),
-(47, 'administration', NULL, 'Administration', 0, '{\"navbar\":{\"format\":\"full\",\"style\":\"fixed\"},\"footer\":{\"format\":\"full\"}}', 'essential', 0, 'this-system/areas/admin/admin.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:23:56', '2026-02-13 01:28:56'),
-(49, 'list-pages', NULL, 'List Pages', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/list-pages.php', 0, 'admin', '', 'only_these', 1, '2021-02-08 17:42:26', '2026-02-13 01:28:56'),
-(60, 'role-management', NULL, 'Role Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/roles-management/custom-pages/roles-management.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:31:58', '2026-02-13 01:28:56'),
+(1, 'home', NULL, 'Welcome to PyroSoft', 0, '{\"navbar\":{\"format\":\"none\",\"style\":\"transparent-scroll\"},\"footer\":{\"format\":\"full\"}}', 'essential', 1, 'this-system/areas/app/home.php', NULL, 'app', '', 'except_these', 1, '2018-02-23 00:00:00', '2026-02-13 01:28:56'),
+(12, 'login', NULL, 'Login', 0, '{\"navbar\":{\"format\":\"none\",\"style\":\"transparent-absolute\"},\"footer\":{\"format\":\"none\"}}', 'essential', 1, 'this-system/areas/app/login.php', NULL, 'app', '', 'except_these', 1, '2021-01-14 14:28:03', '2026-01-28 05:10:13'),
+(47, 'administration', NULL, 'Administration', 0, '{\"navbar\":{\"format\":\"full\",\"style\":\"fixed\"},\"footer\":{\"format\":\"full\"}}', 'essential', 0, 'this-system/areas/admin/admin.php', NULL, 'admin', '', 'only_these', 1, '2021-02-08 17:23:56', '2026-03-09 00:52:05'),
+(49, 'list-pages', NULL, 'List Pages', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/list-pages.php', NULL, 'admin', '', 'only_these', 1, '2021-02-08 17:42:26', '2026-02-13 01:28:56'),
+(60, 'role-management', NULL, 'Role Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/roles-management/custom-pages/roles-management.php', NULL, 'admin', '', 'only_these', 1, '2021-02-09 02:31:58', '2026-02-13 01:28:56'),
 (61, 'manage-permissions', NULL, 'Manage Permissions', 0, '[]', 'not_essential', 0, 'ep-includes/features/permissions-management/custom-pages/permissions-management.php', 60, 'admin', '', 'only_these', 1, '2021-02-09 02:32:59', '2026-02-13 01:28:56'),
-(63, 'list-users', NULL, 'List Users', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2021-02-09 02:40:21', '2026-02-13 01:28:56'),
+(63, 'list-users', NULL, 'List Users', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', NULL, 'admin', '', 'only_these', 1, '2021-02-09 02:40:21', '2026-03-09 00:52:05'),
 (77, 'edit-user', NULL, 'Edit User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-09 15:36:25', '2026-02-13 01:28:56'),
 (84, 'view-user', NULL, 'View User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2021-02-10 00:21:51', '2026-02-01 21:55:25'),
-(179, 'crud-management', NULL, 'Manage CRUDs', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/crud-management.php', 0, 'admin', '', 'only_these', 1, '2022-10-13 21:32:38', '2026-02-13 01:28:56'),
+(179, 'crud-management', NULL, 'Manage CRUDs', 2, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/crud-management.php', NULL, 'admin', '', 'only_these', 1, '2022-10-13 21:32:38', '2026-03-09 01:20:42'),
 (310, 'create-user', NULL, 'Create User', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 63, 'admin', '', 'only_these', 1, '2025-02-12 02:15:52', '2026-02-13 01:28:56'),
-(311, 'menu-management', NULL, 'Menu Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/menu-management/custom-pages/menu-management.php', 0, 'admin', '', 'only_these', 1, '2025-03-13 03:43:15', '2026-02-01 21:55:25'),
-(314, 'scheduled-events', NULL, 'Scheduled Events', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/cron-management.php', 0, 'admin', '', 'only_these', 1, '2025-07-31 07:05:35', '2026-02-13 01:28:56'),
+(311, 'menu-management', NULL, 'Menu Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/menu-management/custom-pages/menu-management.php', NULL, 'admin', '', 'only_these', 1, '2025-03-13 03:43:15', '2026-03-09 00:52:05'),
+(314, 'scheduled-events', NULL, 'Scheduled Events', 1, '[]', 'not_essential', 0, 'this-system/areas/admin/cron-management.php', NULL, 'admin', '', 'only_these', 1, '2025-07-31 07:05:35', '2026-03-09 01:20:35'),
 (315, 'page-manager', NULL, 'Page Manager', 0, '[]', 'not_essential', 0, 'ep-includes/features/page-crud-management-system/custom-pages/page-management.php', 49, 'admin', '', 'only_these', 1, '2025-09-18 21:48:45', '2026-02-13 01:28:56'),
-(316, 'system-settings', NULL, 'System Settings', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', 0, 'admin', '', 'only_these', 1, '2025-10-02 18:34:07', '2026-02-13 01:28:56'),
-(318, 'plugin-management', NULL, 'Plugin Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/plugins-management/custom-pages/plugins-management.php', 0, 'admin', '', 'only_these', 1, '2025-12-03 03:38:00', '2026-02-01 21:55:25');
+(316, 'system-settings', NULL, 'System Settings', 0, '[]', 'not_essential', 0, 'this-system/areas/admin/common.php', NULL, 'admin', '', 'only_these', 1, '2025-10-02 18:34:07', '2026-02-13 01:28:56'),
+(318, 'plugin-management', NULL, 'Plugin Management', 0, '[]', 'not_essential', 0, 'ep-includes/features/plugins-management/custom-pages/plugins-management.php', NULL, 'admin', '', 'only_these', 1, '2025-12-03 03:38:00', '2026-02-01 21:55:25');
 
 -- --------------------------------------------------------
 
@@ -425,7 +429,7 @@ CREATE TABLE `tb_page_content` (
   `contents` longtext COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `subscribers_only` char(1) COLLATE utf8mb4_unicode_ci DEFAULT '0',
   `page_id` int(11) DEFAULT NULL,
-  `crud_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `crud_id` int(11) DEFAULT NULL,
   `order_reg` int(11) DEFAULT NULL,
   `is_model` int(11) DEFAULT NULL,
   `status_id` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -452,16 +456,16 @@ INSERT INTO `tb_page_content` (`id`, `TypeModule`, `settings`, `contents`, `subs
 
 DROP TABLE IF EXISTS `tb_tokens`;
 CREATE TABLE `tb_tokens` (
-  `id` int(10) UNSIGNED NOT NULL,
+  `id` int(10)  NOT NULL,
   `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '''available''',
-  `user_id` int(10) UNSIGNED DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `expires_at` datetime DEFAULT NULL,
   `consumed_at` datetime DEFAULT NULL,
   `meta` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`meta`)),
-  `resource_id` int(10) UNSIGNED DEFAULT 0
+  `resource_id` int(10)  DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -527,9 +531,9 @@ INSERT INTO `tb_user_roles` (`id`, `name`, `slug`, `order_reg`, `redirect_page_i
 
 DROP TABLE IF EXISTS `tb_user_role_assignments`;
 CREATE TABLE `tb_user_role_assignments` (
-  `id` int(10) UNSIGNED NOT NULL,
-  `user_id` int(10) UNSIGNED NOT NULL,
-  `role_id` int(10) UNSIGNED NOT NULL
+  `id` int(10)  NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -596,26 +600,6 @@ INSERT INTO `tb_user_role_permissions` (`id`, `name`, `slug`, `allowed`, `permis
 (9688, NULL, NULL, 0, NULL, '0', NULL, NULL, 9686, 2),
 (9689, NULL, NULL, 0, NULL, '0', NULL, NULL, 9686, 3),
 (9692, NULL, NULL, 0, NULL, '0', NULL, NULL, 9686, 6),
-(33879, NULL, NULL, 1, NULL, 'insert', 0, NULL, NULL, 1),
-(33880, NULL, NULL, 0, NULL, 'insert', 0, NULL, NULL, 2),
-(33881, NULL, NULL, 0, NULL, 'insert', 0, NULL, NULL, 3),
-(33884, NULL, NULL, 0, NULL, 'insert', 0, NULL, NULL, 6),
-(33887, NULL, NULL, 1, NULL, 'update', 0, NULL, NULL, 1),
-(33888, NULL, NULL, 0, NULL, 'update', 0, NULL, NULL, 2),
-(33889, NULL, NULL, 0, NULL, 'update', 0, NULL, NULL, 3),
-(33892, NULL, NULL, 0, NULL, 'update', 0, NULL, NULL, 6),
-(33895, NULL, NULL, 1, NULL, 'view', 0, NULL, NULL, 1),
-(33896, NULL, NULL, 0, NULL, 'view', 0, NULL, NULL, 2),
-(33897, NULL, NULL, 0, NULL, 'view', 0, NULL, NULL, 3),
-(33900, NULL, NULL, 0, NULL, 'view', 0, NULL, NULL, 6),
-(33903, NULL, NULL, 1, NULL, 'delete', 0, NULL, NULL, 1),
-(33904, NULL, NULL, 0, NULL, 'delete', 0, NULL, NULL, 2),
-(33905, NULL, NULL, 0, NULL, 'delete', 0, NULL, NULL, 3),
-(33908, NULL, NULL, 0, NULL, 'delete', 0, NULL, NULL, 6),
-(33911, NULL, NULL, 1, NULL, 'duplicate', 0, NULL, NULL, 1),
-(33912, NULL, NULL, 0, NULL, 'duplicate', 0, NULL, NULL, 2),
-(33913, NULL, NULL, 0, NULL, 'duplicate', 0, NULL, NULL, 3),
-(33916, NULL, NULL, 0, NULL, 'duplicate', 0, NULL, NULL, 6),
 (40943, NULL, NULL, 0, NULL, '0', NULL, 12, NULL, 1),
 (40944, NULL, NULL, 0, NULL, '0', NULL, 12, NULL, 2),
 (40945, NULL, NULL, 0, NULL, '0', NULL, 12, NULL, 3),
@@ -702,26 +686,6 @@ INSERT INTO `tb_user_role_permissions` (`id`, `name`, `slug`, `allowed`, `permis
 (59497, NULL, NULL, 0, NULL, '0', NULL, 311, NULL, 2),
 (59498, NULL, NULL, 0, NULL, '0', NULL, 311, NULL, 3),
 (59499, NULL, NULL, 0, NULL, '0', NULL, 311, NULL, 6),
-(59504, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 1),
-(59505, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 2),
-(59506, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 3),
-(59507, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 6),
-(59508, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 1),
-(59509, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 2),
-(59510, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 3),
-(59511, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 6),
-(59512, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 1),
-(59513, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 2),
-(59514, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 3),
-(59515, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 6),
-(59516, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 1),
-(59517, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 2),
-(59518, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 3),
-(59519, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 6),
-(59520, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 1),
-(59521, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 2),
-(59522, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 3),
-(59523, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 6),
 (59560, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 1),
 (59561, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 2),
 (59562, NULL, NULL, 0, NULL, 'insert', 240, NULL, NULL, 3),
@@ -889,7 +853,27 @@ INSERT INTO `tb_user_role_permissions` (`id`, `name`, `slug`, `allowed`, `permis
 (60376, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 1),
 (60377, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 2),
 (60378, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 3),
-(60379, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 6);
+(60379, NULL, NULL, 0, NULL, '0', NULL, 1, NULL, 6),
+(60380, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 1),
+(60381, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 2),
+(60382, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 3),
+(60383, NULL, NULL, 0, NULL, 'insert', 251, NULL, NULL, 6),
+(60384, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 1),
+(60385, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 2),
+(60386, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 3),
+(60387, NULL, NULL, 0, NULL, 'update', 251, NULL, NULL, 6),
+(60388, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 1),
+(60389, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 2),
+(60390, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 3),
+(60391, NULL, NULL, 0, NULL, 'view', 251, NULL, NULL, 6),
+(60392, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 1),
+(60393, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 2),
+(60394, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 3),
+(60395, NULL, NULL, 0, NULL, 'delete', 251, NULL, NULL, 6),
+(60396, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 1),
+(60397, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 2),
+(60398, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 3),
+(60399, NULL, NULL, 0, NULL, 'duplicate', 251, NULL, NULL, 6);
 
 --
 -- Índices para tabelas despejadas
@@ -984,7 +968,7 @@ ALTER TABLE `tb_user_role_permissions`
 -- AUTO_INCREMENT de tabela `tb_cron_events`
 --
 ALTER TABLE `tb_cron_events`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2374;
+  MODIFY `id` int(10)  NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2374;
 
 --
 -- AUTO_INCREMENT de tabela `tb_cruds`
@@ -1002,13 +986,13 @@ ALTER TABLE `tb_cruds_fields`
 -- AUTO_INCREMENT de tabela `tb_info`
 --
 ALTER TABLE `tb_info`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `id` bigint(20)  NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT de tabela `tb_menus`
 --
 ALTER TABLE `tb_menus`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=338;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=408;
 
 --
 -- AUTO_INCREMENT de tabela `tb_pages`
@@ -1026,7 +1010,7 @@ ALTER TABLE `tb_page_content`
 -- AUTO_INCREMENT de tabela `tb_tokens`
 --
 ALTER TABLE `tb_tokens`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10)  NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `tb_users`
@@ -1044,13 +1028,94 @@ ALTER TABLE `tb_user_roles`
 -- AUTO_INCREMENT de tabela `tb_user_role_assignments`
 --
 ALTER TABLE `tb_user_role_assignments`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=857;
+  MODIFY `id` int(10)  NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=857;
 
 --
 -- AUTO_INCREMENT de tabela `tb_user_role_permissions`
 --
 ALTER TABLE `tb_user_role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60380;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60400;
+
+-- --------------------------------------------------------
+
+--
+-- (Opcional) Validação de órfãos antes de aplicar as FKs abaixo.
+-- Rode estas consultas antes: se qualquer uma retornar linhas, o
+-- ADD CONSTRAINT correspondente vai falhar até esses dados serem corrigidos.
+--
+-- SELECT id, crud_id FROM tb_cruds WHERE crud_id IS NOT NULL AND crud_id NOT IN (SELECT id FROM tb_cruds);
+-- SELECT id, crud_id FROM tb_cruds_fields WHERE crud_id IS NOT NULL AND crud_id NOT IN (SELECT id FROM tb_cruds);
+-- SELECT id, menu_id FROM tb_menus WHERE menu_id IS NOT NULL AND menu_id NOT IN (SELECT id FROM tb_menus);
+-- SELECT id, parent_id FROM tb_menus WHERE parent_id IS NOT NULL AND parent_id NOT IN (SELECT id FROM tb_menus);
+-- SELECT id, page_id FROM tb_menus WHERE page_id IS NOT NULL AND page_id NOT IN (SELECT id FROM tb_pages);
+-- SELECT id, parent_page_id FROM tb_pages WHERE parent_page_id IS NOT NULL AND parent_page_id NOT IN (SELECT id FROM tb_pages);
+-- SELECT id, page_id FROM tb_page_content WHERE page_id IS NOT NULL AND page_id NOT IN (SELECT id FROM tb_pages);
+-- SELECT id, crud_id FROM tb_page_content WHERE crud_id IS NOT NULL AND crud_id NOT IN (SELECT id FROM tb_cruds);
+-- SELECT id, user_id FROM tb_tokens WHERE user_id IS NOT NULL AND user_id NOT IN (SELECT id FROM tb_users);
+-- SELECT id, user_id FROM tb_user_role_assignments WHERE user_id NOT IN (SELECT id FROM tb_users);
+-- SELECT id, role_id FROM tb_user_role_assignments WHERE role_id NOT IN (SELECT id FROM tb_user_roles);
+-- SELECT id, crud_id FROM tb_user_role_permissions WHERE crud_id IS NOT NULL AND crud_id NOT IN (SELECT id FROM tb_cruds);
+-- SELECT id, page_id FROM tb_user_role_permissions WHERE page_id IS NOT NULL AND page_id NOT IN (SELECT id FROM tb_pages);
+-- SELECT id, permission_id FROM tb_user_role_permissions WHERE permission_id IS NOT NULL AND permission_id NOT IN (SELECT id FROM tb_user_role_permissions);
+-- SELECT id, role_id FROM tb_user_role_permissions WHERE role_id IS NOT NULL AND role_id NOT IN (SELECT id FROM tb_user_roles);
+
+-- --------------------------------------------------------
+
+--
+-- Restrições para tabela `tb_cruds`
+--
+ALTER TABLE `tb_cruds`
+  ADD CONSTRAINT `fk_cruds_crud_id` FOREIGN KEY (`crud_id`) REFERENCES `tb_cruds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_cruds_fields`
+--
+ALTER TABLE `tb_cruds_fields`
+  ADD CONSTRAINT `fk_cruds_fields_crud_id` FOREIGN KEY (`crud_id`) REFERENCES `tb_cruds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_menus`
+--
+ALTER TABLE `tb_menus`
+  ADD CONSTRAINT `fk_menus_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `tb_menus` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menus_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `tb_menus` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_menus_page_id` FOREIGN KEY (`page_id`) REFERENCES `tb_pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_pages`
+--
+ALTER TABLE `tb_pages`
+  ADD CONSTRAINT `fk_pages_parent_page_id` FOREIGN KEY (`parent_page_id`) REFERENCES `tb_pages` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_page_content`
+--
+ALTER TABLE `tb_page_content`
+  ADD CONSTRAINT `fk_page_content_page_id` FOREIGN KEY (`page_id`) REFERENCES `tb_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_page_content_crud_id` FOREIGN KEY (`crud_id`) REFERENCES `tb_cruds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_tokens`
+--
+ALTER TABLE `tb_tokens`
+  ADD CONSTRAINT `fk_tokens_user_id` FOREIGN KEY (`user_id`) REFERENCES `tb_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_user_role_assignments`
+--
+ALTER TABLE `tb_user_role_assignments`
+  ADD CONSTRAINT `fk_user_role_assignments_user_id` FOREIGN KEY (`user_id`) REFERENCES `tb_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_role_assignments_role_id` FOREIGN KEY (`role_id`) REFERENCES `tb_user_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Restrições para tabela `tb_user_role_permissions`
+--
+ALTER TABLE `tb_user_role_permissions`
+  ADD CONSTRAINT `fk_user_role_permissions_crud_id` FOREIGN KEY (`crud_id`) REFERENCES `tb_cruds` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_role_permissions_page_id` FOREIGN KEY (`page_id`) REFERENCES `tb_pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_role_permissions_permission_id` FOREIGN KEY (`permission_id`) REFERENCES `tb_user_role_permissions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_user_role_permissions_role_id` FOREIGN KEY (`role_id`) REFERENCES `tb_user_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

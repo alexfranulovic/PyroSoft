@@ -1,0 +1,7 @@
+@media all and (display-mode: standalone)
+{
+    .pwa-install-poupup,
+    .pwa-install-button {
+        display: none !important;
+    }
+}

@@ -1,0 +1,33 @@
+.template-my-subscriptions .gridjs-header {
+    display: none;
+}
+
+.user-plans-timeline { position: relative;
+    padding-left: 2.25rem;
+}
+.user-plans-timeline .timeline-item {
+    position: relative;
+}
+.user-plans-timeline .timeline-item:not(.timeline-item-last)::before {
+    content: '';
+    position: absolute;
+    left: -1.45rem;
+    top: 1.9rem;
+    bottom: -1.75rem;
+    width: 2px;
+    background: var(--bs-border-color, #dee2e6);
+}
+.user-plans-timeline .timeline-marker {
+    position: absolute;
+    left: -2.25rem;
+    top: .1rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--bs-primary, #0d6efd);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+}

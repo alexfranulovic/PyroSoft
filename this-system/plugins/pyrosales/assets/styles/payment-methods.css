@@ -1,0 +1,429 @@
+.payment-methods-page .page-header {
+    margin-bottom: 2rem;
+}
+
+.payment-methods-page .page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.payment-methods-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--bs-secondary-color);
+}
+
+.payment-methods-table td {
+    vertical-align: middle;
+}
+
+.template-payment-history .gridjs-header {
+    display: none;
+}
+
+.card-brand-cell {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    width: max-content;
+}
+
+.card-brand-icon {
+    height: 20px !important;
+    margin: 0 !important;
+    height: 24px;
+    width: auto;
+    flex-shrink: 0;
+}
+
+.card-brand-text {
+    display: inline-grid;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.payment-method-card {
+    margin-bottom: 1rem;
+}
+
+#payment-method-form {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    width: 480px !important;
+    max-width: 100%;
+}
+
+#payment-method-form .offcanvas-body {
+    overflow-y: auto;
+}
+
+/* -----------------------------------------------------------------------
+ * Realistic credit-card visual -- used both by the mobile carousel on
+ * this page and by the carousel-only A/B variant
+ * (payment-methods-carousel.php). Structure comes from
+ * render_credit_card_visual_html() in src/ui.php; everything below is
+ * purely cosmetic.
+ * --------------------------------------------------------------------- */
+.payment-card-visual {
+    position: relative;
+    width: 100%;
+    width: 95%;
+    max-width: 380px;
+    aspect-ratio: 1.586 / 1;
+    margin: 0 auto;
+    border-radius: 18px;
+    padding: 1.35rem 1.5rem;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, .65);
+    overflow: hidden;
+    background: linear-gradient(135deg, #4b3f8f 0%, #2a2560 100%);
+}
+
+.payment-card-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 85% 15%, rgba(255, 255, 255, .16), transparent 55%);
+    pointer-events: none;
+}
+
+.payment-card-visual-variant-1 {
+    background: linear-gradient(135deg, #1f4287 0%, #0a1d3d 100%);
+}
+
+.payment-card-visual-variant-2 {
+    background: linear-gradient(135deg, #3a3a3a 0%, #101010 100%);
+}
+
+.payment-card-visual-variant-3 {
+    background: linear-gradient(135deg, #7a2f5c 0%, #341a34 100%);
+}
+
+.payment-card-visual-inactive {
+    filter: grayscale(.75);
+    opacity: .72;
+}
+
+.payment-card-visual-top {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.payment-card-visual-chip {
+    display: inline-block;
+    width: 42px;
+    height: 32px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #f5d98a 0%, #c9a24b 45%, #f5d98a 100%);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
+    margin-right: .5rem;
+}
+
+.payment-card-visual-badge {
+    font-size: 11px;
+}
+
+.payment-card-visual-issuer {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    opacity: .8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.payment-card-visual-number {
+    position: relative;
+    z-index: 1;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+    /*letter-spacing: .12em;*/
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.payment-card-visual-bottom {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
+}
+
+.payment-card-visual-holder,
+.payment-card-visual-expiration {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.payment-card-visual-holder span,
+.payment-card-visual-expiration span {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.payment-card-visual-holder small,
+.payment-card-visual-expiration small {
+    font-size: 10px;
+    opacity: .75;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.payment-card-visual-holder {
+    flex: 1 1 auto;
+}
+
+.payment-card-visual-logo {
+    height: 26px;
+    width: auto;
+    flex-shrink: 0;
+    /*filter: brightness(0) invert(1);*/
+    opacity: .9;
+}
+
+.payment-card-visual-logo-text {
+    font-weight: 700;
+    font-style: italic;
+    opacity: .9;
+}
+
+/* -----------------------------------------------------------------------
+ * Individual / Tabela view-mode toggle (custom-pages/payment-methods.php)
+ * --------------------------------------------------------------------- */
+.payment-methods-view-toggle-wrap {
+    margin-bottom: 1.25rem;
+    /*display: flex;*/
+}
+
+.payment-methods-view-toggle-wrap p {
+    display: block;
+    font-weight: 600;
+    font-size: .75rem;
+    color: var(--bs-gray-600);
+}
+
+/* -----------------------------------------------------------------------
+ * Mobile carousel wrapper (custom-pages/payment-methods.php)
+ * --------------------------------------------------------------------- */
+.payment-methods-carousel-wrap {
+    margin-bottom: 1.5rem;
+}
+
+.payment-methods-carousel .carousel-inner {
+    padding: .5rem .25rem 1rem;
+}
+
+.payment-methods-carousel .carousel-control-prev,
+.payment-methods-carousel .carousel-control-next {
+    width: 2.5rem;
+    height: 2.5rem;
+    top: 40%;
+    background: rgba(0, 0, 0, .35);
+    border-radius: 50%;
+    opacity: .85;
+}
+
+.payment-methods-carousel .carousel-control-prev {
+    left: -.25rem;
+}
+
+.payment-methods-carousel .carousel-control-next {
+    right: -.25rem;
+}
+
+.payment-methods-carousel .carousel-control-prev-icon,
+.payment-methods-carousel .carousel-control-next-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.payment-methods-carousel .carousel-counter {
+    text-align: center;
+    margin: .5rem 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bs-secondary-color, #6c757d);
+}
+
+.payment-method-mobile-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 .5rem;
+    margin-top: .75rem;
+}
+
+/* -----------------------------------------------------------------------
+ * A/B carousel-only page (custom-pages/payment-methods-carousel.php)
+ * --------------------------------------------------------------------- */
+.payment-methods-carousel-full-wrap {
+    max-width: 480px;
+    margin: 0 auto 2rem;
+}
+
+.payment-method-detail-sections {
+    margin-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.template-payment-methods .gridjs-header {
+    display: none;
+}
+
+.payment-method-section {
+    margin-bottom: 1.5rem;
+}
+
+.payment-method-section small {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.payment-method-section a {
+    font-size: 1rem;
+}
+
+.payment-method-section .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: .75rem;
+}
+
+.payment-method-section .header small {
+    color: var(--bs-gray-600) !important;
+    font-weight: 600;
+}
+
+.payment-method-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    width: fit-content;
+}
+
+.payment-method-section-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--bs-secondary-color);
+    /*border: 1px dashed var(--bs-border-color);*/
+    /*border-radius: 10px;*/
+}
+
+.payment-method-section-empty i,
+.payment-method-section-empty svg {
+    font-size: 1.75rem;
+    display: block;
+    margin: 0 auto .5rem;
+    opacity: .5;
+}
+
+.payment-method-section-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.payment-method-section-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: .6rem;
+    padding: 0 .25rem;
+}
+
+.payment-method-transactions-list {
+    border-radius: 18px;
+    border: 1px solid var(--bs-border-color);;
+    padding: .5rem 1rem;
+}
+.payment-method-transaction-item:last-child {
+    border: none !important;
+}
+.payment-method-transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem 0;
+    border-bottom: 1px solid var(--bs-border-color);;
+}
+.payment-method-transaction-item h4{
+    font-size: 1rem;
+    font-weight: 600;
+}
+.payment-method-transaction-item .amount {
+    display: flex;
+    align-items: center;
+    text-align: right !important;
+}
+.payment-method-transaction-item .total_amount {
+    font-size: 1rem;
+    font-weight: 700;
+}
+.payment-method-transaction-item small {
+    color: var(--bs-gray-600) !important;
+    font
+}
+.payment-method-transaction-item .amount .badge {
+    display: block;
+    margin-top: .313rem;
+}
+
+
+/* Skeleton / loading placeholder, shown while the detail sections fetch. */
+.payment-method-skeleton .skeleton-line {
+    height: 14px;
+    border-radius: 6px;
+    margin-bottom: .6rem;
+    background: linear-gradient(90deg, rgba(0, 0, 0, .06) 25%, rgba(0, 0, 0, .12) 37%, rgba(0, 0, 0, .06) 63%);
+    background-size: 400% 100%;
+    animation: payment-method-skeleton-shimmer 1.4s ease infinite;
+}
+
+.payment-method-skeleton .skeleton-line.w-75 { width: 75%; }
+.payment-method-skeleton .skeleton-line.w-50 { width: 50%; }
+.payment-method-skeleton .skeleton-line.w-25 { width: 25%; }
+
+@keyframes payment-method-skeleton-shimmer {
+    0%   { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+}
+
+[data-payment-method-dropdown] .dropdown-toggle {
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: .5rem;
+    text-align: start;
+    display: flex;
+    color: var(--bs-body-color);
+    box-shadow: none !important;
+    width: 100%;
+    padding: .375rem .75rem;
+}
+[data-payment-method-dropdown] .dropdown-toggle:after {
+    margin-left: auto;
+    margin-top: auto;
+    align-items: center;
+    margin-bottom: auto;
+}

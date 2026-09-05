@@ -1,0 +1,6 @@
+{
+  "name": "Plans and Subscriptions",
+  "description": "Adds plan, subscription, price lock, and plan-to-role management to the CMS while keeping the native roles and permissions engine as the core access control layer.",
+  "version": "1.0.0",
+  "author": "Alex Franulovic"
+}

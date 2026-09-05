@@ -20,17 +20,58 @@ function log_it(string $archive, string $content = '')
     }
 }
 
-
 /**
- * Logger genérico em formato JSON por linha.
+ * Generic JSON line logger.
  *
- * @param string $level   error|warning|info|debug etc
- * @param string $message Mensagem principal
- * @param array  $context Dados extras (response, extra info, etc)
+ * Features:
+ * - Creates daily folders: logs/YYYY-MM-DD/
+ * - Allows custom log file name through $context['file_name']
+ * - Stores one JSON record per line
+ *
+ * @param string $level   error|warning|info|debug|fatal etc
+ * @param string $message Main log message
+ * @param array  $context Extra context data
+ *
+ * @return void
  */
 function app_log(string $level, string $message, array $context = []): void
 {
-    // Captura dados do request
+    /**
+     * Resolve final log file name.
+     */
+    $fileName = (string)($context['file_name'] ?? 'app.log');
+    unset($context['file_name']);
+
+    $fileName = trim($fileName);
+
+    if ($fileName === '') {
+        $fileName = 'app.log';
+    }
+
+    /**
+     * Sanitize file name to avoid invalid paths or traversal.
+     */
+    $fileName = preg_replace('/[^a-zA-Z0-9._-]/', '-', $fileName);
+    $fileName = ltrim($fileName, '.-');
+
+    if ($fileName === '') {
+        $fileName = 'app.log';
+    }
+
+    if (stripos($fileName, '.log') === false) {
+        $fileName .= '.log';
+    }
+
+    /**
+     * Build dated directory path: logs/YYYY-MM-DD/
+     */
+    $dateFolder = date('Y-m-d');
+    $logDir = rtrim(APP_LOG_DIR, '/\\') . DIRECTORY_SEPARATOR . $dateFolder;
+    $logFile = $logDir . DIRECTORY_SEPARATOR . $fileName;
+
+    /**
+     * Capture request data.
+     */
     $request = [
         'method'      => $_SERVER['REQUEST_METHOD'] ?? null,
         'uri'         => $_SERVER['REQUEST_URI'] ?? null,
@@ -40,7 +81,9 @@ function app_log(string $level, string $message, array $context = []): void
         'user_agent'  => $_SERVER['HTTP_USER_AGENT'] ?? null,
     ];
 
-    // Tenta pegar JSON bruto (quando for API)
+    /**
+     * Try to capture raw JSON body for API requests.
+     */
     $rawInput = null;
     if (
         isset($_SERVER['CONTENT_TYPE'])
@@ -53,27 +96,33 @@ function app_log(string $level, string $message, array $context = []): void
         $request['raw_body'] = $rawInput;
     }
 
-    // Sessão / usuário logados (ajusta pro padrão do teu CMS)
+    /**
+     * Logged session / current user.
+     */
     $session = [
         'session_id' => session_id() ?: null,
-        'user_id'    => $_SESSION['current_user']['id'] ?? null, // troca pelo que você usa (id_usuario, admin_id etc)
+        'user_id'    => $_SESSION['current_user']['id'] ?? null,
     ];
 
-    // Response (opcional): você passa no $context['response']
+    /**
+     * Optional response passed in context.
+     */
     $response = $context['response'] ?? null;
     if (isset($response['body']) && is_string($response['body'])) {
-        // Não lotar o log com HTML gigante / JSON enorme
         $maxLen = 2000;
         if (strlen($response['body']) > $maxLen) {
-            $response['body'] = substr($response['body'], 0, $maxLen) . '... [truncado]';
+            $response['body'] = substr($response['body'], 0, $maxLen) . '... [truncated]';
         }
     }
 
-    // Se veio uma exception no contexto, serializa de forma bonitinha
+    /**
+     * Serialize exception if present.
+     */
     $exceptionData = null;
     if (isset($context['exception']) && $context['exception'] instanceof Throwable) {
         /** @var Throwable $e */
         $e = $context['exception'];
+
         $exceptionData = [
             'class'   => get_class($e),
             'message' => $e->getMessage(),
@@ -81,39 +130,53 @@ function app_log(string $level, string $message, array $context = []): void
             'line'    => $e->getLine(),
             'trace'   => explode("\n", $e->getTraceAsString()),
         ];
+
         unset($context['exception']);
     }
 
+    /**
+     * Final log record.
+     */
     $record = [
         'timestamp' => date('c'),
         'origin'    => $context['origin'] ?? 'server',
         'level'     => $level,
         'message'   => $message,
+        'context'   => $context,
         'request'   => $request,
-        'session'   => $session,
         'response'  => $response,
+        'session'   => $session,
         'exception' => $exceptionData,
-        'context'   => $context, // resto do que você passar
     ];
 
-    $line = json_encode($record, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . PHP_EOL;
+    $line = json_encode(
+        $record,
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
+    ) . PHP_EOL;
 
-    if (!is_dir(APP_LOG_DIR)) {
-        @mkdir(APP_LOG_DIR, 0775, true);
+    /**
+     * Ensure dated log directory exists.
+     */
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0775, true);
     }
 
-    // Grava no arquivo
-    @file_put_contents(APP_LOG_FILE, $line, FILE_APPEND | LOCK_EX);
+    /**
+     * Write log line.
+     */
+    @file_put_contents($logFile, $line, FILE_APPEND | LOCK_EX);
 }
 
-// Handler para warnings/notices convertidos em erro
+/**
+ * Error handler for warnings/notices converted into logs.
+ */
 set_error_handler(function ($severity, $message, $file, $line) {
-    // Respeita o error_reporting atual
     if (!(error_reporting() & $severity)) {
         return false;
     }
 
     app_log('error', $message, [
+        'file_name' => 'php-errors.log',
         'php_error' => [
             'severity' => $severity,
             'file'     => $file,
@@ -121,37 +184,23 @@ set_error_handler(function ($severity, $message, $file, $line) {
         ],
     ]);
 
-    // Se quiser derrubar a execução, joga exception
-    // throw new ErrorException($message, 0, $severity, $file, $line);
-    return false; // deixa o PHP seguir o fluxo padrão também
+    return false;
 });
 
-// Handler para exceptions não tratadas
-// set_exception_handler(function (Throwable $e)
-// {
-//     app_log('error', $e->getMessage(), [
-//         'exception' => $e,
-//     ]);
-
-//     // // Aqui você pode redirecionar pra uma página de erro amigável, etc
-//     // http_response_code(500);
-//     // if (php_sapi_name() === 'cli') {
-//     //     fwrite(STDERR, "Erro fatal: {$e->getMessage()}" . PHP_EOL);
-//     // } else {
-//     //     echo "Ocorreu um erro interno. Tente novamente mais tarde.";
-//     // }
-// });
-
-// Fatal errors (parse, memória, etc)
+/**
+ * Fatal errors handler.
+ */
 register_shutdown_function(function () {
-  $error = error_get_last();
-  if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
-      app_log('fatal', $error['message'], [
-          'php_error' => [
-              'type' => $error['type'],
-              'file' => $error['file'],
-              'line' => $error['line'],
-          ],
-      ]);
-  }
+    $error = error_get_last();
+
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+        app_log('fatal', $error['message'], [
+            'file_name' => 'php-fatal.log',
+            'php_error' => [
+                'type' => $error['type'],
+                'file' => $error['file'],
+                'line' => $error['line'],
+            ],
+        ]);
+    }
 });

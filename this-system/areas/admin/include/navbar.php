@@ -29,27 +29,27 @@
       <?php
       $name        = explode(' ', $current_user['first_name']);
       $placeholder = "preview_img.jpg";
-      $path        = pg ."/uploads/images/users/";
+      $path        = site_url("/uploads/images/users/");
 
-      $user_image  = !empty($current_user['imagem'])
-        ? "{$current_user['id']}/{$current_user['imagem']}"
+      $user_image  = !empty($current_user['profile_pic'])
+        ? "{$current_user['id']}/{$current_user['profile_pic']}"
         : $placeholder;
       ?>
 
       <a href="#" class="info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <img
+        <!-- <img
             src="<?= $path . $user_image ?>"
             alt="Nós somos: <?= $name[0] ?>"
             loading="lazy"
             width="32"
             height="32"
             onerror="this.src='<?= $path . $placeholder ?>'"
-        >
+        > -->
         <span><?= $name[0] ?></span>
       </a>
 
       <ul class="dropdown-menu dropdown-menu-end">
-        <!-- <a class="dropdown-item" href="<?= pg .'/admin/visualizar-usuario?id='.$current_user['id'] ?>" title="Ver seu perfil"><?= icon('fas fa-user') ?> Perfil</a> -->
+        <!-- <a class="dropdown-item" href="<?= pg .'/admin/view-user?id='.$current_user['id'] ?>" title="Ver seu perfil"><?= icon('fas fa-user') ?> Perfil</a> -->
         <a class="dropdown-item" href="<?= logout_url() ?>" title="Sair"><?= icon('fas fa-sign-out-alt') ?> Sair</a>
       </ul>
 

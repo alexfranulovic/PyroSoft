@@ -6,7 +6,7 @@ function get_roles(string $mode = '', array $attr = [])
     $id = $attr['id'] ?? '';
 
     if ($mode == 'list') {
-        return get_results("SELECT id as value, name as display FROM tb_user_roles WHERE type = 'role'");
+        return get_results("SELECT id as value, name as display FROM tb_user_roles ORDER BY order_reg ASC");
     }
 
     if ($mode == 'crud')
@@ -36,7 +36,7 @@ function get_roles(string $mode = '', array $attr = [])
             WHERE permission_id = '{$id}' AND allowed = 1");
     }
 
-    return get_results("SELECT * FROM tb_user_roles WHERE type = 'role'");
+    return get_results("SELECT * FROM tb_user_roles ORDER BY order_reg ASC");
 }
 
 
@@ -399,13 +399,15 @@ function lowest_role_user()
  * @param mixed $product Unused parameter in this function.
  * @return array The products information as an array of associative arrays.
  */
-function get_roles_by_user_id($user_id = 0)
+function get_roles_by_user_id($user_id = 0, string $mode = 'for_select')
 {
     $lowest = lowest_role_user();
 
     $user_id = ($user_id > 0) ? $user_id : id_by_get();
 
-    $query = "
+    if ($mode == 'for_select')
+    {
+        $query = "
         SELECT
             r.id     AS value,
             r.name   AS display,
@@ -415,7 +417,21 @@ function get_roles_by_user_id($user_id = 0)
             ON ura.role_id = r.id AND ura.user_id = '{$user_id}' AND ura.user_id != 0
         ORDER BY r.name ASC";
 
-    return get_results($query);
+        return get_results($query);
+    }
+
+    else
+    {
+        $query = "
+        SELECT
+            r.id
+        FROM tb_user_roles r
+        INNER JOIN tb_user_role_assignments ura
+            ON ura.role_id = r.id AND ura.user_id = '{$user_id}' AND ura.user_id != 0
+        ORDER BY r.name ASC";
+
+        return get_cols($query);
+    }
 }
 
 

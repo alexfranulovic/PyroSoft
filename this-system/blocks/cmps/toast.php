@@ -36,7 +36,7 @@ function toast(array $Attr = [])
       ? img(['src' => $Attr['img']])
       : '';
 
-    $header = (!empty($title) OR !empty($close_button))
+    $header = (!empty($title) && !empty($close_button))
       ? "<div class='toast-header message-$color'>
         $img
         <h6>".format_text($title)."</h6>
@@ -44,10 +44,15 @@ function toast(array $Attr = [])
         </div>"
       : '';
 
+    $body = $Attr['body'];
+    if (empty($title) && !empty($close_button)) {
+      $body = "<p>{$Attr['body']}</p>" . $close_button;
+    }
+
     $res = "<article class='toast message-$color' id='$id' $attributes role='toast' aria-live='polite' aria-atomic='true' data-bs-delay='$time'>";
     $res.= $header;
     $res.= "<div class='content'>";
-    $res.= "<div class='toast-body'>". format_text($Attr['body']) ."</div>";
+    $res.= "<div class='toast-body'>". format_text($body) ."</div>";
     $res.= !empty($footer) ? "<div class='toast-footer'>".format_text($footer)."</div>" : '';
     $res.= "</article>";
 

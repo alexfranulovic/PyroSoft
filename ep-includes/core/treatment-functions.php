@@ -106,6 +106,11 @@ function format_text($content = '', $mode = 'encode')
             return !empty(trim($matches[1])) ? '<u>' . $matches[1] . '</u>' : $matches[0];
         }, $content);
 
+        // From == to <u>
+        $content = preg_replace_callback('/==(.*?)==/', function($matches) {
+            return !empty(trim($matches[1])) ? '<small>' . $matches[1] . '</small>' : $matches[0];
+        }, $content);
+
         // From ~~ to <s>
         $content = preg_replace_callback('/~~(.*?)~~/', function($matches) {
             return !empty(trim($matches[1])) ? '<s>' . $matches[1] . '</s>' : $matches[0];
@@ -147,6 +152,11 @@ function format_text($content = '', $mode = 'encode')
         // From <u> to __
         $content = preg_replace_callback('/<u>(.*?)<\/u>/', function($matches) {
             return '__' . $matches[1] . '__';
+        }, $content);
+
+        // From <u> to ==
+        $content = preg_replace_callback('/<small>(.*?)<\/small>/', function($matches) {
+            return '==' . $matches[1] . '==';
         }, $content);
 
         // From <s> to ~~
@@ -301,7 +311,7 @@ function filter_empty_values(array $data)
  * @param string $str The string to clean.
  * @return string The cleaned string, with all non-numeric characters removed.
  */
-function clean_number(string $str) {
+function clean_number(string|int $str = '') {
     return preg_replace("/[^0-9]/", "", $str);
 }
 
@@ -665,9 +675,15 @@ function _parse_fn_call(string $fnString, array $data, string $key): array
         foreach ($tokens as $t) {
             if ($t === '') continue;
 
-            // "{field}" → resolve from $data
+            // // "{field}" → resolve from $data
+            // if (preg_match('/^\{([^}]+)\}$/', $t, $mm)) {
+            //     $args[] = $data[$mm[1]] ?? null;
+            //     continue;
+            // }
+
+            // "{field}" → resolve from $data (agora com suporte a "->" pra path aninhado)
             if (preg_match('/^\{([^}]+)\}$/', $t, $mm)) {
-                $args[] = $data[$mm[1]] ?? null;
+                $args[] = get_value_from_pointer($data, explode('->', $mm[1]));
                 continue;
             }
 
@@ -766,7 +782,7 @@ function function_view($function_name = '', string $key = '', $data = null)
  *        - Pass only the field value ($data[$key]) to the function_name if it exists; otherwise return the raw value.
  *
  * Notes:
- *   - The function name is not renamed; "function_proccess" spelling retained for backward compatibility.
+ *   - The function name is not renamed; "function_process" spelling retained for backward compatibility.
  *   - Helper function is_json(string): bool must exist in your codebase.
  *
  * @param string           $function_name Function signature or name (supports placeholders and explicit literals)
@@ -774,7 +790,7 @@ function function_view($function_name = '', string $key = '', $data = null)
  * @param array|object|null $data         Row data
  * @return mixed                          Processed value
  */
-function function_proccess($function_name = '', string $key = '', $data = null)
+function function_process($function_name = '', string $key = '', $data = null)
 {
     $data = is_array($data) ? $data : (array)$data;
 
@@ -902,20 +918,20 @@ function get_value_from_pointer($root, array $pointer, $default = null)
 
 /**
  * Returns the resolved value for a token:
- * - Function: any string containing '(' is treated as a function call and passed to function_proccess().
+ * - Function: any string containing '(' is treated as a function call and passed to function_process().
  * - Variable: first char is '$' → read from $GLOBALS.
  * - Constant: if defined($token), return constant($token).
  * - Otherwise: null.
  *
- * Optional $data/$key let you resolve placeholders in function_proccess (e.g. my_fn({slug}, 10)).
+ * Optional $data/$key let you resolve placeholders in function_process (e.g. my_fn({slug}, 10)).
  */
 function is_function_or_var(string $value)
 {
     $raw = trim($value);
 
-    // Function call → delegate full string to function_proccess()
+    // Function call → delegate full string to function_process()
     if (strpos($raw, '(') !== false) {
-        return function_proccess($raw, '', []);
+        return function_process($raw, '', []);
     }
 
     // Variable from $GLOBALS with optional pointer path via '.'
@@ -926,7 +942,7 @@ function is_function_or_var(string $value)
         $varName  = ltrim($varToken, '$');        // "user"
 
         if (!array_key_exists($varName, $GLOBALS)) {
-            return null;
+            return $value;
         }
 
         $root = $GLOBALS[$varName];

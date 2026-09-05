@@ -46,6 +46,7 @@ $st-600: map-get($st-scale, 600);
 $st-700: map-get($st-scale, 700);
 $st-800: map-get($st-scale, 800);
 $st-900: map-get($st-scale, 900);
+$st-black: darken($st, 45%);
 $st-dark: darken($st, 10%);
 $st-light: lighten($st, 10%);
 
@@ -60,6 +61,7 @@ $nd-600: map-get($nd-scale, 600);
 $nd-700: map-get($nd-scale, 700);
 $nd-800: map-get($nd-scale, 800);
 $nd-900: map-get($nd-scale, 900);
+$nd-black: darken($nd, 45%);
 $nd-dark: darken($nd, 10%);
 $nd-light: lighten($nd, 10%);
 
@@ -74,6 +76,7 @@ $rd-600: map-get($rd-scale, 600);
 $rd-700: map-get($rd-scale, 700);
 $rd-800: map-get($rd-scale, 800);
 $rd-900: map-get($rd-scale, 900);
+$rd-black: darken($rd, 45%);
 $rd-dark: darken($rd, 10%);
 $rd-light: lighten($rd, 10%);
 
@@ -88,6 +91,7 @@ $th-600: map-get($th-scale, 600);
 $th-700: map-get($th-scale, 700);
 $th-800: map-get($th-scale, 800);
 $th-900: map-get($th-scale, 900);
+$th-black: darken($th, 45%);
 $th-dark: darken($th, 10%);
 $th-light: lighten($th, 10%);
 
@@ -99,4 +103,24 @@ $svg-google: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' v
   background-size: 100% 100%;
   width: 1rem;
   height: 1rem;
+}
+
+:root {
+  @each $name, $scale in (
+    st: $st-scale,
+    nd: $nd-scale,
+    rd: $rd-scale,
+    th: $th-scale
+  ) {
+    @each $tone, $color in $scale {
+      --#{$name}-#{$tone}: #{$color};
+    }
+  }
+}
+
+:root {
+  --st-black: #{$st-black};
+  --nd-black: #{$nd-black};
+  --rd-black: #{$rd-black};
+  --th-black: #{$th-black};
 }

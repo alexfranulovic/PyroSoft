@@ -7,8 +7,14 @@ function input_payment_methods(string $type_form, array $Attr = [])
 
     global $config, $seg;
 
-    $user_payment_methods = format_user_payment_gateways(false);
-    if (!empty($user_payment_methods))
+    $field_attr                       = [];
+    $only_these                       = $Attr['only_these'] ?? [];
+    $bypass_saved_methods             = $Attr['bypass_saved_methods'] ?? false;
+    $field_attr['allow_installments'] = false;
+    $user_payment_methods             = format_user_payment_gateways($only_these);
+
+
+    if (!$bypass_saved_methods && !empty($user_payment_methods))
     {
         $res.= input(
             'selection_type',
@@ -20,7 +26,7 @@ function input_payment_methods(string $type_form, array $Attr = [])
                 'variation' => 'group-block',
                 'label' => 'Seus cartões',
                 'name' => 'payment_method',
-                'Options' => format_user_payment_gateways(false),
+                'Options' => $user_payment_methods,
                 'Required' => true
             ]
         );
@@ -34,20 +40,29 @@ function input_payment_methods(string $type_form, array $Attr = [])
             'size' => 'col-12',
             'type' => 'radio',
             'variation' => 'group-block',
-            'label' => 'Método de pagamento',
+            'label' => !empty($Attr['label']) ? $Attr['label'] : 'Método de pagamento',
             'name' => 'payment_method',
-            'Options' => format_payment_gateways(false),
+            'Options' => format_payment_gateways('checkout', [], $only_these),
             'Required' => true
         ]
     );
 
-    $field_attr = [];
 
-    if (!empty($plan_id))
-    $field_attr['plan_id'] = $plan_id;
+    if (!empty($plan_id)) {
+        $field_attr['plan_id'] = $plan_id;
+        $field_attr['allow_installments'] = false;
+    }
 
-    if (!empty($product_id))
-    $field_attr['product_id'] = $product_id;
+    if (!empty($product_id)) {
+        $field_attr['product_id'] = $product_id;
+        $field_attr['allow_installments'] = true;
+    }
+
+    if (!empty($one_off))
+    {
+        $field_attr['one_off'] = $one_off;
+        $field_attr['allow_installments'] = get_system_info('pyrosales_one_off_allow_installments');
+    }
 
     if (!empty($custom_statement_descriptor))
     $field_attr['custom_statement_descriptor'] = $custom_statement_descriptor;
@@ -55,6 +70,8 @@ function input_payment_methods(string $type_form, array $Attr = [])
     $payment_methods = $config['active_payment_methods'] ?? [];
     foreach ($payment_methods as $key => $provider_method)
     {
+        $field_attr['provider_method'] = $GLOBALS['payment_gateways'][$provider_method];
+
         $provider = explode('.', $provider_method)[0];
         $provider_method = str_replace('.', '_', $provider_method);
 

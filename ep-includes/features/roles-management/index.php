@@ -40,6 +40,13 @@ function manage_roles_form(string $type_form = 'insert', int $counter = 1)
         $type_form = 'insert';
     }
 
+    $panel['hooks_out'][] = [
+        'title' => 'Listar',
+        'url'  => get_url_page('list-roles', 'full'),
+        'color' => 'outline-info',
+        'pre_icon' => 'fas fa-list',
+    ];
+
     if ($type_form == 'update')
     {
         $panel['hooks_out'][] = [
@@ -61,44 +68,10 @@ function manage_roles_form(string $type_form = 'insert', int $counter = 1)
             'pre_icon' => 'fas fa-trash',
         ];
     }
-
+    echo crud_panel( $panel ?? [] );
     ?>
 
     <section class="row user-role-management">
-
-    <section class="col-12">
-    <div class="card box-fields">
-        <form method="GET" action="" class="card-body row content-center">
-            <?= input(
-            'selection_type',
-                'update',
-                [
-                    'size' => 'col-md-8',
-                    'type' => 'search',
-                    'label' => 'Selecione o nível para editar',
-                    'name' => 'id',
-                    'Query' => "SELECT id as value, name as display FROM tb_user_roles",
-                    'Value' => $id,
-                ]
-            ).
-            input(
-            'submit_button',
-            $type_form,
-            [
-                'size' => 'col',
-                'class' => 'btn btn-outline-nd btn-block',
-                'Value' => 'Selecionar'
-            ])?>
-
-            <div class="col-12">
-                <a href="<?= get_url_page($page['id'], 'full') ?>">ou criar um novo nível.</a>
-            </div>
-
-        </form>
-    </div>
-    </section>
-
-    <?= crud_panel( $panel ?? [] ) ?>
 
     <form class="col-md col-lg col-xl main-form" method="POST" data-send-ctrl-s data-send-without-reload action="<?= rest_api_route_url("manage-user-role?mode={$type_form}") ?>">
 
@@ -145,24 +118,9 @@ function manage_roles_form(string $type_form = 'insert', int $counter = 1)
             $type_form,
             [
                 'size' => 'col-md-6 col-lg-4',
-                'function_proccess' => 'general_status',
+                'function_process' => 'general_status',
                 'name' => "status_id",
                 'Value' => ($type_form=='update') ? $role['status_id'] : '',
-                'Required' => true
-            ]) .
-            input(
-            'selection_type',
-            $type_form,
-            [
-                'type' => 'search',
-                'size' => 'col-md-6 col-lg-4',
-                'label' => 'Tipo',
-                'name' => 'type',
-                'Options' => [
-                    [ 'value' => 'role', 'display' => 'Função' ],
-                    [ 'value' => 'plan', 'display' => 'Plano' ],
-                ],
-                'Value' => ($type_form=='update') ? $role['type'] : '',
                 'Required' => true
             ]) .
             input(
@@ -175,7 +133,7 @@ function manage_roles_form(string $type_form = 'insert', int $counter = 1)
                 'Options' => [
                     [ 'value' => '1', 'display' => 'Esse é o nível mais básico' ],
                 ],
-                'Value' => ($type_form=='update' AND $id == lowest_role_user()) ? 1 : 0,
+                'Value' => ($type_form=='update' AND in_array($id, lowest_role_user())) ? 1 : 0,
                 'Required' => true
             ]) .
             input(
@@ -221,11 +179,16 @@ function manage_user_role_system(array $data, string $mode, bool $debug = false)
 
     $msg_type = 'toast';
 
+    $permission = load_permission('manage-permissions', 'custom');
+    if (!$permission) {
+      return invalid_permission_response();
+    }
+
     /*
-     * Define the verifyer function.
+     * Define the verifier function.
      */
-    if     ($mode == 'insert') $verifyer = 'inserted_id';
-    elseif ($mode == 'update') $verifyer = 'affected_rows';
+    if     ($mode == 'insert') $verifier = 'inserted_id';
+    elseif ($mode == 'update') $verifier = 'affected_rows';
     else                       $error    = true;
 
 
@@ -261,7 +224,7 @@ function manage_user_role_system(array $data, string $mode, bool $debug = false)
         /*
          * Verify if inserted/updated correctaly.
          */
-        if ($verifyer())
+        if ($verifier())
         {
             unset($_SESSION['FormData']);
 

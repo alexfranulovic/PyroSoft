@@ -2,7 +2,7 @@
 if (!isset($seg)) exit;
 
 
-define('PYROSOFT_VERSION', '1.0.4');
+define('PYROSOFT_VERSION', '1.0.5');
 
 /**
  * Define itens for CRON operations.
@@ -48,7 +48,7 @@ define('APP_LOG_FILE', APP_LOG_DIR . '/app.log');
 /**
  * Inputs
  */
-if (!defined('IMAGE_QUALITY'))         define('IMAGE_QUALITY', 30);      // seconds
+if (!defined('IMAGE_QUALITY'))         define('IMAGE_QUALITY', 30);
 if (!defined('MIN_TIME_AUDIO'))        define('MIN_TIME_AUDIO', 1);       // seconds
 if (!defined('MAX_TIME_AUDIO'))        define('MAX_TIME_AUDIO', 10);      // seconds
 if (!defined('EVENT_DEFAULT_HOUR'))    define('EVENT_DEFAULT_HOUR', "09:00");
@@ -70,15 +70,25 @@ if (!defined('TIME_TO_DELETE_TEMP_FILES'))  define('TIME_TO_DELETE_TEMP_FILES', 
 if (!defined('USER_PASSWORD_RECOVERY_TIME'))    define('USER_PASSWORD_RECOVERY_TIME', 3600);
 
 
+/**
+ * Queue messages
+ */
+if (!defined('TIME_TO_DELETE_QUEUE_MESSAGES'))      define('TIME_TO_DELETE_QUEUE_MESSAGES', 30); // days
+if (!defined('MAX_ATTEMPTS_TO_SEND_MESSAGES'))      define('MAX_ATTEMPTS_TO_SEND_MESSAGES', 3);
+if (!defined('MESSAGE_SENDING_LIMIT_IN_THE_QUEUE')) define('MESSAGE_SENDING_LIMIT_IN_THE_QUEUE', 10);
 
-global $alerts;
-$alerts = [];
+
+
+
+$GLOBALS['alerts'] = [];
 
 global $available_structured_data;
 $available_structured_data = [];
+$GLOBALS['available_structured_data'] = $available_structured_data;
 
 global $all_input_types;
 $all_input_types = [];
+$GLOBALS['all_input_types'] = $all_input_types;
 
 global $force_depth_zero_inputs;
 $force_depth_zero_inputs = [];
@@ -87,27 +97,34 @@ $force_depth_zero_inputs[] = [
     'divider',
     'hidden'
 ];
+$GLOBALS['force_depth_zero_inputs'] = $force_depth_zero_inputs;
 
 global $inputs;
 $inputs = [];
+$GLOBALS['inputs'] = $inputs;
 
 global $custom_pages_inputs;
 $custom_pages_inputs = [];
+$GLOBALS['custom_pages_inputs'] = $custom_pages_inputs;
 
 global $custom_cruds_inputs;
 $custom_cruds_inputs = [];
+$GLOBALS['custom_cruds_inputs'] = $custom_cruds_inputs;
 
 global $all_status;
 $all_status = [];
+$GLOBALS['all_status'] = $all_status;
 
 global $login_forms;
 $login_forms = [];
+$GLOBALS['login_forms'] = $login_forms;
 
 global $assets_to_load;
 $assets_to_load = [
     'head' => [],
     'footer' => [],
 ];
+$GLOBALS['assets_to_load'] = $assets_to_load;
 
 global $user_status;
 $user_status = [
@@ -136,6 +153,7 @@ $user_status = [
         'color' => 'subtle-primary',
     ],
 ];
+$GLOBALS['user_status'] = $user_status;
 
 global $general_status;
 $general_status = [
@@ -164,21 +182,27 @@ $general_status = [
         'color' => 'info',
     ],
 ];
+$GLOBALS['general_status'] = $general_status;
 
 global $custom_menu_type_options;
 $custom_menu_type_options = [];
+$GLOBALS['custom_menu_type_options'] = $custom_menu_type_options;
 
 global $email_providers;
 $email_providers = [];
+$GLOBALS['email_providers'] = $email_providers;
 
 global $html_classes;
 $html_classes = [];
+$GLOBALS['html_classes'] = $html_classes;
 
 global $inputs_that_dont_need_name;
 $inputs_that_dont_need_name = [];
+$GLOBALS['inputs_that_dont_need_name'] = $inputs_that_dont_need_name;
 
 global $login_social;
 $login_social = [];
+$GLOBALS['login_social'] = $login_social;
 
 global $crud_action_triggers;
 $crud_action_triggers = [
@@ -190,6 +214,7 @@ $crud_action_triggers = [
     // 'truncate' => 'Truncar',
     // 'order' => 'Ordenar',
 ];
+$GLOBALS['crud_action_triggers'] = $crud_action_triggers;
 
 global $allowed_mime_types;
 $allowed_mime_types =
@@ -231,12 +256,14 @@ $allowed_mime_types =
         'text/plain',
     ],
 ];
-
+$GLOBALS['allowed_mime_types'] = $allowed_mime_types;
 
 global $max_upload;
+$GLOBALS['max_upload'] = $max_upload ?? null;
 
 global $cron_schedules;
 $cron_schedules = [];
+$GLOBALS['cron_schedules'] = $cron_schedules;
 
 global $tables;
 $tables = [
@@ -253,4 +280,52 @@ $tables = [
     'tb_user_roles' => 'Funções de usuários',
     'tb_user_role_assignments' => 'Funções dos usuários',
     'tb_user_role_permissions' => 'Permissões de funções de usuários',
+];
+$GLOBALS['tables'] = $tables;
+
+global $custom_tables;
+$custom_tables = [
+    'pages' =>
+    [
+        'table' => 'tb_pages',
+        'get_data_by' => 'table',
+        'fields' => [
+            'id',
+            'title',
+            'slug',
+            'area_page',
+            'is_public',
+            'qtd_views',
+            'status_id',
+        ],
+    ],
+    'permissions' => [
+        'table' => 'tb_permissions',
+        'get_data_by' => 'function',
+        'function_name' => 'get_permissions()',
+        'fields' => [
+            'id',
+            'title',
+            'slug',
+            'area_page',
+            'is_public',
+            'qtd_views',
+            'status_id',
+        ],
+    ],
+];
+$GLOBALS['custom_tables'] = $custom_tables;
+
+$GLOBALS['searchable-fields']['users'] = [
+    'permission' => 'list-sensitive-data',
+    'query' => "SELECT id AS value, CONCAT('#', id, ' - ', first_name, ' ', last_name, ' - ', email) AS display FROM tb_users",
+    'fields' => [
+        'id',
+        'first_name',
+        'last_name',
+        'email',
+    ],
+    // 'insert' => [
+    //     'query' => "INSERT INTO tb_users (first_name, created_at) VALUES ('{value}', 4, NOW())",
+    // ],
 ];

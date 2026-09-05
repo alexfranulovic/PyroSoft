@@ -50,7 +50,7 @@ include "include/menu.php";
   </div>
 
   <div class="col-lg right-box">
-    <img alt="PyroSoft logotype" src="<?= file_url('images/brand', false, 'imagotype-black-st-colab.png') ?>">
+    <img alt="PyroSoft logotype" src="<?= file_url('images/brand', false, 'x-imagotype-black-st-colab.png') ?>">
   </div>
 
 </main>

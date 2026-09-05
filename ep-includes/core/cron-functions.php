@@ -1,8 +1,6 @@
 <?php
 if (!isset($seg)) exit;
 
-
-
 /**
  * Builds a full URL for accessing cron routes.
  *
@@ -259,6 +257,18 @@ function get_next_execution_info(int $timestamp): string
  */
 $cron_schedules =
 [
+    'everytime' => [
+        'interval' => 0,
+        'display'  => 'Everytime',
+    ],
+    'every_15_seconds' => [
+        'interval' => 15,
+        'display'  => 'Every 15 seconds',
+    ],
+    'every_30_seconds' => [
+        'interval' => 30,
+        'display'  => 'Every 30 seconds',
+    ],
     'every_minute' => [
         'interval' => 60,
         'display'  => 'Every minute',
@@ -317,7 +327,7 @@ $cron_schedules =
     ],
     'biyearly' => [
         'interval' => 60 * 60 * 24 * 365 * 2,
-        'display'  => 'Anual',
+        'display'  => 'Bianual',
     ],
 ];
 

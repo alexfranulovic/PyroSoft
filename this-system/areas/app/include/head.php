@@ -1,7 +1,11 @@
 <?php
-global $config, $page;
+$html_settings = load_html_settings();
+extract($html_settings);
+
 flush();
 ?>
+<!DOCTYPE html>
+<html lang='<?= $html_settings['lang'] ?>' class='<?= $html_settings['html_class'] ?>' data-bs-theme='<?= $html_settings['theme_color'] ?>'>
 <head>
 
     <link rel="shortcut icon" type="image/png" href="<?= $info['favicon'] ?>"/>

@@ -10,8 +10,8 @@ $navbar_style  = $page['page_settings']['navbar']['style'] ?? ($config['branding
 
     <div>
         <a class="navbar-brand" href="<?= $config['main_page']['url'] ?>" title="<?= $info['name'] ?>">
-            <img class="logotype-light" src="<?= file_url('images/brand', false, 'logotype-black.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
-            <img class="logotype-dark" src="<?= file_url('images/brand', false, 'logotype-white.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
+            <img class="logotype-light" src="<?= file_url('images/brand', false, 'x-imagotype-st.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
+            <img class="logotype-dark" src="<?= file_url('images/brand', false, 'x-imagotype-nd.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
             <!--
             <span class="d-none d-lg-block d-xl-block align-middle" style="text-transform: none;"><?= $info['name'] ?></span>
             -->
@@ -20,7 +20,7 @@ $navbar_style  = $page['page_settings']['navbar']['style'] ?? ($config['branding
 
     <div>
         <a class="#" href="<?= $config['main_page']['url'] ?>" title="<?= $info['name'] ?>">
-            <img src="<?= pg ?>/uploads/images/brand/isotype-white.png" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" width="24" height="24">
+            <img src="<?= pg ?>/uploads/images/brand/isotype-white.webp" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" width="24" height="24">
         </a>
     </div>
 
@@ -30,8 +30,8 @@ $navbar_style  = $page['page_settings']['navbar']['style'] ?? ($config['branding
 <nav class="navbar medium navbar-<?= $navbar_style ?>">
 
     <a class="navbar-brand" href="<?= $config['main_page']['url'] ?>" title="<?= $info['name'] ?>">
-        <img class="logotype-light" src="<?= file_url('images/brand', false, 'logotype-black.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
-        <img class="logotype-dark" src="<?= file_url('images/brand', false, 'logotype-white.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
+        <img class="logotype-light" src="<?= file_url('images/brand', false, 'x-imagotype-st.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
+        <img class="logotype-dark" src="<?= file_url('images/brand', false, 'x-imagotype-nd.webp') ?>" alt="Nós somos: <?= $info['name'] ?>" loading="lazy" height="36">
     </a>
 
 </nav>

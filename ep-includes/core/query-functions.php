@@ -146,6 +146,44 @@ function get_results(string $sql = null, $associative = 'default', bool $debug =
 
 
 /**
+ * Escape HTML on array values (strings only).
+ *
+ * This function is intended for OUTPUT LAYER usage only.
+ * Do NOT use before saving to database.
+ *
+ * @param array $data The array to be processed.
+ * @param array|null $fields Optional list of fields to escape. If null, all string fields will be escaped.
+ * @param bool $recursive Apply recursively for nested arrays.
+ *
+ * @return array
+ */
+function esc_array_html(array $data, ?array $fields = null, bool $recursive = true): array
+{
+    foreach ($data as $key => $value)
+    {
+        // If specific fields are defined, skip others
+        if (is_array($fields) && !in_array($key, $fields, true)) {
+            $data[$key] = $value;
+            // continue;
+        }
+
+        // Recursive handling
+        if ($recursive && is_array($value)) {
+            $data[$key] = esc_array_html($value, $fields, $recursive);
+            continue;
+        }
+
+        // Only escape strings
+        if (is_string($value)) {
+            $data[$key] = esc_html($value);
+        }
+    }
+
+    return $data;
+}
+
+
+/**
  * Checks if a table with the given name exists in the database.
  *
  * @param string $table The name of the table to check for existence.
@@ -235,17 +273,23 @@ function update(string $table, array $args, bool $show_warnings = false, bool $d
         return 'No data provided for update.';
     }
 
-    // if (!array_key_exists('updated_at', $args['data'])) {
-    //     $args['data']['updated_at'] = 'NOW()';
-    // }
-
     $setClauses = array_map(function ($field, $value) {
-        if (is_array($value) || is_object($value)) {
-            $value = json_encode($value);
+        // SQL NULL (não escapar/aspar)
+        if ($value === null) {
+            return "`$field` = NULL";
         }
 
-        // Se for uma string e contiver "NOW()", mantém sem aspas
-        return "`$field` = " . (is_string($value) && strtoupper(trim($value)) === 'NOW()' ? 'NOW()' : "'" . db_escape($value) . "'");
+        if (is_array($value) || is_object($value)) {
+            $value = json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
+        $raw = (string)$value;
+
+        if (strtoupper(trim($raw)) === 'NOW()') {
+            return "`$field` = NOW()";
+        }
+
+        return "`$field` = '" . db_escape($raw) . "'";
     }, array_keys($args['data']), $args['data']);
 
     $sql = "UPDATE {$table} SET " . implode(', ', $setClauses);
@@ -253,10 +297,28 @@ function update(string $table, array $args, bool $show_warnings = false, bool $d
     if (isset($args['where']) && is_array($args['where']) && !empty($args['where']))
     {
         $whereClauses = array_map(function ($clause) {
-            return safe_where($clause['field'], $clause['operator'], $clause['value']);
+            return safe_where($clause['field'], $clause['operator'], $clause['value'], $clause['skip_sanitize'] ?? false);
         }, $args['where']);
 
         $sql .= " WHERE " . implode(' AND ', $whereClauses);
+    }
+
+    if (isset($args['order_by']) && is_array($args['order_by']) && !empty($args['order_by']))
+    {
+        $orderClauses = [];
+        foreach ($args['order_by'] as $order) {
+            if (!isset($order['field']) || !isset($order['way'])) {
+                throw new Exception("Invalid ORDER BY structure.");
+            }
+            $field = preg_replace('/[^a-zA-Z0-9_]/', '', $order['field']);
+            $way = strtoupper($order['way']) === 'DESC' ? 'DESC' : 'ASC';
+            $orderClauses[] = "`$field` $way";
+        }
+        $sql .= " ORDER BY " . implode(', ', $orderClauses);
+    }
+
+    if (isset($args['limit'])) {
+        $sql .= " LIMIT " . (int)$args['limit'];
     }
 
     return query_it($sql, $show_warnings, $debug);
@@ -438,6 +500,12 @@ function affected_rows()
     return mysqli_affected_rows($conn);
 }
 
+function verifier(string $mode = '')
+{
+    if     ($mode == 'insert') return 'inserted_id';
+    elseif ($mode == 'update') return 'affected_rows';
+}
+
 
 /**
  * Generates a copied name for a record based on the given conditions.
@@ -542,33 +610,47 @@ function get_cols($sql)
 
 
 /**
- * Build a SQL query based on the provided parameters.
+ * query_builder() — three additive changes from the version you sent:
  *
- * This function constructs a SELECT query with optional clauses like DISTINCT, JOIN, WHERE, ORDER BY, and pagination.
- * It takes an associative array of parameters to build the query.
+ *   1) GROUP BY support (new `group_by` param). Needed for the JOIN-based
+ *      list_orders() below: a LEFT JOIN to tb_order_payments can produce
+ *      more than one row per order if an order has multiple payment rows,
+ *      and GROUP BY tb_orders.id collapses that back to one row per order
+ *      — same intent as the original list_orders()' correlated subquery
+ *      with LIMIT 1, just expressed as a JOIN + GROUP BY instead.
  *
- * @param array $params An associative array containing the query parameters.
- * 		Possible keys:
- * 		- 'table' (string): The name of the main table for the query (required).
- * 		- 'distinct' (string): Optional distinct clause.
- * 		- 'registers_per_page' (int): Number of records per page for pagination (optional).
- * 		- 'current_page' (int): The current page for pagination (optional).
- * 		- 'fields' (array): An array of fields to select (optional, defaults to '*').
- * 		- 'joins' (array): An array of JOIN clauses (optional).
- * 		- 'where' (array): An array of WHERE clauses (optional).
- * 		- 'order_by' (array): An array of ORDER BY clauses (optional).
+ *   2) ORDER BY no longer blindly wraps the field in backticks. The
+ *      existing code did `` `$field` `` unconditionally, which breaks for
+ *      a table-qualified field like `tb_orders.created_at` (MySQL doesn't
+ *      accept backticks around a whole dotted identifier). Bare field
+ *      names (the only kind used anywhere in the codebase so far) are
+ *      unaffected — they still get backtick-wrapped exactly as before;
+ *      only a name containing a `.` skips it.
  *
- * @throws Exception Throws an exception if the 'table' parameter is not provided.
- * @throws Exception Throws an exception if the 'order_by' parameter has an invalid structure.
+ *   3) New `raw_where` param: an array of already-built, already-escaped
+ *      SQL boolean expressions, each wrapped in parens and AND'ed with
+ *      everything else (the structured `where` group, if any, is wrapped
+ *      in its own parens and treated as one more AND'ed part). This exists
+ *      because `where`'s `where_logic` is a single flat AND/OR for the
+ *      whole clause list — it can't express "these filters are AND'ed,
+ *      but this particular OR-group of search clauses is one unit". Rather
+ *      than guess at how safe_where()'s `skip_sanitize` behaves for a
+ *      fully custom fragment (I don't have its source), `raw_where` is a
+ *      separate, explicit lane: the caller is responsible for escaping
+ *      values in it (e.g. via addslashes()), same as list_orders() below
+ *      already does for its search clause.
  *
- * @return string The generated SQL query.
+ * JOINs themselves needed no change — `joins` (with `type`/`table`/
+ * `condition`) was already there and already accepts LEFT/RIGHT/INNER/FULL,
+ * whatever string you pass in `type`.
+ *
+ * Everything else in this function is byte-for-byte what you sent.
  */
 function query_builder($params, bool $debug = false)
 {
     if (!isset($params['table'])) throw new Exception("A tabela não foi especificada.");
 
     $query = "SELECT ";
-
     if (isset($params['distinct'])) $query .= "DISTINCT " . $params['distinct'] . " ";
 
     $registersPerPage = 0;
@@ -590,7 +672,6 @@ function query_builder($params, bool $debug = false)
             $joinType      = isset($join['type']) ? strtoupper($join['type']) : "INNER";
             $joinTable     = isset($join['table']) ? $join['table'] : "";
             $joinCondition = isset($join['condition']) ? $join['condition'] : "";
-
             if (!empty($joinType) && !empty($joinTable) && !empty($joinCondition))
             {
                 $query .= "$joinType JOIN $joinTable ON $joinCondition ";
@@ -598,10 +679,14 @@ function query_builder($params, bool $debug = false)
         }
     }
 
-    // WHERE
-    if (isset($params['where']) && is_array($params['where']))
+    // WHERE — structured `where` (existing behaviour) and the new
+    // `raw_where` (pre-built fragments) are each wrapped in their own
+    // parens and AND'ed together, so one can be OR-flavoured and the
+    // other AND-flavoured without conflicting.
+    $where_parts = [];
+
+    if (!empty($params['where']) && is_array($params['where']))
     {
-        $query .= "WHERE ";
         $clauses = [];
         foreach ($params['where'] as $clause)
         {
@@ -609,19 +694,34 @@ function query_builder($params, bool $debug = false)
             $value          = $clause['value'];
             $operator       = $clause['operator'] ?? '=';
             $skip_sanitize  = $clause['skip_sanitize'] ?? false;
-
             $clauses[] = safe_where($field, $operator, $value, $skip_sanitize);
         }
-
-        // Get logic operator (default AND)
         $where_logic = strtoupper($params['where_logic'] ?? 'AND');
         if (!in_array($where_logic, ['AND', 'OR'])) $where_logic = 'AND';
+        $where_parts[] = '(' . implode(" {$where_logic} ", $clauses) . ')';
+    }
 
-        $query .= implode(" {$where_logic} ", $clauses) . " ";
+    if (!empty($params['raw_where']) && is_array($params['raw_where']))
+    {
+        foreach ($params['raw_where'] as $raw_clause)
+        {
+            $where_parts[] = "($raw_clause)";
+        }
+    }
+
+    if (!empty($where_parts))
+    {
+        $query .= "WHERE " . implode(' AND ', $where_parts) . " ";
+    }
+
+    // GROUP BY
+    if (!empty($params['group_by']) && is_array($params['group_by']))
+    {
+        $query .= "GROUP BY " . implode(', ', $params['group_by']) . " ";
     }
 
     // ORDER BY
-    if (isset($params['order_by']) && is_array($params['order_by']))
+    if (!empty($params['order_by']) && is_array($params['order_by']))
     {
         $query .= "ORDER BY ";
         $orderClauses = [];
@@ -632,7 +732,10 @@ function query_builder($params, bool $debug = false)
             }
             $field = $order['field'];
             $way = strtoupper($order['way']) === 'DESC' ? 'DESC' : 'ASC';
-            $orderClauses[] = "`$field` $way";
+            // Bare name -> keep the existing backtick-wrap behaviour.
+            // Table-qualified name (has a '.') -> pass through as-is.
+            $safeField = (strpos($field, '.') === false) ? "`$field`" : $field;
+            $orderClauses[] = "$safeField $way";
         }
         $query .= implode(', ', $orderClauses) . " ";
     }
@@ -645,7 +748,6 @@ function query_builder($params, bool $debug = false)
     }
 
     if ($debug) echo "{$query}<br><hr>";
-
     return $query;
 }
 

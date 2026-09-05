@@ -94,7 +94,7 @@ register_rest_route('load-crud-piece', [
 
       elseif ($mode == 'delete')
       {
-        $verifyer = delete_record([
+        $verifier = delete_record([
           'table'            => 'tb_cruds',
           'id'               => $piece_id,
           'foreign_key'      => 'crud_id',
@@ -106,7 +106,7 @@ register_rest_route('load-crud-piece', [
 
       elseif ($mode == 'duplicate')
       {
-        $verifyer = duplicate_record([
+        $verifier = duplicate_record([
           'table'            => 'tb_cruds',
           'id'               => $piece_id,
           'foreign_key'      => 'crud_id',
@@ -119,7 +119,7 @@ register_rest_route('load-crud-piece', [
       elseif ($mode == 'insert')
       {
         $msg = alert_message('SC_TO_DUPLICATE', $type);
-        $verifyer = manage_crud_system([
+        $verifier = manage_crud_system([
           'piece_name' => $_POST['piece_name'] ?? '',
           'type_crud' => $_POST['type_crud'] ?? '',
           'slug' => strtolower(sanitize_string($_POST['piece_name'] ?? '')),

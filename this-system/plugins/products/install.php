@@ -7,15 +7,15 @@ if (!isset($seg)) exit;
  */
 $sql = "
 CREATE TABLE `tb_products` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `product_id` INT UNSIGNED NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `product_id` INT NULL,
 
   -- Basic
   `name` VARCHAR(255) NOT NULL,
   `slug` VARCHAR(255) NULL,
   `description` TEXT NULL,
   `seo` VARCHAR(255) NULL,
-  `view_count` INT UNSIGNED NOT NULL DEFAULT 0,
+  `view_count` INT NOT NULL DEFAULT 0,
 
   -- Pricing
   `regular_price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
@@ -26,8 +26,8 @@ CREATE TABLE `tb_products` (
   `manage_stock` TINYINT(1) NOT NULL DEFAULT 0,
   `stock_qty` INT NULL,
   `backorder` TINYINT(1) NOT NULL DEFAULT 0,
-  `min_cart_qty` SMALLINT UNSIGNED NOT NULL DEFAULT 1,
-  `max_cart_qty` SMALLINT UNSIGNED NULL DEFAULT NULL,
+  `min_cart_qty` SMALLINT NOT NULL DEFAULT 1,
+  `max_cart_qty` SMALLINT NULL DEFAULT NULL,
 
   -- Shipping (physical)
   `requires_shipping` TINYINT(1) NOT NULL DEFAULT 1,
@@ -44,13 +44,13 @@ CREATE TABLE `tb_products` (
   -- Downloadable
   `download_url` VARCHAR(1500) NULL,
   `download_name` VARCHAR(255) NULL,
-  `download_limit` INT UNSIGNED NULL,
-  `download_expiry_days` INT UNSIGNED NULL,
+  `download_limit` INT NULL,
+  `download_expiry_days` INT NULL,
 
   -- Ownership / misc
   `product_type` ENUM('simple','variable','downloadable') NOT NULL DEFAULT 'simple',
-  `user_id` INT UNSIGNED NULL,
-  `status_id` INT UNSIGNED NULL,
+  `user_id` INT NULL,
+  `status_id` INT NULL,
   `is_visible` TINYINT(1) NOT NULL DEFAULT 0,
 
   -- Timestamps
@@ -78,12 +78,12 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE `tb_product_categories` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `slug` VARCHAR(255) NOT NULL,
   `description` TEXT NULL,
-  `category_id` INT UNSIGNED NULL COMMENT 'for hierarchical categories',
-  `status_id` INT UNSIGNED NULL,
+  `category_id` INT NULL COMMENT 'for hierarchical categories',
+  `status_id` INT NULL,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
 
@@ -104,9 +104,9 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE `tb_product_category_relations` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `product_id` INT UNSIGNED NOT NULL,
-  `category_id` INT UNSIGNED NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `product_id` INT NOT NULL,
+  `category_id` INT NOT NULL,
 
   PRIMARY KEY (`id`),
 
@@ -130,12 +130,12 @@ query_it($sql);
 
 $sql = "
 CREATE TABLE `tb_product_medias` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `product_id` INT UNSIGNED NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `product_id` INT NOT NULL,
   `url` VARCHAR(1000) NOT NULL,
   `alt` VARCHAR(255) NULL,
   `role` ENUM('main','gallery') NOT NULL DEFAULT 'gallery',
-  `order_reg` INT UNSIGNED NOT NULL DEFAULT 0,
+  `order_reg` INT NOT NULL DEFAULT 0,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (`id`),

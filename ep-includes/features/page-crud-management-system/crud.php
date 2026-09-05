@@ -320,7 +320,7 @@ function common_inputs_for_crud(string $type_form, string $selector, $data = nul
     return input('status_selector', $type_form,
         [
             'size' => 'col-md-6 col-lg-4',
-            'function_proccess' => 'general_status',
+            'function_process' => 'general_status',
             'name' => "Fields[$counter][status_id]",
             'input_id' => "status_id-$counter",
             'Value' => $data,
@@ -328,14 +328,14 @@ function common_inputs_for_crud(string $type_form, string $selector, $data = nul
         ]
     );
 
-    if ($selector == 'function_proccess')
+    if ($selector == 'function_process')
     return input('basic', $type_form,
         [
             'size' => 'col-md-12 col-lg-6',
             'label' => 'Função de BACKEND',
             'Placeholder' => 'clean_text()',
-            'name' => "Fields[$counter][function_proccess]",
-            'input_id' => "function_proccess-$counter",
+            'name' => "Fields[$counter][function_process]",
+            'input_id' => "function_process-$counter",
             'Value' => $data,
         ]
     );
@@ -1046,7 +1046,7 @@ function get_crud_piece_to_edit($id = 0)
         ) . input('status_selector', 'update',
             [
                 'size' => 'col-12 col-lg-3',
-                'function_proccess' => 'general_status',
+                'function_process' => 'general_status',
                 'name' => 'status_id',
                 'input_id' => 'status_id',
                 'Value' => $crud['status_id'] ?? 4,
@@ -1552,7 +1552,7 @@ function manage_crud_form(string $type_form = 'insert', int $counter = 1)
             ) . input('status_selector', $type_form,
                 [
                     'size' => 'col-12',
-                    'function_proccess' => 'general_status',
+                    'function_process' => 'general_status',
                     'name' => 'status_id',
                     'input_id' => 'status_id',
                     'Value' => ($type_form=='update') ? $crud['status_id'] : 4,
@@ -1755,6 +1755,8 @@ function manage_crud_fields(array $params, bool $debug = false): array
     $mode       = (string)($params['mode'] ?? '');
     $from       = (string)($params['from'] ?? 'in');
 
+    // print_r($params);
+
     if ($crud_id <= 0) throw new Exception("Missing/invalid crud_id.");
     if (!in_array($mode, ['insert','update'], true)) throw new Exception("Invalid mode.");
     if (!is_array($Fields)) $Fields = [];
@@ -1847,7 +1849,7 @@ function manage_crud_fields(array $params, bool $debug = false): array
             $name     = $field['name'] ?? null;
             $old_name = $field['old_name'] ?? null;
 
-            $idCrud     = get_col("SELECT crud_id FROM tb_cruds WHERE id = {$valid_data['id']}");
+            $idCrud     = get_col("SELECT crud_id FROM tb_cruds WHERE id = {$params['crud_id']}");
             $table_crud = get_col("SELECT table_crud FROM tb_cruds WHERE id = {$idCrud} AND type_crud = 'master'");
 
             $table = !empty($field['table'])
@@ -1914,17 +1916,22 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
 
     $error        = false;
     $valid_data   = $data;
+    $msg_type     = 'toast';
 
     // print_r($valid_data);
     // die;
 
-    $msg_type = 'toast';
+    $permission = load_permission('manage-cruds', 'custom');
+    if (!$permission) {
+      return invalid_permission_response();
+    }
+
 
     /*
-     * Define the verifyer function.
+     * Define the verifier function.
      */
-    if     ($mode == 'insert') $verifyer = 'inserted_id';
-    elseif ($mode == 'update') $verifyer = 'affected_rows';
+    if     ($mode == 'insert') $verifier = 'inserted_id';
+    elseif ($mode == 'update') $verifier = 'affected_rows';
     else                       $error    = true;
 
     $crud_id = '';
@@ -1989,7 +1996,7 @@ function manage_crud_system(array $data, string $mode, bool $debug = false)
         /*
         * Verify if inserted/updated correctaly.
         */
-        if ($verifyer())
+        if ($verifier())
         {
             $crud_id = ($mode == 'insert')
                 ? inserted_id()

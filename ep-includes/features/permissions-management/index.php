@@ -131,7 +131,7 @@ function manage_permissions_form(string $type_form = 'insert', int $counter = 1)
             $type_form,
             [
                 'size' => 'col-md-6 col-lg-4',
-                'function_proccess' => 'general_status',
+                'function_process' => 'general_status',
                 'name' => "status_id",
                 'Value' => ($type_form=='update') ? $role['status_id'] : '',
                 'Required' => true
